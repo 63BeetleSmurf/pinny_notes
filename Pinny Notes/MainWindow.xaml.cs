@@ -112,6 +112,8 @@ namespace Pinny_Notes
                     StartupPositionBottomRightMenuItem.IsChecked = true;
             }
 
+            // Not a setting but will do here for now
+            TitleTextBox.ContextMenu = TitleBarGrid.ContextMenu;
         }
 
         private void SetColour(string? colour = null, string? parentColour = null)
@@ -257,6 +259,7 @@ namespace Pinny_Notes
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Text Documents (*.txt)|*.txt|All Files|*";
+            saveFileDialog.FileName = TitleTextBox.Text;
             if (saveFileDialog.ShowDialog(this) == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, NoteTextBox.Text);
@@ -295,6 +298,25 @@ namespace Pinny_Notes
             else
                 TopButtonImage.Source = (ImageSource)Resources[(object)"Pin45ImageSource"];
         }
+
+        #region Title
+
+        private void TitleTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TitleTextBox.Cursor = Cursors.IBeam;
+            TitleTextBox.Focusable = true;
+            TitleTextBox.Focus();
+            // Should restore original context menu here if possible
+        }
+
+        private void TitleTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TitleTextBox.Cursor = Cursors.Arrow;
+            TitleTextBox.Focusable = false;
+            TitleTextBox.ContextMenu = TitleBarGrid.ContextMenu;
+        }
+
+        #endregion
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
@@ -642,9 +664,9 @@ namespace Pinny_Notes
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                NoteTextBox.Text = File.ReadAllText(
-                    ((string[])e.Data.GetData(DataFormats.FileDrop))[0]
-                );
+                string filePath = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+                NoteTextBox.Text = File.ReadAllText(filePath);
+                TitleTextBox.Text = Path.GetFileNameWithoutExtension(filePath);
             }
             else if (e.Data.GetDataPresent(DataFormats.StringFormat))
             {

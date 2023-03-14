@@ -37,9 +37,10 @@
             <Button Name="NewButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Left" Margin="10,0,0,0" Click="NewButton_Click" ToolTip="New Note" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
                 <Image Source="/Images/plus-solid.png"/>
             </Button>
-            <Button Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Center" Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+            <Button Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Left" Margin="40,0,0,0"  Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
                 <Image Name="TopButtonImage" Source="{StaticResource Pin45ImageSource}" />
             </Button>
+            <TextBox Name="TitleTextBox" Background="Transparent" Margin="70,5,40,5" Focusable="False" BorderBrush="Transparent" Cursor="Arrow" MouseDoubleClick="TitleTextBox_MouseDoubleClick" LostFocus="TitleTextBox_LostFocus" FontSize="16" VerticalContentAlignment="Center" />
             <Button Name="CloseButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click" ToolTip="Close" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
                 <Image Source="/Images/xmark-solid.png"/>
             </Button>
