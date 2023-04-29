@@ -94,6 +94,7 @@
                 Padding="5,5,5,5"
                 PreviewDragOver="NoteTextBox_DragOver"
                 PreviewDrop="NoteTextBox_Drop"
+                MouseDoubleClick="NoteTextBox_MouseDoubleClick"
                 PreviewMouseDown="NoteTextBox_MouseDown"
                 SelectionChanged="NoteTextBox_SelectionChanged"
                 TextChanged="NoteTextBox_TextChanged"

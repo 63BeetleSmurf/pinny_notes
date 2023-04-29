@@ -567,6 +567,14 @@ namespace Pinny_Notes
             }
         }
 
+        private void NoteTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (NoteTextBox.SelectionLength > 0
+                && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            )
+                NoteTextBox_Copy();
+        }
+
         private void NoteTextBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // Triple click to select line, quadruple click to select entire wrapped line
@@ -596,6 +604,8 @@ namespace Pinny_Notes
 
                 textBox.SelectionStart = textBox.GetCharacterIndexFromLineIndex(lineIndex);
                 textBox.SelectionLength = lineLength;
+
+                NoteTextBox_MouseDoubleClick(sender, e);
             }
         }
 
