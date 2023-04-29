@@ -153,5 +153,17 @@ namespace Pinny_Notes.Properties {
                 this["TrimPastedText"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool KeepNewLineAtEndVisible {
+            get {
+                return ((bool)(this["KeepNewLineAtEndVisible"]));
+            }
+            set {
+                this["KeepNewLineAtEndVisible"] = value;
+            }
+        }
     }
 }

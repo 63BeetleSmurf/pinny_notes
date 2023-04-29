@@ -127,7 +127,8 @@ namespace Pinny_Notes
             TrimPastedTextMenuItem.IsChecked = Properties.Settings.Default.TrimPastedText;
             SpellCheckMenuItem.IsChecked = Properties.Settings.Default.SpellCheck;
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
-            NewLineMenuItem.IsChecked = Properties.Settings.Default.NewLine;
+            NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
+            NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
             CheckForUpdatesMenuItem.IsChecked = Properties.Settings.Default.CheckForUpdates;
             ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
             SetColour(parentColour: parentColour);
@@ -489,14 +490,20 @@ namespace Pinny_Notes
             Properties.Settings.Default.Save();
         }
 
-        private void NewLineMenuItem_Click(object sender, RoutedEventArgs e)
+        private void NewLineEnabledMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.NewLine = NewLineMenuItem.IsChecked;
+            Properties.Settings.Default.NewLine = NewLineEnabledMenuItem.IsChecked;
             Properties.Settings.Default.Save();
 
             // Check for new line when this option is activated
             if (Properties.Settings.Default.NewLine)
                 NoteTextBox_TextChanged(sender, e);
+        }
+
+        private void NewLineKeepVisibleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.KeepNewLineAtEndVisible = NewLineKeepVisibleMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
         private void CheckForUpdatesMenuItem_Click(object sender, RoutedEventArgs e)
@@ -519,6 +526,7 @@ namespace Pinny_Notes
             NOTE_SAVED = false;
             if (Properties.Settings.Default.NewLine && NoteTextBox.Text != "" && !NoteTextBox.Text.EndsWith(Environment.NewLine))
             {
+                bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
                 // Preserving selection when adding new line
                 int selectionStart = NoteTextBox.SelectionStart;
                 int selectionLength = NoteTextBox.SelectionLength;
@@ -527,6 +535,9 @@ namespace Pinny_Notes
 
                 NoteTextBox.SelectionStart = selectionStart;
                 NoteTextBox.SelectionLength = selectionLength;
+
+                if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                    NoteTextBox.ScrollToEnd();
             }
         }
 
@@ -621,8 +632,11 @@ namespace Pinny_Notes
                 if (NoteTextBox.SelectionLength == 0)
                 {
                     int caretIndex = NoteTextBox.CaretIndex;
+                    bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
                     NoteTextBox.Text = NoteTextBox.Text.Substring(0, caretIndex) + clipboardString + NoteTextBox.Text.Substring(caretIndex);
                     NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
+                    if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                        NoteTextBox.ScrollToEnd();
                 }
                 else
                 {

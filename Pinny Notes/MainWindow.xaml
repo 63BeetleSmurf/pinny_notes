@@ -73,7 +73,10 @@
                             <MenuItem Name="AutoCopyMenuItem" Header="Auto Copy" IsCheckable="True" Click="AutoCopyMenuItem_Click"/>
                         </MenuItem>
                         <MenuItem Name="SpellCheckMenuItem" Header="Spell Checker" IsCheckable="True" Click="SpellCheckMenuItem_Click"/>
-                        <MenuItem Name="NewLineMenuItem" Header="New Line At End" IsCheckable="True" Click="NewLineMenuItem_Click"/>
+                        <MenuItem Header="New Line At End">
+                            <MenuItem Name="NewLineEnabledMenuItem" Header="Enabled" IsCheckable="True" Click="NewLineEnabledMenuItem_Click"/>
+                            <MenuItem Name="NewLineKeepVisibleMenuItem" Header="Keep Visible" IsCheckable="True" Click="NewLineKeepVisibleMenuItem_Click"/>
+                        </MenuItem>
                         <MenuItem Name="CheckForUpdatesMenuItem" Header="Check For Updates" IsCheckable="True" Click="CheckForUpdatesMenuItem_Click"/>
                     </MenuItem>
                 </ContextMenu>
