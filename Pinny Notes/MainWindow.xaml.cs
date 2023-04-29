@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Net;
 using System.Windows.Documents;
 using System.Globalization;
+using System.Reflection.Emit;
 
 namespace Pinny_Notes
 {
@@ -719,89 +720,303 @@ namespace Pinny_Notes
 
             menu.Items.Add(
                 CreateMenuItem(
-                    header: "Tools",
-                    children: new List<object> {
-                        CreateMenuItem(
-                            header: "Base64",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(Base64EncodeMenuItem_Click)),
-                                CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(Base64DecodeMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Case",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Lower", clickEventHandler: new RoutedEventHandler(CaseLowerMenuItem_Click)),
-                                CreateMenuItem(header: "Upper", clickEventHandler: new RoutedEventHandler(CaseUpperMenuItem_Click)),
-                                CreateMenuItem(header: "Proper", clickEventHandler: new RoutedEventHandler(CaseProperMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Hash",
-                            children: new List<object> {
-                                CreateMenuItem(header: "SHA512", clickEventHandler: new RoutedEventHandler(HashSHA512MenuItem_Click)),
-                                CreateMenuItem(header: "SHA384", clickEventHandler: new RoutedEventHandler(HashSHA384MenuItem_Click)),
-                                CreateMenuItem(header: "SHA256", clickEventHandler: new RoutedEventHandler(HashSHA256MenuItem_Click)),
-                                CreateMenuItem(header: "SHA1", clickEventHandler: new RoutedEventHandler(HashSHA1MenuItem_Click)),
-                                CreateMenuItem(header: "MD5", clickEventHandler: new RoutedEventHandler(HashMD5MenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "HTML Entity",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(HTMLEntityEncodeMenuItem_Click)),
-                                CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(HTMLEntityDecodeMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Indent",
-                            children: new List<object> {
-                                CreateMenuItem(header: "2 Spaces", clickEventHandler: new RoutedEventHandler(Indent2SpacesMenuItem_Click)),
-                                CreateMenuItem(header: "4 Spaces", clickEventHandler: new RoutedEventHandler(Indent4SpacesMenuItem_Click)),
-                                CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(IndentTabMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Join",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(JoinCommaMenuItem_Click)),
-                                CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(JoinSpaceMenuItem_Click)),
-                                CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(JoinTabMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "JSON",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Prettify", clickEventHandler: new RoutedEventHandler(JSONPrettifyMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "List",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Enumerate", clickEventHandler: new RoutedEventHandler(ListEnumerateMenuItem_Click)),
-                                CreateMenuItem(header: "Sort Asc.", clickEventHandler: new RoutedEventHandler(ListSortAscMenuItem_Click)),
-                                CreateMenuItem(header: "Sort Des.", clickEventHandler: new RoutedEventHandler(ListSortDecMenuItem_Click)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Split",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(SplitCommaMenuItem_Click)),
-                                CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(SplitSpaceMenuItem_Click)),
-                                CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(SplitTabMenuItem_Click)),
-                                new Separator(),
-                                CreateMenuItem(header: "Selected", clickEventHandler: new RoutedEventHandler(SplitSelectedMenuItem_Click), enabled: (NoteTextBox.SelectionLength > 0)),
-                            }
-                        ),
-                        CreateMenuItem(
-                            header: "Trim",
-                            children: new List<object> {
-                                CreateMenuItem(header: "Start", clickEventHandler: new RoutedEventHandler(TrimStartMenuItem_Click)),
-                                CreateMenuItem(header: "End", clickEventHandler: new RoutedEventHandler(TrimEndMenuItem_Click)),
-                                CreateMenuItem(header: "Both", clickEventHandler: new RoutedEventHandler(TrimBothMenuItem_Click)),
-                            }
-                        ),
-                    }
+                    header: "▸ Tools",
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Base64",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Encode",
+                    clickEventHandler: new RoutedEventHandler(Base64EncodeMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Decode",
+                    clickEventHandler: new RoutedEventHandler(Base64DecodeMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Case",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Lower",
+                    clickEventHandler: new RoutedEventHandler(CaseLowerMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Upper",
+                    clickEventHandler: new RoutedEventHandler(CaseUpperMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Proper",
+                    clickEventHandler: new RoutedEventHandler(CaseProperMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Hash",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ SHA512",
+                    clickEventHandler: new RoutedEventHandler(HashSHA512MenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ SHA384",
+                    clickEventHandler: new RoutedEventHandler(HashSHA384MenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ SHA256",
+                    clickEventHandler: new RoutedEventHandler(HashSHA256MenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ SHA1",
+                    clickEventHandler: new RoutedEventHandler(HashSHA1MenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ MD5",
+                    clickEventHandler: new RoutedEventHandler(HashMD5MenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ HTML Entity",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Encode",
+                    clickEventHandler: new RoutedEventHandler(HTMLEntityEncodeMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Decode",
+                    clickEventHandler: new RoutedEventHandler(HTMLEntityDecodeMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Indent",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ 2 Spaces",
+                    clickEventHandler: new RoutedEventHandler(Indent2SpacesMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ 4 Spaces",
+                    clickEventHandler: new RoutedEventHandler(Indent4SpacesMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Tab",
+                    clickEventHandler: new RoutedEventHandler(IndentTabMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Join",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Comma",
+                    clickEventHandler: new RoutedEventHandler(JoinCommaMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Space",
+                    clickEventHandler: new RoutedEventHandler(JoinSpaceMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Tab",
+                    clickEventHandler: new RoutedEventHandler(JoinTabMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ JSON",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Prettify",
+                    clickEventHandler: new RoutedEventHandler(JSONPrettifyMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ List",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Enumerate",
+                    clickEventHandler: new RoutedEventHandler(ListEnumerateMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Sort Asc.",
+                    clickEventHandler: new RoutedEventHandler(ListSortAscMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Sort Des.",
+                    clickEventHandler: new RoutedEventHandler(ListSortDecMenuItem_Click),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Split",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Comma",
+                    clickEventHandler: new RoutedEventHandler(SplitCommaMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Space",
+                    clickEventHandler: new RoutedEventHandler(SplitSpaceMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Tab",
+                    clickEventHandler: new RoutedEventHandler(SplitTabMenuItem_Click),
+                    visible: false
+                )
+            );
+            //menu.Items.Add(new Separator());
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Selected",
+                    clickEventHandler: new RoutedEventHandler(SplitSelectedMenuItem_Click),
+                    enabled: (NoteTextBox.SelectionLength > 0),
+                    visible: false
+                )
+            );
+
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "└ ▸ Trim",
+                    visible: false,
+                    staysOpenOnClick: true,
+                    clickEventHandler: new RoutedEventHandler(ParentMenuItem_Click)
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Start",
+                    clickEventHandler: new RoutedEventHandler(TrimStartMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ End",
+                    clickEventHandler: new RoutedEventHandler(TrimEndMenuItem_Click),
+                    visible: false
+                )
+            );
+            menu.Items.Add(
+                CreateMenuItem(
+                    header: "  └ Both",
+                    clickEventHandler: new RoutedEventHandler(TrimBothMenuItem_Click),
+                    visible: false
                 )
             );
 
@@ -811,7 +1026,7 @@ namespace Pinny_Notes
         private MenuItem CreateMenuItem(string header, bool headerBold = false, bool enabled = true,
             RoutedEventHandler? clickEventHandler = null, List<object>? children = null,
             ICommand? command = null, object? commandParameter = null, IInputElement? commandTarget = null,
-            string? inputGestureText = null
+            string? inputGestureText = null, bool staysOpenOnClick = false, bool visible = true
             )
         {
             MenuItem menuItem = new();
@@ -822,7 +1037,7 @@ namespace Pinny_Notes
             
             if (clickEventHandler != null)
                 menuItem.Click += clickEventHandler;
-            
+
             if (children != null)
                 foreach (object child in children)
                     menuItem.Items.Add(child);
@@ -840,12 +1055,63 @@ namespace Pinny_Notes
             if (inputGestureText != null)
                 menuItem.InputGestureText = inputGestureText;
 
+            menuItem.StaysOpenOnClick = staysOpenOnClick;
+
+            if (!visible)
+                menuItem.Visibility = Visibility.Collapsed;
+
             return menuItem;
         }
 
         private void NoteTextBox_ContextMenuOpening(object sender, RoutedEventArgs e)
         {
             NoteTextBox.ContextMenu = GetNoteTextBoxContextMenu();
+        }
+
+        private void ParentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ItemCollection contextMenuItems = NoteTextBox.ContextMenu.Items;
+            int index = contextMenuItems.IndexOf(sender);
+
+            MenuItem senderMenuItem = (MenuItem)sender;
+            string header = senderMenuItem.Header.ToString();
+
+            if (header.Contains("▸"))
+            {
+                int level = header.IndexOf("▸");
+
+                senderMenuItem.Header = header.Replace("▸", "▾");
+                index++;
+                while (index < contextMenuItems.Count
+                    && ((MenuItem)contextMenuItems[index]).Visibility == Visibility.Collapsed
+                    && (
+                        ((MenuItem)contextMenuItems[index]).Header.ToString()[level].ToString() == "└"
+                        || ((MenuItem)contextMenuItems[index]).Header.ToString()[level].ToString() == " ")
+                    )
+                {
+                    if (((MenuItem)contextMenuItems[index]).Header.ToString()[level].ToString() != " ")
+                        ((MenuItem)contextMenuItems[index]).Visibility = Visibility.Visible;
+                    index++;
+                }
+            }
+            else if (header.Contains("▾"))
+            {
+                int level = header.IndexOf("▾");
+
+                senderMenuItem.Header = header.Replace("▾", "▸");
+                index++;
+                while (
+                    index < contextMenuItems.Count
+                    && (
+                        ((MenuItem)contextMenuItems[index]).Header.ToString()[level].ToString() == "└"
+                        || ((MenuItem)contextMenuItems[index]).Header.ToString()[level].ToString() == " ")
+                    )
+                {
+                    ((MenuItem)contextMenuItems[index]).Visibility = Visibility.Collapsed;
+                    ((MenuItem)contextMenuItems[index]).Header = ((MenuItem)contextMenuItems[index]).Header.ToString().Replace("▾", "▸");
+                    index++;
+                }
+            }
         }
 
         #region SelectAll Clear Save
