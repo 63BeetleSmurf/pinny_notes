@@ -77,6 +77,7 @@
                             <MenuItem Name="NewLineEnabledMenuItem" Header="Enabled" IsCheckable="True" Click="NewLineEnabledMenuItem_Click"/>
                             <MenuItem Name="NewLineKeepVisibleMenuItem" Header="Keep Visible" IsCheckable="True" Click="NewLineKeepVisibleMenuItem_Click"/>
                         </MenuItem>
+                        <MenuItem Name="AutoIndentMenuItem" Header="Auto Indent" IsCheckable="True" Click="AutoIndentMenuItem_Click"/>
                         <MenuItem Name="CheckForUpdatesMenuItem" Header="Check For Updates" IsCheckable="True" Click="CheckForUpdatesMenuItem_Click"/>
                     </MenuItem>
                 </ContextMenu>
@@ -94,6 +95,7 @@
                 Padding="5,5,5,5"
                 PreviewDragOver="NoteTextBox_DragOver"
                 PreviewDrop="NoteTextBox_Drop"
+                PreviewKeyDown="NoteTextBox_PreviewKeyDown"
                 MouseDoubleClick="NoteTextBox_MouseDoubleClick"
                 PreviewMouseDown="NoteTextBox_MouseDown"
                 SelectionChanged="NoteTextBox_SelectionChanged"

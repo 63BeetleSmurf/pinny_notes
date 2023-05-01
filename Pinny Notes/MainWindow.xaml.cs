@@ -129,6 +129,7 @@ namespace Pinny_Notes
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
             NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
             NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
+            AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
             CheckForUpdatesMenuItem.IsChecked = Properties.Settings.Default.CheckForUpdates;
             ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
             SetColour(parentColour: parentColour);
@@ -506,6 +507,12 @@ namespace Pinny_Notes
             Properties.Settings.Default.Save();
         }
 
+        private void AutoIndentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.AutoIndent = AutoIndentMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
         private void CheckForUpdatesMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.CheckForUpdates = CheckForUpdatesMenuItem.IsChecked;
@@ -606,6 +613,29 @@ namespace Pinny_Notes
                 textBox.SelectionLength = lineLength;
 
                 NoteTextBox_MouseDoubleClick(sender, e);
+            }
+        }
+
+        private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return && Properties.Settings.Default.AutoIndent)
+            {
+                e.Handled = true;
+
+                TextBox textBox = (TextBox)sender;
+                int caretIndex = textBox.CaretIndex;
+                string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
+
+                int i = 0;
+                string indent = Environment.NewLine;
+                while (i < line.Length && (line[i] == ' ' || line[i] == '\t'))
+                {
+                    indent += line[i];
+                    i++;
+                }
+
+                textBox.Text = textBox.Text.Insert(caretIndex, indent);
+                textBox.CaretIndex = caretIndex + indent.Length;
             }
         }
 
