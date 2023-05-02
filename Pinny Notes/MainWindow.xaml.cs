@@ -125,6 +125,7 @@ namespace Pinny_Notes
             AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
             TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
             TrimPastedTextMenuItem.IsChecked = Properties.Settings.Default.TrimPastedText;
+            MiddleClickPasteMenuItem.IsChecked = Properties.Settings.Default.MiddleClickPaste;
             SpellCheckMenuItem.IsChecked = Properties.Settings.Default.SpellCheck;
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
             NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
@@ -484,6 +485,12 @@ namespace Pinny_Notes
             Properties.Settings.Default.Save();
         }
 
+        private void MiddleClickPasteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.MiddleClickPaste = MiddleClickPasteMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
         private void SpellCheckMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
@@ -614,6 +621,12 @@ namespace Pinny_Notes
 
                 NoteTextBox_MouseDoubleClick(sender, e);
             }
+        }
+
+        private void NoteTextBox_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Properties.Settings.Default.MiddleClickPaste && e.ChangedButton == MouseButton.Middle)
+                NoteTextBox_Paste();
         }
 
         private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)

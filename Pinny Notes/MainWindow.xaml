@@ -70,6 +70,7 @@
                         <MenuItem Header="Copy &amp; Paste">
                             <MenuItem Name="TrimCopiedTextMenuItem" Header="Trim Copied Text" IsCheckable="True" Click="TrimCopiedTextMenuItem_Click"/>
                             <MenuItem Name="TrimPastedTextMenuItem" Header="Trim Pasted Text" IsCheckable="True" Click="TrimPastedTextMenuItem_Click"/>
+                            <MenuItem Name="MiddleClickPasteMenuItem" Header="Middle Click Paste" IsCheckable="True" Click="MiddleClickPasteMenuItem_Click"/>
                             <MenuItem Name="AutoCopyMenuItem" Header="Auto Copy" IsCheckable="True" Click="AutoCopyMenuItem_Click"/>
                         </MenuItem>
                         <MenuItem Name="SpellCheckMenuItem" Header="Spell Checker" IsCheckable="True" Click="SpellCheckMenuItem_Click"/>
@@ -91,13 +92,14 @@
                 Background="Transparent"
                 ContextMenuOpening="NoteTextBox_ContextMenuOpening"
                 FontSize="16"
+                MouseDoubleClick="NoteTextBox_MouseDoubleClick"
                 Name="NoteTextBox"
                 Padding="5,5,5,5"
                 PreviewDragOver="NoteTextBox_DragOver"
                 PreviewDrop="NoteTextBox_Drop"
                 PreviewKeyDown="NoteTextBox_PreviewKeyDown"
-                MouseDoubleClick="NoteTextBox_MouseDoubleClick"
                 PreviewMouseDown="NoteTextBox_MouseDown"
+                PreviewMouseUp="NoteTextBox_MouseUp"
                 SelectionChanged="NoteTextBox_SelectionChanged"
                 TextChanged="NoteTextBox_TextChanged"
                 TextWrapping="Wrap"
