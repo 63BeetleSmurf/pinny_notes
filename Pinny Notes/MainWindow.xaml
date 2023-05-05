@@ -33,7 +33,7 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Name="TitleBarGrid" Grid.Column="0" Grid.Row="0">
+        <Grid Name="TitleBarGrid" Grid.Column="0" Grid.Row="0" MouseDown="TitleBar_MouseDown">
             <Button Name="NewButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Left" Margin="10,0,0,0" Click="NewButton_Click" ToolTip="New Note" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
                 <Image Source="/Images/plus-solid.png"/>
             </Button>
@@ -70,10 +70,15 @@
                         <MenuItem Header="Copy &amp; Paste">
                             <MenuItem Name="TrimCopiedTextMenuItem" Header="Trim Copied Text" IsCheckable="True" Click="TrimCopiedTextMenuItem_Click"/>
                             <MenuItem Name="TrimPastedTextMenuItem" Header="Trim Pasted Text" IsCheckable="True" Click="TrimPastedTextMenuItem_Click"/>
+                            <MenuItem Name="MiddleClickPasteMenuItem" Header="Middle Click Paste" IsCheckable="True" Click="MiddleClickPasteMenuItem_Click"/>
                             <MenuItem Name="AutoCopyMenuItem" Header="Auto Copy" IsCheckable="True" Click="AutoCopyMenuItem_Click"/>
                         </MenuItem>
                         <MenuItem Name="SpellCheckMenuItem" Header="Spell Checker" IsCheckable="True" Click="SpellCheckMenuItem_Click"/>
-                        <MenuItem Name="NewLineMenuItem" Header="New Line At End" IsCheckable="True" Click="NewLineMenuItem_Click"/>
+                        <MenuItem Header="New Line At End">
+                            <MenuItem Name="NewLineEnabledMenuItem" Header="Enabled" IsCheckable="True" Click="NewLineEnabledMenuItem_Click"/>
+                            <MenuItem Name="NewLineKeepVisibleMenuItem" Header="Keep Visible" IsCheckable="True" Click="NewLineKeepVisibleMenuItem_Click"/>
+                        </MenuItem>
+                        <MenuItem Name="AutoIndentMenuItem" Header="Auto Indent" IsCheckable="True" Click="AutoIndentMenuItem_Click"/>
                         <MenuItem Name="CheckForUpdatesMenuItem" Header="Check For Updates" IsCheckable="True" Click="CheckForUpdatesMenuItem_Click"/>
                     </MenuItem>
                 </ContextMenu>
@@ -87,11 +92,14 @@
                 Background="Transparent"
                 ContextMenuOpening="NoteTextBox_ContextMenuOpening"
                 FontSize="16"
+                MouseDoubleClick="NoteTextBox_MouseDoubleClick"
                 Name="NoteTextBox"
                 Padding="5,5,5,5"
                 PreviewDragOver="NoteTextBox_DragOver"
                 PreviewDrop="NoteTextBox_Drop"
+                PreviewKeyDown="NoteTextBox_PreviewKeyDown"
                 PreviewMouseDown="NoteTextBox_MouseDown"
+                PreviewMouseUp="NoteTextBox_MouseUp"
                 SelectionChanged="NoteTextBox_SelectionChanged"
                 TextChanged="NoteTextBox_TextChanged"
                 TextWrapping="Wrap"

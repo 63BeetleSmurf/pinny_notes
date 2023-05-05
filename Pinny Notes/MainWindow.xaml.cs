@@ -124,9 +124,12 @@ namespace Pinny_Notes
             AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
             TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
             TrimPastedTextMenuItem.IsChecked = Properties.Settings.Default.TrimPastedText;
+            MiddleClickPasteMenuItem.IsChecked = Properties.Settings.Default.MiddleClickPaste;
             SpellCheckMenuItem.IsChecked = Properties.Settings.Default.SpellCheck;
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
-            NewLineMenuItem.IsChecked = Properties.Settings.Default.NewLine;
+            NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
+            NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
+            AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
             CheckForUpdatesMenuItem.IsChecked = Properties.Settings.Default.CheckForUpdates;
             ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
             SetColour(parentColour: parentColour);
@@ -323,9 +326,10 @@ namespace Pinny_Notes
             }
         }
 
-        private void ApplyFunctionToEachLine(Func<string, int, string?, string> function, string? additional = null)
+        private void ApplyFunctionToEachLine(Func<string, int, string?, string?> function, string? additional = null)
         {
             string[] lines;
+            List<string> newLines = new();
 
             if (NoteTextBox.SelectionLength > 0)
                 lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
@@ -337,13 +341,17 @@ namespace Pinny_Notes
             if (Properties.Settings.Default.NewLine && lines[lineCount - 1] == "")
                 lineCount--;
             for (int i = 0; i < lineCount; i++)
-                lines[i] = function(lines[i], i, additional);
+            {
+                string? line = function(lines[i], i, additional);
+                if (line != null)
+                    newLines.Add(line);
+            }
 
             if (NoteTextBox.SelectionLength > 0)
-                NoteTextBox.SelectedText = string.Join(Environment.NewLine, lines);
+                NoteTextBox.SelectedText = string.Join(Environment.NewLine, newLines);
             else
             {
-                NoteTextBox.Text = string.Join(Environment.NewLine, lines);
+                NoteTextBox.Text = string.Join(Environment.NewLine, newLines);
                 if (NoteTextBox.Text.Length > 0)
                     NoteTextBox.CaretIndex = NoteTextBox.Text.Length - 1;
             }
@@ -352,6 +360,17 @@ namespace Pinny_Notes
         #endregion
 
         #region TitleBar
+
+        private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount >= 2)
+            {
+                if (WindowState == WindowState.Normal)
+                    WindowState = WindowState.Maximized;
+                else
+                    WindowState = WindowState.Normal;
+            }
+        }
 
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
@@ -481,6 +500,12 @@ namespace Pinny_Notes
             Properties.Settings.Default.Save();
         }
 
+        private void MiddleClickPasteMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.MiddleClickPaste = MiddleClickPasteMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
         private void SpellCheckMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
@@ -488,14 +513,26 @@ namespace Pinny_Notes
             Properties.Settings.Default.Save();
         }
 
-        private void NewLineMenuItem_Click(object sender, RoutedEventArgs e)
+        private void NewLineEnabledMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.NewLine = NewLineMenuItem.IsChecked;
+            Properties.Settings.Default.NewLine = NewLineEnabledMenuItem.IsChecked;
             Properties.Settings.Default.Save();
 
             // Check for new line when this option is activated
             if (Properties.Settings.Default.NewLine)
                 NoteTextBox_TextChanged(sender, e);
+        }
+
+        private void NewLineKeepVisibleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.KeepNewLineAtEndVisible = NewLineKeepVisibleMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void AutoIndentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.AutoIndent = AutoIndentMenuItem.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
         private void CheckForUpdatesMenuItem_Click(object sender, RoutedEventArgs e)
@@ -518,6 +555,7 @@ namespace Pinny_Notes
             NOTE_SAVED = false;
             if (Properties.Settings.Default.NewLine && NoteTextBox.Text != "" && !NoteTextBox.Text.EndsWith(Environment.NewLine))
             {
+                bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
                 // Preserving selection when adding new line
                 int selectionStart = NoteTextBox.SelectionStart;
                 int selectionLength = NoteTextBox.SelectionLength;
@@ -526,6 +564,9 @@ namespace Pinny_Notes
 
                 NoteTextBox.SelectionStart = selectionStart;
                 NoteTextBox.SelectionLength = selectionLength;
+
+                if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                    NoteTextBox.ScrollToEnd();
             }
         }
 
@@ -553,6 +594,14 @@ namespace Pinny_Notes
             {
                 NoteTextBox.Text = (string)e.Data.GetData(DataFormats.StringFormat);
             }
+        }
+
+        private void NoteTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (NoteTextBox.SelectionLength > 0
+                && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            )
+                NoteTextBox_Copy();
         }
 
         private void NoteTextBox_MouseDown(object sender, MouseButtonEventArgs e)
@@ -584,6 +633,37 @@ namespace Pinny_Notes
 
                 textBox.SelectionStart = textBox.GetCharacterIndexFromLineIndex(lineIndex);
                 textBox.SelectionLength = lineLength;
+
+                NoteTextBox_MouseDoubleClick(sender, e);
+            }
+        }
+
+        private void NoteTextBox_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Properties.Settings.Default.MiddleClickPaste && e.ChangedButton == MouseButton.Middle)
+                NoteTextBox_Paste();
+        }
+
+        private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return && Properties.Settings.Default.AutoIndent)
+            {
+                e.Handled = true;
+
+                TextBox textBox = (TextBox)sender;
+                int caretIndex = textBox.CaretIndex;
+                string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
+
+                int i = 0;
+                string indent = Environment.NewLine;
+                while (i < line.Length && (line[i] == ' ' || line[i] == '\t'))
+                {
+                    indent += line[i];
+                    i++;
+                }
+
+                textBox.Text = textBox.Text.Insert(caretIndex, indent);
+                textBox.CaretIndex = caretIndex + indent.Length;
             }
         }
 
@@ -620,8 +700,11 @@ namespace Pinny_Notes
                 if (NoteTextBox.SelectionLength == 0)
                 {
                     int caretIndex = NoteTextBox.CaretIndex;
+                    bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
                     NoteTextBox.Text = NoteTextBox.Text.Substring(0, caretIndex) + clipboardString + NoteTextBox.Text.Substring(caretIndex);
                     NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
+                    if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                        NoteTextBox.ScrollToEnd();
                 }
                 else
                 {
@@ -719,6 +802,28 @@ namespace Pinny_Notes
 
             menu.Items.Add(
                 CreateMenuItem(
+                    header: "Counts",
+                    children: new List<object> {
+                        CreateMenuItem(
+                            header: "Lines: " + GetLineCount().ToString(),
+                            enabled: false
+                        ),
+                        CreateMenuItem(
+                            header: "Words: " + GetWordCount().ToString(),
+                            enabled: false
+                        ),
+                        CreateMenuItem(
+                            header: "Chars: " + GetCharCount().ToString(),
+                            enabled: false
+                        )
+                    }
+                )
+            );
+
+            menu.Items.Add(new Separator());
+
+            menu.Items.Add(
+                CreateMenuItem(
                     header: "Tools",
                     children: new List<object> {
                         CreateMenuItem(
@@ -779,8 +884,18 @@ namespace Pinny_Notes
                             header: "List",
                             children: new List<object> {
                                 CreateMenuItem(header: "Enumerate", clickEventHandler: new RoutedEventHandler(ListEnumerateMenuItem_Click)),
+                                CreateMenuItem(header: "Dash", clickEventHandler: new RoutedEventHandler(ListDashMenuItem_Click)),
+                                CreateMenuItem(header: "Remove", clickEventHandler: new RoutedEventHandler(ListRemoveMenuItem_Click)),
+                                new Separator(),
                                 CreateMenuItem(header: "Sort Asc.", clickEventHandler: new RoutedEventHandler(ListSortAscMenuItem_Click)),
                                 CreateMenuItem(header: "Sort Des.", clickEventHandler: new RoutedEventHandler(ListSortDecMenuItem_Click)),
+                            }
+                        ),
+                        CreateMenuItem(
+                            header: "Quote",
+                            children: new List<object> {
+                                CreateMenuItem(header: "Double", clickEventHandler: new RoutedEventHandler(QuoteDoubleMenuItem_Click)),
+                                CreateMenuItem(header: "Single", clickEventHandler: new RoutedEventHandler(QuoteSingleMenuItem_Click)),
                             }
                         ),
                         CreateMenuItem(
@@ -799,6 +914,7 @@ namespace Pinny_Notes
                                 CreateMenuItem(header: "Start", clickEventHandler: new RoutedEventHandler(TrimStartMenuItem_Click)),
                                 CreateMenuItem(header: "End", clickEventHandler: new RoutedEventHandler(TrimEndMenuItem_Click)),
                                 CreateMenuItem(header: "Both", clickEventHandler: new RoutedEventHandler(TrimBothMenuItem_Click)),
+                                CreateMenuItem(header: "Empty Lines", clickEventHandler: new RoutedEventHandler(TrimEmptyLinesMenuItem_Click)),
                             }
                         ),
                     }
@@ -841,6 +957,50 @@ namespace Pinny_Notes
                 menuItem.InputGestureText = inputGestureText;
 
             return menuItem;
+        }
+
+        private int GetLineCount()
+        {
+            int count = 0;
+            if (NoteTextBox.SelectionLength > 0)
+                count = NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.SelectionStart + NoteTextBox.SelectionLength)
+                    -  NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.SelectionStart)
+                    + 1;
+            else
+                count = NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.Text.Length);
+            return count;
+        }
+
+        private int GetWordCount()
+        {
+            int count = 0;
+            string text = string.Empty;
+            if (NoteTextBox.SelectionLength > 0)
+                text = NoteTextBox.SelectedText;
+            else
+                text = NoteTextBox.Text;
+            if (!string.IsNullOrEmpty(text.Trim()))
+            {
+                string[] words = text.Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                count = words.Length;
+            }
+            return count;
+        }
+
+        private int GetCharCount()
+        {
+            int count = 0;
+            string text = string.Empty;
+            if (NoteTextBox.SelectionLength > 0)
+                text = NoteTextBox.SelectedText;
+            else
+                text = NoteTextBox.Text;
+            if (!string.IsNullOrEmpty(text))
+            {
+                text = text.Replace(Environment.NewLine, string.Empty);
+                count = text.Length;
+            }
+            return count;
         }
 
         private void NoteTextBox_ContextMenuOpening(object sender, RoutedEventArgs e)
@@ -1103,6 +1263,23 @@ namespace Pinny_Notes
             return (index + 1).ToString() + ". " + line;
         }
 
+#pragma warning disable CS8622
+        private void ListDashMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFunctionToEachLine(IndentText, "- ");
+        }
+#pragma warning restore CS8622
+
+        private void ListRemoveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFunctionToEachLine(RemoveFirstWordInLine);
+        }
+
+        private string RemoveFirstWordInLine(string line, int index, string? additional)
+        {
+            return line.Substring(line.IndexOf(" ") + 1);
+        }
+
         private void ListSortAscMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToNoteText(SortNoteText);
@@ -1120,6 +1297,29 @@ namespace Pinny_Notes
             if (reverse == "rev")
                 Array.Reverse(lines);
             return string.Join(Environment.NewLine, lines);
+        }
+
+        #endregion
+
+        #region Quote
+
+#pragma warning disable CS8622
+
+        private void QuoteDoubleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFunctionToEachLine(QuoteText, "\"");
+        }
+
+        private void QuoteSingleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFunctionToEachLine(QuoteText, "'");
+        }
+
+#pragma warning restore CS8622
+
+        private string QuoteText(string line, int index, string additional)
+        {
+            return additional + line + additional;
         }
 
         #endregion
@@ -1178,9 +1378,14 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(TrimText, "Both");
         }
 
+        private void TrimEmptyLinesMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyFunctionToEachLine(TrimText, "Lines");
+        }
+
 #pragma warning restore CS8622
 
-        private string TrimText(string line, int index, string trimType)
+        private string? TrimText(string line, int index, string trimType)
         {
             switch (trimType)
             {
@@ -1190,6 +1395,11 @@ namespace Pinny_Notes
                     return line.TrimEnd();
                 case "Both":
                     return line.Trim();
+                case "Lines":
+                    if (string.IsNullOrEmpty(line))
+                        return null;
+                    else
+                        return line;
                 default:
                     return line;
 

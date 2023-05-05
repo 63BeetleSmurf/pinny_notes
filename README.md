@@ -9,6 +9,11 @@
 - Auto Copy: Option to automatically copy text when highlighted.
 - Ends with new line: Option to ensure text always ends with a new line.
 - Full line select: Triple click to select a line, quadruple click to select full line ignoring wrapping.
+- Counts menu: View line, word and char counts of all or selected text.
+- Middle Click Paste: Quickly paste text from the clipboard using the middle click.
+- Auto Indent: Indent new lines to match previous.
+- Copy on Click: Hold Ctrl to copy text when highlighted by the mouse clicking.
+- Auto Scroll: When pasting text automatically scroll to keep last line visible.
 - Spell checking.
 - Tools;
   - Base64: Encode and decode to and from Base64.
@@ -18,9 +23,10 @@
   - Indent: Indent all lines by 2 or 4 spaces, or a tab.
   - Join: Join multiple lines into one separated by a comma, space or tab.
   - JSON: Prettify JSON.
-  - List: Enumerate and sort ascending or descending.
+  - List: Enumerate, Dash (markdown), sort ascending or descending or remove list markers.
+  - Quote: Wrap text with double or single quotes.
   - Split: Split a lines into multiple line by a comma, space, tab or highlighted text.
-  - Trim: Trim whitespace from start or/and end of each line.
+  - Trim: Trim whitespace from start or/and end of each line or remove all blank lines.
 
 ## Installation
 
