@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using Newtonsoft.Json;
 using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
@@ -15,6 +14,7 @@ using System.Windows.Controls;
 using System.Net;
 using System.Windows.Documents;
 using System.Globalization;
+using System.Text.Json;
 
 namespace Pinny_Notes
 {
@@ -1198,9 +1198,12 @@ namespace Pinny_Notes
         {
             try
             {
-                return JsonConvert.SerializeObject(
-                    JsonConvert.DeserializeObject(text),
-                    Formatting.Indented
+                return JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<object>(text),
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    }
                 );
             }
             catch
