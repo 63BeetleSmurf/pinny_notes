@@ -188,11 +188,9 @@ namespace Pinny_Notes
             object? bodyBrush = brushConverter.ConvertFromString(NOTE_COLOURS[colour].Item2);
             object? borderBrush = brushConverter.ConvertFromString(NOTE_COLOURS[colour].Item3);
 
-#pragma warning disable CS8600
             TitleBarGrid.Background = (Brush)titleBrush;
             Background = (Brush)bodyBrush;
             BorderBrush = (Brush)borderBrush;
-#pragma warning restore CS8600
 
             NOTE_COLOUR = colour;
             Properties.Settings.Default.Colour = colour;
@@ -216,7 +214,7 @@ namespace Pinny_Notes
         {
             double positionTop = 0;
             double positionLeft = 0;
-#pragma warning disable CS8602
+
             // If there is no parent, position relative to screen
             if (parentLeft == null || parentTop == null)
             {
@@ -244,7 +242,6 @@ namespace Pinny_Notes
                 else
                     positionTop = (double)parentTop - 45;
             }
-#pragma warning restore CS8602
 
             // Don't allow note to open off screen. Will eventually end up stuck
             // in a corner, but that's only after opening a silly number of notes.
@@ -434,9 +431,7 @@ namespace Pinny_Notes
                     childMenuItem.IsChecked = false;
             }
 
-#pragma warning disable CS8602
             string[] position = menuItem.Header.ToString().Split(" ");
-#pragma warning restore CS8602
             if (position[0] == "Top")
                 Properties.Settings.Default.StartupPositionTop = true;
             else
@@ -980,8 +975,6 @@ namespace Pinny_Notes
 
         #region Base64
 
-#pragma warning disable CS8622
-
         private void Base64EncodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToNoteText(Base64EncodeText);
@@ -991,8 +984,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToNoteText(Base64DecodeText);
         }
-
-#pragma warning restore CS8622
 
         private string Base64EncodeText(string text, string? additional = null)
         {
@@ -1010,7 +1001,6 @@ namespace Pinny_Notes
 
         #region Case
 
-#pragma warning disable CS8622
         private void CaseLowerMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToEachLine(SetTextCase, "l");
@@ -1025,7 +1015,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToEachLine(SetTextCase, "p");
         }
-#pragma warning restore CS8622
 
         private string SetTextCase(string line, int index, string textCase)
         {
@@ -1046,8 +1035,6 @@ namespace Pinny_Notes
         #endregion
 
         #region Hash
-
-#pragma warning disable CS8622
 
         private void HashSHA512MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1073,8 +1060,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToNoteText(HashText, "md5");
         }
-
-#pragma warning restore CS8622
 
         private string HashText(string text, string algorithm)
         {
@@ -1108,8 +1093,6 @@ namespace Pinny_Notes
 
         #region HTML Entity
 
-#pragma warning disable CS8622
-
         private void HTMLEntityEncodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToNoteText(HTMLEntityEncodeText);
@@ -1119,8 +1102,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToNoteText(HTMLEntityDecodeText);
         }
-
-#pragma warning restore CS8622
 
         private string HTMLEntityEncodeText(string text, string? additional = null)
         {
@@ -1135,7 +1116,6 @@ namespace Pinny_Notes
 
         #region Indent
 
-#pragma warning disable CS8622
         private void Indent2SpacesMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToEachLine(IndentText, "  ");
@@ -1150,7 +1130,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToEachLine(IndentText, "\t");
         }
-#pragma warning restore CS8622
 
         private string IndentText(string line, int index, string indentString)
         {
@@ -1160,8 +1139,6 @@ namespace Pinny_Notes
         #endregion
 
         #region Join
-
-#pragma warning disable CS8622
 
         private void JoinCommaMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1177,8 +1154,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToNoteText(JoinText, "\t");
         }
-
-#pragma warning restore CS8622
 
         private string JoinText(string text, string joinString)
         {
@@ -1226,12 +1201,10 @@ namespace Pinny_Notes
             return (index + 1).ToString() + ". " + line;
         }
 
-#pragma warning disable CS8622
         private void ListDashMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToEachLine(IndentText, "- ");
         }
-#pragma warning restore CS8622
 
         private void ListRemoveMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1266,8 +1239,6 @@ namespace Pinny_Notes
 
         #region Quote
 
-#pragma warning disable CS8622
-
         private void QuoteDoubleMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ApplyFunctionToEachLine(QuoteText, "\"");
@@ -1278,8 +1249,6 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(QuoteText, "'");
         }
 
-#pragma warning restore CS8622
-
         private string QuoteText(string line, int index, string additional)
         {
             return additional + line + additional;
@@ -1288,8 +1257,6 @@ namespace Pinny_Notes
         #endregion
 
         #region Split
-
-#pragma warning disable CS8622
 
         private void SplitCommaMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1313,8 +1280,6 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(SplitText, splitString);
         }
 
-#pragma warning restore CS8622
-
         private string SplitText(string line, int index, string splitString)
         {
             return line.Replace(splitString, Environment.NewLine);
@@ -1323,8 +1288,6 @@ namespace Pinny_Notes
         #endregion
 
         #region Trim
-
-#pragma warning disable CS8622
 
         private void TrimStartMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1345,8 +1308,6 @@ namespace Pinny_Notes
         {
             ApplyFunctionToEachLine(TrimText, "Lines");
         }
-
-#pragma warning restore CS8622
 
         private string? TrimText(string line, int index, string trimType)
         {
