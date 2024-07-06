@@ -8,7 +8,6 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Octokit;
 using System.Reflection;
 using System.Windows.Media;
 using System.Linq;
@@ -66,9 +65,6 @@ namespace Pinny_Notes
             MainWindowInitialize();
             LoadSettings();
             PositionNote();
-#pragma warning disable CS4014
-            CheckForNewVersion();
-#pragma warning restore CS4014
         }
 
         public MainWindow(double parentLeft, double parentTop, string? parentColour, Tuple<bool, bool>? parentGravity)
@@ -130,7 +126,6 @@ namespace Pinny_Notes
             NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
             NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
             AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
-            CheckForUpdatesMenuItem.IsChecked = Properties.Settings.Default.CheckForUpdates;
             ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
             SetColour(parentColour: parentColour);
             if (parentGravity == null)
@@ -266,35 +261,6 @@ namespace Pinny_Notes
                 Top = SystemParameters.PrimaryScreenHeight - Height;
             else
                 Top = positionTop;
-        }
-
-        private async Task CheckForNewVersion()
-        {
-            DateTime lastUpdateCheck = Properties.Settings.Default.LastUpdateCheck;
-            if (
-                Properties.Settings.Default.CheckForUpdates
-                || DateTime.Now.Subtract(lastUpdateCheck).Days < 7
-            )
-                return;
-
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("pinny_notes"));
-            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll("63BeetleSmurf", "pinny_notes");
-
-            Version latestVersion = new Version(releases[0].TagName.Replace("v", "") + ".0");
-            Version? localVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            if (localVersion is null)
-                return;
-
-            if (localVersion.CompareTo(latestVersion) < 0)
-                MessageBox.Show(
-                    "A new version of Pinny Notes is available.\n\nGet the latest release from;\nhttps://github.com/63BeetleSmurf/pinny_notes/releases",
-                    "Update Available",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information
-                );
-
-            Properties.Settings.Default.LastUpdateCheck = DateTime.Now;
-            Properties.Settings.Default.Save();
         }
 
         private MessageBoxResult SaveNote()
@@ -532,12 +498,6 @@ namespace Pinny_Notes
         private void AutoIndentMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.AutoIndent = AutoIndentMenuItem.IsChecked;
-            Properties.Settings.Default.Save();
-        }
-
-        private void CheckForUpdatesMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.CheckForUpdates = CheckForUpdatesMenuItem.IsChecked;
             Properties.Settings.Default.Save();
         }
 

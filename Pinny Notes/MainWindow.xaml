@@ -79,7 +79,6 @@
                             <MenuItem Name="NewLineKeepVisibleMenuItem" Header="Keep Visible" IsCheckable="True" Click="NewLineKeepVisibleMenuItem_Click"/>
                         </MenuItem>
                         <MenuItem Name="AutoIndentMenuItem" Header="Auto Indent" IsCheckable="True" Click="AutoIndentMenuItem_Click"/>
-                        <MenuItem Name="CheckForUpdatesMenuItem" Header="Check For Updates" IsCheckable="True" Click="CheckForUpdatesMenuItem_Click"/>
                     </MenuItem>
                 </ContextMenu>
             </Grid.ContextMenu>
