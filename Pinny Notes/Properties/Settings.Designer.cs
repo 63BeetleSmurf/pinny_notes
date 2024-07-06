@@ -49,10 +49,10 @@ namespace Pinny_Notes.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Green")]
-        public string Colour {
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Colour {
             get {
-                return ((string)(this["Colour"]));
+                return ((int)(this["Colour"]));
             }
             set {
                 this["Colour"] = value;

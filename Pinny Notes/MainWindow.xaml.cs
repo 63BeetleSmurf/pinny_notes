@@ -36,21 +36,42 @@ namespace Pinny_Notes
         public event EventHandler? CanExecuteChanged;
     }
 
+    public class Theme(string name, Color titleBarColor, Color backgroundColor, Color borderColor)
+    {
+        public string Name { get; set; } = name;
+        public Color TitleBarColor { get; set; } = titleBarColor;
+        public Color BackgroundColor { get; set; } = backgroundColor;
+        public Color BorderColor { get; set; } = borderColor;
+    }
+
+    public enum ThemeColors
+    {
+        Yellow = 0,
+        Orange = 1,
+        Red = 2,
+        Pink = 3,
+        Purple = 4,
+        Blue = 5,
+        Aqua = 6,
+        Green = 7
+    }
+
     public partial class MainWindow : Window
     {
-        // Colour tuple = (Title Bar, Background, Border)
-        Dictionary<string, (string, string, string)> NOTE_COLOURS = new Dictionary<string, (string, string, string)>{
-            {"Yellow", ("#fef7b1", "#fffcdd", "#feea00")},
-            {"Orange", ("#ffd179", "#fee8b9", "#ffab00")},
-            {"Red",    ("#ff7c81", "#ffc4c6", "#e33036")},
-            {"Pink",   ("#d986cc", "#ebbfe3", "#a72995")},
-            {"Purple", ("#9d9add", "#d0cef3", "#625bb8")},
-            {"Blue",   ("#7ac3e6", "#b3d9ec", "#1195dd")},
-            {"Aqua",   ("#97cfc6", "#c0e2e1", "#16b098")},
-            {"Green",  ("#c6d67d", "#e3ebc6", "#aacc04")}
+        // Title Bar, Background, Border
+        Dictionary<ThemeColors, Theme> _noteThemes = new()
+        {
+            {ThemeColors.Yellow, new Theme("Yellow", Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},  // #fef7b1 #fffcdd #feea00
+            {ThemeColors.Orange, new Theme("Orange", Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},  // #ffd179 #fee8b9 #ffab00
+            {ThemeColors.Red, new Theme("Red", Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},        // #ff7c81 #ffc4c6 #e33036
+            {ThemeColors.Pink, new Theme("Pink", Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
+            {ThemeColors.Purple, new Theme("Purple", Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},  // #9d9add #d0cef3 #625bb8
+            {ThemeColors.Blue, new Theme("Blue", Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
+            {ThemeColors.Aqua, new Theme("Aqua", Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
+            {ThemeColors.Green, new Theme("Green", Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}     // #c6d67d #e3ebc6 #aacc04
         };
 
-        string? NOTE_COLOUR = null;
+        ThemeColors _noteCurrentTheme;
         Tuple<bool, bool>? NOTE_GRAVITY = null;
         bool NOTE_SAVED = false;
 
@@ -67,7 +88,7 @@ namespace Pinny_Notes
             PositionNote();
         }
 
-        public MainWindow(double parentLeft, double parentTop, string? parentColour, Tuple<bool, bool>? parentGravity)
+        public MainWindow(double parentLeft, double parentTop, ThemeColors? parentColour, Tuple<bool, bool>? parentGravity)
         {
             MainWindowInitialize();
             LoadSettings(parentColour, parentGravity);
@@ -115,7 +136,7 @@ namespace Pinny_Notes
 
         #region MiscFunctions
 
-        private void LoadSettings(string? parentColour = null, Tuple<bool, bool>? parentGravity = null)
+        private void LoadSettings(ThemeColors? parentColour = null, Tuple<bool, bool>? parentGravity = null)
         {
             AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
             TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
@@ -153,47 +174,42 @@ namespace Pinny_Notes
 
         }
 
-        private void SetColour(string? colour = null, string? parentColour = null)
+        private void SetColour(ThemeColors? colour = null, ThemeColors? parentColour = null)
         {
-            if (colour == null)
+            if (colour != null)
             {
-                if (Properties.Settings.Default.CycleColours)
+                _noteCurrentTheme = (ThemeColors)colour;
+            }
+            else if (!Properties.Settings.Default.CycleColours)
+            {
+                _noteCurrentTheme = (ThemeColors)Properties.Settings.Default.Colour;
+            }
+            else
+            {
+                // Get the next colour ensuring it is not the same as the parent notes colour.
+                ThemeColors? nextColour = null;
+                int nextColourIndex = _noteThemes.Keys.ToList().IndexOf((ThemeColors)Properties.Settings.Default.Colour) + 1;
+                while (nextColour == null)
                 {
-                    // Get the next colour ensuring it is not the same as the parent notes colour.
-                    string? nextColour = null;
-                    int nextColourIndex = NOTE_COLOURS.Keys.ToList().IndexOf(Properties.Settings.Default.Colour) + 1;
-                    while (nextColour == null)
+                    nextColour = _noteThemes.Keys.ElementAtOrDefault(nextColourIndex);
+                    if (nextColour == null)
                     {
-                        nextColour = NOTE_COLOURS.Keys.ElementAtOrDefault(nextColourIndex);
-                        if (nextColour == null)
-                        {
-                            nextColourIndex = 0;
-                        }
-                        else if (nextColour == parentColour)
-                        {
-                            nextColour = null;
-                            nextColourIndex++;
-                        }
+                        nextColourIndex = 0;
                     }
-                    colour = nextColour;
+                    else if (nextColour == parentColour)
+                    {
+                        nextColour = null;
+                        nextColourIndex++;
+                    }
                 }
-                else
-                {
-                    colour = Properties.Settings.Default.Colour;
-                }
+                _noteCurrentTheme = (ThemeColors)nextColour;
             }
 
-            BrushConverter brushConverter = new BrushConverter();
-            object? titleBrush = brushConverter.ConvertFromString(NOTE_COLOURS[colour].Item1);
-            object? bodyBrush = brushConverter.ConvertFromString(NOTE_COLOURS[colour].Item2);
-            object? borderBrush = brushConverter.ConvertFromString(NOTE_COLOURS[colour].Item3);
+            TitleBarGrid.Background = new SolidColorBrush(_noteThemes[_noteCurrentTheme].TitleBarColor);
+            Background = new SolidColorBrush(_noteThemes[_noteCurrentTheme].BackgroundColor);
+            BorderBrush = new SolidColorBrush(_noteThemes[_noteCurrentTheme].BorderColor);
 
-            TitleBarGrid.Background = (Brush)titleBrush;
-            Background = (Brush)bodyBrush;
-            BorderBrush = (Brush)borderBrush;
-
-            NOTE_COLOUR = colour;
-            Properties.Settings.Default.Colour = colour;
+            Properties.Settings.Default.Colour = (int)_noteCurrentTheme;
             Properties.Settings.Default.Save();
 
             // Tick correct menu item for colour or note.
@@ -203,9 +219,9 @@ namespace Pinny_Notes
                     continue;
 
                 MenuItem childMenuItem = (MenuItem)childObject;
-                if (childMenuItem.Header.ToString() != "Cycle" && childMenuItem.Header.ToString() != colour)
+                if (childMenuItem.Header.ToString() != "Cycle" && childMenuItem.Header.ToString() != _noteThemes[_noteCurrentTheme].Name)
                     childMenuItem.IsChecked = false;
-                else if (childMenuItem.Header.ToString() == colour)
+                else if (childMenuItem.Header.ToString() == _noteThemes[_noteCurrentTheme].Name)
                     childMenuItem.IsChecked = true;
             }
         }
@@ -340,7 +356,7 @@ namespace Pinny_Notes
             new MainWindow(
                 Left,
                 Top,
-                NOTE_COLOUR,
+                _noteCurrentTheme,
                 NOTE_GRAVITY
             ).Show();
         }
@@ -406,7 +422,15 @@ namespace Pinny_Notes
                 return;
             }
 
-            SetColour(menuItem.Header.ToString());
+            // To Do - Implement commands which will pass parameter for color.
+            foreach (KeyValuePair<ThemeColors, Theme> noteTheme in _noteThemes)
+            {
+                if (noteTheme.Value.Name == menuItem.Header.ToString())
+                {
+                    SetColour(noteTheme.Key);
+                    break;
+                }
+            }
         }
 
         #endregion
