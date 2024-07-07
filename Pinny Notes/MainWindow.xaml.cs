@@ -16,47 +16,12 @@ using System.Windows.Documents;
 using System.Globalization;
 using System.Text.Json;
 using System.Windows.Media.Imaging;
+using Pinny_Notes.Enums;
+using Pinny_Notes.Commands;
+using Pinny_Notes.Themes;
 
 namespace Pinny_Notes
 {
-    public class CustomCommand : ICommand
-    {
-        public Func<bool>? ExecuteMethod { get; set; }
-
-        public void Execute(object? parameter)
-        {
-            if (ExecuteMethod != null)
-                _ = ExecuteMethod();
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public event EventHandler? CanExecuteChanged;
-    }
-
-    public class Theme(string name, Color titleBarColor, Color backgroundColor, Color borderColor)
-    {
-        public string Name { get; set; } = name;
-        public Color TitleBarColor { get; set; } = titleBarColor;
-        public Color BackgroundColor { get; set; } = backgroundColor;
-        public Color BorderColor { get; set; } = borderColor;
-    }
-
-    public enum ThemeColors
-    {
-        Yellow = 0,
-        Orange = 1,
-        Red = 2,
-        Pink = 3,
-        Purple = 4,
-        Blue = 5,
-        Aqua = 6,
-        Green = 7
-    }
-
     public partial class MainWindow : Window
     {
         private readonly char[] _wordSeparators = [' ', '\t', '\r', '\n'];
@@ -66,16 +31,16 @@ namespace Pinny_Notes
         };
 
         // Title Bar, Background, Border
-        private readonly Dictionary<ThemeColors, Theme> _noteThemes = new()
+        private readonly Dictionary<ThemeColors, NoteTheme> _noteThemes = new()
         {
-            {ThemeColors.Yellow, new Theme("Yellow", Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},  // #fef7b1 #fffcdd #feea00
-            {ThemeColors.Orange, new Theme("Orange", Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},  // #ffd179 #fee8b9 #ffab00
-            {ThemeColors.Red, new Theme("Red", Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},        // #ff7c81 #ffc4c6 #e33036
-            {ThemeColors.Pink, new Theme("Pink", Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
-            {ThemeColors.Purple, new Theme("Purple", Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},  // #9d9add #d0cef3 #625bb8
-            {ThemeColors.Blue, new Theme("Blue", Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
-            {ThemeColors.Aqua, new Theme("Aqua", Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
-            {ThemeColors.Green, new Theme("Green", Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}     // #c6d67d #e3ebc6 #aacc04
+            {ThemeColors.Yellow, new NoteTheme("Yellow", Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},  // #fef7b1 #fffcdd #feea00
+            {ThemeColors.Orange, new NoteTheme("Orange", Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},  // #ffd179 #fee8b9 #ffab00
+            {ThemeColors.Red, new NoteTheme("Red", Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},        // #ff7c81 #ffc4c6 #e33036
+            {ThemeColors.Pink, new NoteTheme("Pink", Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
+            {ThemeColors.Purple, new NoteTheme("Purple", Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},  // #9d9add #d0cef3 #625bb8
+            {ThemeColors.Blue, new NoteTheme("Blue", Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
+            {ThemeColors.Aqua, new NoteTheme("Aqua", Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
+            {ThemeColors.Green, new NoteTheme("Green", Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}     // #c6d67d #e3ebc6 #aacc04
         };
 
         private ThemeColors _noteCurrentTheme;
@@ -433,7 +398,7 @@ namespace Pinny_Notes
             }
 
             // To Do - Implement commands which will pass parameter for color.
-            foreach (KeyValuePair<ThemeColors, Theme> noteTheme in _noteThemes)
+            foreach (KeyValuePair<ThemeColors, NoteTheme> noteTheme in _noteThemes)
             {
                 if (noteTheme.Value.Name == menuItem.Header.ToString())
                 {
