@@ -42,12 +42,12 @@ public partial class MainWindow : Window
     };
 
     private ThemeColors _noteCurrentTheme;
-    private Tuple<bool, bool> NOTE_GRAVITY = new(true, true);
-    private bool NOTE_SAVED = false;
+    private Tuple<bool, bool> _noteGravity = new(true, true);
+    private bool _noteSaved = false;
 
-    private readonly CustomCommand COPY_COMMAND = new();
-    private readonly CustomCommand CUT_COMMAND = new();
-    private readonly CustomCommand PASTE_COMMAND = new();
+    private readonly CustomCommand _copyCommand = new();
+    private readonly CustomCommand _cutCommand = new();
+    private readonly CustomCommand _pasteCommand = new();
 
     #region MainWindow
 
@@ -70,12 +70,12 @@ public partial class MainWindow : Window
         InitializeComponent();
         NoteTextBox.ContextMenu = GetNoteTextBoxContextMenu();
 
-        COPY_COMMAND.ExecuteMethod = NoteTextBox_Copy;
-        NoteTextBox.InputBindings.Add(new InputBinding(COPY_COMMAND, new KeyGesture(Key.C, ModifierKeys.Control)));
-        CUT_COMMAND.ExecuteMethod = NoteTextBox_Cut;
-        NoteTextBox.InputBindings.Add(new InputBinding(CUT_COMMAND, new KeyGesture(Key.X, ModifierKeys.Control)));
-        PASTE_COMMAND.ExecuteMethod = NoteTextBox_Paste;
-        NoteTextBox.InputBindings.Add(new InputBinding(PASTE_COMMAND, new KeyGesture(Key.V, ModifierKeys.Control)));
+        _copyCommand.ExecuteMethod = NoteTextBox_Copy;
+        NoteTextBox.InputBindings.Add(new InputBinding(_copyCommand, new KeyGesture(Key.C, ModifierKeys.Control)));
+        _cutCommand.ExecuteMethod = NoteTextBox_Cut;
+        NoteTextBox.InputBindings.Add(new InputBinding(_cutCommand, new KeyGesture(Key.X, ModifierKeys.Control)));
+        _pasteCommand.ExecuteMethod = NoteTextBox_Paste;
+        NoteTextBox.InputBindings.Add(new InputBinding(_pasteCommand, new KeyGesture(Key.V, ModifierKeys.Control)));
     }
 
     private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -95,7 +95,7 @@ public partial class MainWindow : Window
                 gravityLeft = false;
             if (Top > SystemParameters.PrimaryScreenHeight / 2)
                 gravityTop = false;
-            NOTE_GRAVITY = new Tuple<bool, bool>(
+            _noteGravity = new Tuple<bool, bool>(
                 gravityLeft,
                 gravityTop
             );
@@ -120,12 +120,12 @@ public partial class MainWindow : Window
         ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
         SetColour(parentColour: parentColour);
         if (parentGravity == null)
-            NOTE_GRAVITY = new Tuple<bool, bool>(
+            _noteGravity = new Tuple<bool, bool>(
                 Properties.Settings.Default.StartupPositionLeft,
                 Properties.Settings.Default.StartupPositionTop
             );
         else
-            NOTE_GRAVITY = parentGravity;
+            _noteGravity = parentGravity;
 
         if (Properties.Settings.Default.StartupPositionLeft)
         {
@@ -205,12 +205,12 @@ public partial class MainWindow : Window
         if (parentLeft == null || parentTop == null)
         {
             int screenMargin = 78;
-            if (NOTE_GRAVITY.Item1) // Left
+            if (_noteGravity.Item1) // Left
                 positionLeft = screenMargin;
             else // Right
                 positionLeft = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
 
-            if (NOTE_GRAVITY.Item2) // Top
+            if (_noteGravity.Item2) // Top
                 positionTop = screenMargin;
             else // Bottom
                 positionTop = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
@@ -218,12 +218,12 @@ public partial class MainWindow : Window
         // Position relative to parent
         else
         {
-            if (NOTE_GRAVITY.Item1)
+            if (_noteGravity.Item1)
                 positionLeft = (double)parentLeft + 45;
             else
                 positionLeft = (double)parentLeft - 45;
 
-            if (NOTE_GRAVITY.Item2)
+            if (_noteGravity.Item2)
                 positionTop = (double)parentTop + 45;
             else
                 positionTop = (double)parentTop - 45;
@@ -255,7 +255,7 @@ public partial class MainWindow : Window
         if (saveFileDialog.ShowDialog(this) == true)
         {
             File.WriteAllText(saveFileDialog.FileName, NoteTextBox.Text);
-            NOTE_SAVED = true;
+            _noteSaved = true;
             return MessageBoxResult.OK;
         }
         return MessageBoxResult.Cancel;
@@ -329,7 +329,7 @@ public partial class MainWindow : Window
             Left,
             Top,
             _noteCurrentTheme,
-            NOTE_GRAVITY
+            _noteGravity
         ).Show();
     }
 
@@ -345,7 +345,7 @@ public partial class MainWindow : Window
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!NOTE_SAVED && NoteTextBox.Text != "")
+        if (!_noteSaved && NoteTextBox.Text != "")
         {
             MessageBoxResult messageBoxResult = MessageBox.Show(
                 this,
@@ -505,7 +505,7 @@ public partial class MainWindow : Window
 
     private void NoteTextBox_TextChanged(object sender, RoutedEventArgs e)
     {
-        NOTE_SAVED = false;
+        _noteSaved = false;
         if (Properties.Settings.Default.NewLine && NoteTextBox.Text != "" && !NoteTextBox.Text.EndsWith(Environment.NewLine))
         {
             bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
@@ -713,7 +713,7 @@ public partial class MainWindow : Window
         menu.Items.Add(
             CreateMenuItem(
                 header: "Copy",
-                command: COPY_COMMAND,
+                command: _copyCommand,
                 inputGestureText: "Ctrl+C",
                 enabled: (NoteTextBox.SelectionLength > 0)
             )
@@ -721,7 +721,7 @@ public partial class MainWindow : Window
         menu.Items.Add(
             CreateMenuItem(
                 header: "Cut",
-                command: CUT_COMMAND,
+                command: _cutCommand,
                 inputGestureText: "Ctrl+X",
                 enabled: (NoteTextBox.SelectionLength > 0)
             )
@@ -729,7 +729,7 @@ public partial class MainWindow : Window
         menu.Items.Add(
             CreateMenuItem(
                 header: "Paste",
-                command: PASTE_COMMAND,
+                command: _pasteCommand,
                 inputGestureText: "Ctrl+V",
                 enabled: (Clipboard.ContainsText())
             )
