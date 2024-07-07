@@ -14,7 +14,7 @@
         BorderThickness="1"
         >
     <Window.Resources>
-        <Style TargetType="{x:Type Image}">
+        <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
             <Setter Property="Opacity" Value="0.2"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -34,14 +34,29 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Name="TitleBarGrid" Grid.Column="0" Grid.Row="0" MouseDown="TitleBar_MouseDown">
-            <Button Name="NewButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Left" Margin="10,0,0,0" Click="NewButton_Click" ToolTip="New Note" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
-                <Image Source="/Images/plus-solid.png"/>
+            <Button Name="NewButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Left" Margin="10,0,0,0" Click="NewButton_Click" ToolTip="New Note" Padding="0,0,0,0"  Style="{StaticResource FadeOutButton}" Focusable="False">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Image Source="/Images/plus-solid.png"/>
+                    </ControlTemplate>
+                </Button.Template>
             </Button>
-            <Button Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Center" Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
-                <Image Name="TopButtonImage" Source="{StaticResource Pin45ImageSource}" />
+            <Button Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Center" Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0"  Style="{StaticResource FadeOutButton}" Focusable="False">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Source="{TemplateBinding Content}"/>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Content>
+                    <StaticResource ResourceKey="Pin45ImageSource" />
+                </Button.Content>
             </Button>
-            <Button Name="CloseButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click" ToolTip="Close" Padding="0,0,0,0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
-                <Image Source="/Images/xmark-solid.png"/>
+            <Button Name="CloseButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click" ToolTip="Close" Padding="0,0,0,0" Style="{StaticResource FadeOutButton}" Focusable="False">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Image Source="/Images/xmark-solid.png"/>
+                    </ControlTemplate>
+                </Button.Template>
             </Button>
             <Grid.ContextMenu>
                 <ContextMenu>

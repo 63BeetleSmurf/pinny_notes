@@ -15,6 +15,7 @@ using System.Net;
 using System.Windows.Documents;
 using System.Globalization;
 using System.Text.Json;
+using System.Windows.Media.Imaging;
 
 namespace Pinny_Notes
 {
@@ -372,10 +373,11 @@ namespace Pinny_Notes
         private void TopButton_Click(object sender, RoutedEventArgs e)
         {
             Topmost = !Topmost;
+
             if (Topmost)
-                TopButtonImage.Source = (ImageSource)Resources[(object)"PinImageSource"];
+                TopButton.Content = (BitmapImage)FindResource("PinImageSource");
             else
-                TopButtonImage.Source = (ImageSource)Resources[(object)"Pin45ImageSource"];
+                TopButton.Content = (BitmapImage)FindResource("Pin45ImageSource");
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
