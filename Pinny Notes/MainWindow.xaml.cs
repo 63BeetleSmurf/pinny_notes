@@ -641,6 +641,14 @@ namespace Pinny_Notes
                 e.Handled = true;
 
                 TextBox textBox = (TextBox)sender;
+
+                if (textBox.SelectionLength > 0)
+                {
+                    int selectionStart = textBox.SelectionStart;
+                    textBox.Text = $"{textBox.Text[..selectionStart]}{textBox.Text[(selectionStart + textBox.SelectionLength)..]}";
+                    textBox.CaretIndex = selectionStart;
+                }
+
                 int caretIndex = textBox.CaretIndex;
                 string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
 
