@@ -6,8 +6,6 @@ using System.Windows.Input;
 using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Reflection;
 using System.Windows.Media;
 using System.Linq;
 using System.Windows.Controls;
