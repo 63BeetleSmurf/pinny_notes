@@ -20,12 +20,12 @@ namespace Pinny_Notes
 {
     public class CustomCommand : ICommand
     {
-        public Func<bool>? executeMethod { get; set; }
+        public Func<bool>? ExecuteMethod { get; set; }
 
         public void Execute(object? parameter)
         {
-            if (executeMethod != null)
-                executeMethod();
+            if (ExecuteMethod != null)
+                _ = ExecuteMethod();
         }
 
         public bool CanExecute(object? parameter)
@@ -58,8 +58,14 @@ namespace Pinny_Notes
 
     public partial class MainWindow : Window
     {
+        private readonly char[] _wordSeparators = [' ', '\t', '\r', '\n'];
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+        {
+            WriteIndented = true
+        };
+
         // Title Bar, Background, Border
-        Dictionary<ThemeColors, Theme> _noteThemes = new()
+        private readonly Dictionary<ThemeColors, Theme> _noteThemes = new()
         {
             {ThemeColors.Yellow, new Theme("Yellow", Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},  // #fef7b1 #fffcdd #feea00
             {ThemeColors.Orange, new Theme("Orange", Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},  // #ffd179 #fee8b9 #ffab00
@@ -71,13 +77,13 @@ namespace Pinny_Notes
             {ThemeColors.Green, new Theme("Green", Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}     // #c6d67d #e3ebc6 #aacc04
         };
 
-        ThemeColors _noteCurrentTheme;
-        Tuple<bool, bool>? NOTE_GRAVITY = null;
-        bool NOTE_SAVED = false;
+        private ThemeColors _noteCurrentTheme;
+        private Tuple<bool, bool> NOTE_GRAVITY = new(true, true);
+        private bool NOTE_SAVED = false;
 
-        CustomCommand COPY_COMMAND = new();
-        CustomCommand CUT_COMMAND = new();
-        CustomCommand PASTE_COMMAND = new();
+        private readonly CustomCommand COPY_COMMAND = new();
+        private readonly CustomCommand CUT_COMMAND = new();
+        private readonly CustomCommand PASTE_COMMAND = new();
 
         #region MainWindow
 
@@ -100,11 +106,11 @@ namespace Pinny_Notes
             InitializeComponent();
             NoteTextBox.ContextMenu = GetNoteTextBoxContextMenu();
 
-            COPY_COMMAND.executeMethod = NoteTextBox_Copy;
+            COPY_COMMAND.ExecuteMethod = NoteTextBox_Copy;
             NoteTextBox.InputBindings.Add(new InputBinding(COPY_COMMAND, new KeyGesture(Key.C, ModifierKeys.Control)));
-            CUT_COMMAND.executeMethod = NoteTextBox_Cut;
+            CUT_COMMAND.ExecuteMethod = NoteTextBox_Cut;
             NoteTextBox.InputBindings.Add(new InputBinding(CUT_COMMAND, new KeyGesture(Key.X, ModifierKeys.Control)));
-            PASTE_COMMAND.executeMethod = NoteTextBox_Paste;
+            PASTE_COMMAND.ExecuteMethod = NoteTextBox_Paste;
             NoteTextBox.InputBindings.Add(new InputBinding(PASTE_COMMAND, new KeyGesture(Key.V, ModifierKeys.Control)));
         }
 
@@ -228,8 +234,8 @@ namespace Pinny_Notes
 
         private void PositionNote(double? parentLeft = null, double? parentTop = null)
         {
-            double positionTop = 0;
-            double positionLeft = 0;
+            double positionTop;
+            double positionLeft;
 
             // If there is no parent, position relative to screen
             if (parentLeft == null || parentTop == null)
@@ -278,8 +284,10 @@ namespace Pinny_Notes
 
         private MessageBoxResult SaveNote()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Text Documents (*.txt)|*.txt|All Files|*";
+            SaveFileDialog saveFileDialog = new()
+            {
+                Filter = "Text Documents (*.txt)|*.txt|All Files|*"
+            };
             if (saveFileDialog.ShowDialog(this) == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, NoteTextBox.Text);
@@ -308,7 +316,7 @@ namespace Pinny_Notes
         private void ApplyFunctionToEachLine(Func<string, int, string?, string?> function, string? additional = null)
         {
             string[] lines;
-            List<string> newLines = new();
+            List<string> newLines = [];
 
             if (NoteTextBox.SelectionLength > 0)
                 lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
@@ -455,7 +463,8 @@ namespace Pinny_Notes
                     childMenuItem.IsChecked = false;
             }
 
-            string[] position = menuItem.Header.ToString().Split(" ");
+            string menuItemText = menuItem.Header.ToString() ?? "";
+            string[] position = menuItemText.Split(" ");
             if (position[0] == "Top")
                 Properties.Settings.Default.StartupPositionTop = true;
             else
@@ -662,7 +671,7 @@ namespace Pinny_Notes
                 copiedText = copiedText.Trim();
             Clipboard.SetDataObject(copiedText);
             int selectionStart = NoteTextBox.SelectionStart;
-            NoteTextBox.Text = NoteTextBox.Text.Substring(0, selectionStart) + NoteTextBox.Text.Substring(selectionStart + NoteTextBox.SelectionLength);
+            NoteTextBox.Text = $"{ NoteTextBox.Text[..selectionStart] }{ NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..] }";
             NoteTextBox.CaretIndex = selectionStart;
             return true;
         }
@@ -680,7 +689,7 @@ namespace Pinny_Notes
                 {
                     int caretIndex = NoteTextBox.CaretIndex;
                     bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
-                    NoteTextBox.Text = NoteTextBox.Text.Substring(0, caretIndex) + clipboardString + NoteTextBox.Text.Substring(caretIndex);
+                    NoteTextBox.Text = $"{ NoteTextBox.Text[..caretIndex] }{ clipboardString }{ NoteTextBox.Text[caretIndex..] }";
                     NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
                     if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
                         NoteTextBox.ScrollToEnd();
@@ -688,7 +697,7 @@ namespace Pinny_Notes
                 else
                 {
                     int selectionStart = NoteTextBox.SelectionStart;
-                    NoteTextBox.Text = NoteTextBox.Text.Substring(0, selectionStart) + clipboardString + NoteTextBox.Text.Substring(selectionStart + NoteTextBox.SelectionLength);
+                    NoteTextBox.Text = $"{ NoteTextBox.Text[..selectionStart] }{ clipboardString }{ NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..] }";
                     NoteTextBox.CaretIndex = selectionStart + clipboardString.Length;
                 }
             }
@@ -699,13 +708,13 @@ namespace Pinny_Notes
 
         private ContextMenu GetNoteTextBoxContextMenu()
         {
-            ContextMenu menu = new ContextMenu();
+            ContextMenu menu = new();
 
             int caretIndex = NoteTextBox.CaretIndex;
             SpellingError spellingError = NoteTextBox.GetSpellingError(caretIndex);
             if (spellingError != null)
             {
-                if (spellingError.Suggestions.Count() == 0)
+                if (spellingError.Suggestions.Any())
                     menu.Items.Add(
                             CreateMenuItem(
                                 header: "(no spelling suggestions)",
@@ -782,7 +791,7 @@ namespace Pinny_Notes
             menu.Items.Add(
                 CreateMenuItem(
                     header: "Counts",
-                    children: new List<object> {
+                    children: [
                         CreateMenuItem(
                             header: "Lines: " + GetLineCount().ToString(),
                             enabled: false
@@ -795,7 +804,7 @@ namespace Pinny_Notes
                             header: "Chars: " + GetCharCount().ToString(),
                             enabled: false
                         )
-                    }
+                    ]
                 )
             );
 
@@ -804,114 +813,115 @@ namespace Pinny_Notes
             menu.Items.Add(
                 CreateMenuItem(
                     header: "Tools",
-                    children: new List<object> {
+                    children: [
                         CreateMenuItem(
                             header: "Base64",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(Base64EncodeMenuItem_Click)),
                                 CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(Base64DecodeMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Case",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Lower", clickEventHandler: new RoutedEventHandler(CaseLowerMenuItem_Click)),
                                 CreateMenuItem(header: "Upper", clickEventHandler: new RoutedEventHandler(CaseUpperMenuItem_Click)),
                                 CreateMenuItem(header: "Proper", clickEventHandler: new RoutedEventHandler(CaseProperMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Hash",
-                            children: new List<object> {
+                            children:[
                                 CreateMenuItem(header: "SHA512", clickEventHandler: new RoutedEventHandler(HashSHA512MenuItem_Click)),
                                 CreateMenuItem(header: "SHA384", clickEventHandler: new RoutedEventHandler(HashSHA384MenuItem_Click)),
                                 CreateMenuItem(header: "SHA256", clickEventHandler: new RoutedEventHandler(HashSHA256MenuItem_Click)),
                                 CreateMenuItem(header: "SHA1", clickEventHandler: new RoutedEventHandler(HashSHA1MenuItem_Click)),
                                 CreateMenuItem(header: "MD5", clickEventHandler: new RoutedEventHandler(HashMD5MenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "HTML Entity",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(HTMLEntityEncodeMenuItem_Click)),
                                 CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(HTMLEntityDecodeMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Indent",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "2 Spaces", clickEventHandler: new RoutedEventHandler(Indent2SpacesMenuItem_Click)),
                                 CreateMenuItem(header: "4 Spaces", clickEventHandler: new RoutedEventHandler(Indent4SpacesMenuItem_Click)),
                                 CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(IndentTabMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Join",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(JoinCommaMenuItem_Click)),
                                 CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(JoinSpaceMenuItem_Click)),
                                 CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(JoinTabMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "JSON",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Prettify", clickEventHandler: new RoutedEventHandler(JSONPrettifyMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "List",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Enumerate", clickEventHandler: new RoutedEventHandler(ListEnumerateMenuItem_Click)),
                                 CreateMenuItem(header: "Dash", clickEventHandler: new RoutedEventHandler(ListDashMenuItem_Click)),
                                 CreateMenuItem(header: "Remove", clickEventHandler: new RoutedEventHandler(ListRemoveMenuItem_Click)),
                                 new Separator(),
                                 CreateMenuItem(header: "Sort Asc.", clickEventHandler: new RoutedEventHandler(ListSortAscMenuItem_Click)),
                                 CreateMenuItem(header: "Sort Des.", clickEventHandler: new RoutedEventHandler(ListSortDecMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Quote",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Double", clickEventHandler: new RoutedEventHandler(QuoteDoubleMenuItem_Click)),
                                 CreateMenuItem(header: "Single", clickEventHandler: new RoutedEventHandler(QuoteSingleMenuItem_Click)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Split",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(SplitCommaMenuItem_Click)),
                                 CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(SplitSpaceMenuItem_Click)),
                                 CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(SplitTabMenuItem_Click)),
                                 new Separator(),
                                 CreateMenuItem(header: "Selected", clickEventHandler: new RoutedEventHandler(SplitSelectedMenuItem_Click), enabled: (NoteTextBox.SelectionLength > 0)),
-                            }
+                            ]
                         ),
                         CreateMenuItem(
                             header: "Trim",
-                            children: new List<object> {
+                            children: [
                                 CreateMenuItem(header: "Start", clickEventHandler: new RoutedEventHandler(TrimStartMenuItem_Click)),
                                 CreateMenuItem(header: "End", clickEventHandler: new RoutedEventHandler(TrimEndMenuItem_Click)),
                                 CreateMenuItem(header: "Both", clickEventHandler: new RoutedEventHandler(TrimBothMenuItem_Click)),
                                 CreateMenuItem(header: "Empty Lines", clickEventHandler: new RoutedEventHandler(TrimEmptyLinesMenuItem_Click)),
-                            }
+                            ]
                         ),
-                    }
+                    ]
                 )
             );
 
             return menu;
         }
 
-        private MenuItem CreateMenuItem(string header, bool headerBold = false, bool enabled = true,
+        private static MenuItem CreateMenuItem(string header, bool headerBold = false, bool enabled = true,
             RoutedEventHandler? clickEventHandler = null, List<object>? children = null,
             ICommand? command = null, object? commandParameter = null, IInputElement? commandTarget = null,
             string? inputGestureText = null
             )
         {
-            MenuItem menuItem = new();
-            
-            menuItem.Header = header;
+            MenuItem menuItem = new()
+            {
+                Header = header
+            };
             if (headerBold)
                 menuItem.FontWeight = FontWeights.Bold;
             
@@ -940,7 +950,7 @@ namespace Pinny_Notes
 
         private int GetLineCount()
         {
-            int count = 0;
+            int count;
             if (NoteTextBox.SelectionLength > 0)
                 count = NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.SelectionStart + NoteTextBox.SelectionLength)
                     -  NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.SelectionStart)
@@ -953,14 +963,14 @@ namespace Pinny_Notes
         private int GetWordCount()
         {
             int count = 0;
-            string text = string.Empty;
+            string text;
             if (NoteTextBox.SelectionLength > 0)
                 text = NoteTextBox.SelectedText;
             else
                 text = NoteTextBox.Text;
             if (!string.IsNullOrEmpty(text.Trim()))
             {
-                string[] words = text.Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] words = text.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries);
                 count = words.Length;
             }
             return count;
@@ -969,14 +979,14 @@ namespace Pinny_Notes
         private int GetCharCount()
         {
             int count = 0;
-            string text = string.Empty;
+            string text;
             if (NoteTextBox.SelectionLength > 0)
                 text = NoteTextBox.SelectedText;
             else
                 text = NoteTextBox.Text;
             if (!string.IsNullOrEmpty(text))
             {
-                text = text.Replace(Environment.NewLine, string.Empty);
+                text = text.Replace(Environment.NewLine, "");
                 count = text.Length;
             }
             return count;
@@ -1040,20 +1050,15 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(SetTextCase, "p");
         }
 
-        private string SetTextCase(string line, int index, string textCase)
+        private string? SetTextCase(string line, int index, string? textCase)
         {
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-            switch (textCase)
+            return textCase switch
             {
-                case "u":
-                    return textInfo.ToUpper(line);
-                case "p":
-                    return textInfo.ToTitleCase(
-                        textInfo.ToLower(line)
-                    );
-                default:
-                    return textInfo.ToLower(line);
-            }
+                "u" => textInfo.ToUpper(line),
+                "p" => textInfo.ToTitleCase(textInfo.ToLower(line)),
+                _ => textInfo.ToLower(line),
+            };
         }
 
         #endregion
@@ -1085,7 +1090,7 @@ namespace Pinny_Notes
             ApplyFunctionToNoteText(HashText, "md5");
         }
 
-        private string HashText(string text, string algorithm)
+        private string HashText(string text, string? algorithm)
         {
             HashAlgorithm hasher;
             switch (algorithm)
@@ -1155,7 +1160,7 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(IndentText, "\t");
         }
 
-        private string IndentText(string line, int index, string indentString)
+        private string? IndentText(string line, int index, string? indentString)
         {
             return indentString + line;
         }
@@ -1179,7 +1184,7 @@ namespace Pinny_Notes
             ApplyFunctionToNoteText(JoinText, "\t");
         }
 
-        private string JoinText(string text, string joinString)
+        private string JoinText(string text, string? joinString)
         {
             return text.Replace(Environment.NewLine, joinString);
         }
@@ -1197,18 +1202,14 @@ namespace Pinny_Notes
         {
             try
             {
-                return JsonSerializer.Serialize(
-                    JsonSerializer.Deserialize<object>(text),
-                    new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    }
-                );
+                object? jsonObject = JsonSerializer.Deserialize<object>(text);
+                if (jsonObject != null)
+                    return JsonSerializer.Serialize<object>(jsonObject, _jsonSerializerOptions);
             }
             catch
             {
-                return text;
             }
+            return text;
         }
 
         #endregion
@@ -1237,7 +1238,7 @@ namespace Pinny_Notes
 
         private string RemoveFirstWordInLine(string line, int index, string? additional)
         {
-            return line.Substring(line.IndexOf(" ") + 1);
+            return line[(line.IndexOf(' ') + 1)..];
         }
 
         private void ListSortAscMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1273,7 +1274,7 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(QuoteText, "'");
         }
 
-        private string QuoteText(string line, int index, string additional)
+        private string? QuoteText(string line, int index, string? additional)
         {
             return additional + line + additional;
         }
@@ -1304,8 +1305,10 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(SplitText, splitString);
         }
 
-        private string SplitText(string line, int index, string splitString)
+        private string? SplitText(string line, int index, string? splitString)
         {
+            if (splitString == null)
+                return null;
             return line.Replace(splitString, Environment.NewLine);
         }
 
@@ -1333,7 +1336,7 @@ namespace Pinny_Notes
             ApplyFunctionToEachLine(TrimText, "Lines");
         }
 
-        private string? TrimText(string line, int index, string trimType)
+        private string? TrimText(string line, int index, string? trimType)
         {
             switch (trimType)
             {
