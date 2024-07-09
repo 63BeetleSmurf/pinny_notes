@@ -4,26 +4,29 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class JsonTool : BaseTool, ITool
+public class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = true
     };
 
-    public JsonTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "JSON",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Prettify",
                 Command = new CustomCommand() { ExecuteMethod = JsonPrettifyAction }
             }
         );
+
+        return menuItem;
     }
 
     private bool JsonPrettifyAction()

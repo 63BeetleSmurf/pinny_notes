@@ -3,36 +3,37 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class TrimTool : BaseTool, ITool
+public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public TrimTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Trim",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Start",
                 Command = new CustomCommand() { ExecuteMethod = TrimStartAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "End",
                 Command = new CustomCommand() { ExecuteMethod = TrimEndAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Both",
                 Command = new CustomCommand() { ExecuteMethod = TrimBothAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Empty Lines",
@@ -40,6 +41,7 @@ public class TrimTool : BaseTool, ITool
             }
         );
 
+        return menuItem;
     }
 
     private bool TrimStartAction()

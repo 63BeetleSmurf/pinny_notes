@@ -3,28 +3,31 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class Base64Tool : BaseTool, ITool
+public class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public Base64Tool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Base64",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Encode",
                 Command = new CustomCommand() { ExecuteMethod = Base64EncodeAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
                 Command = new CustomCommand() { ExecuteMethod = Base64DecodeAction }
             }
         );
+
+        return menuItem;
     }
 
     private bool Base64EncodeAction()

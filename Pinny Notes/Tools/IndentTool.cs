@@ -3,35 +3,38 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class IndentTool : BaseTool, ITool
+public class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public IndentTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Indent",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "2 Spaces",
                 Command = new CustomCommand() { ExecuteMethod = Indent2SpacesAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "4 Spaces",
                 Command = new CustomCommand() { ExecuteMethod = Indent4SpacesAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
                 Command = new CustomCommand() { ExecuteMethod = IndentTabAction }
             }
         );
+
+        return menuItem;
     }
     private bool Indent2SpacesAction()
     {

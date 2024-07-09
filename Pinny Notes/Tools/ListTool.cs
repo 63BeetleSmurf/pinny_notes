@@ -4,50 +4,55 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class ListTool : BaseTool, ITool
+public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public ListTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "List",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Enumerate",
                 Command = new CustomCommand() { ExecuteMethod = ListEnumerateAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Dash",
                 Command = new CustomCommand() { ExecuteMethod = ListDashAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove",
                 Command = new CustomCommand() { ExecuteMethod = ListRemoveAction }
             }
         );
-        MenuItem.Items.Add(new Separator());
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(new Separator());
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Sort Asc.",
                 Command = new CustomCommand() { ExecuteMethod = ListSortAscAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Sort Dec.",
                 Command = new CustomCommand() { ExecuteMethod = ListSortDecAction }
             }
         );
+
+        return menuItem;
     }
 
     private bool ListEnumerateAction()
