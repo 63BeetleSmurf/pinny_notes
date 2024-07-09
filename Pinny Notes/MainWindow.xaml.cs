@@ -754,21 +754,21 @@ public partial class MainWindow : Window
         countsMenuItem.Items.Add(
             new MenuItem()
             {
-                Header = "Lines: " + GetLineCount().ToString(),
+                Header = $"Lines: {GetLineCount()}",
                 IsEnabled = false
             }
         );
         countsMenuItem.Items.Add(
             new MenuItem()
             {
-                Header = "Words: " + GetWordCount().ToString(),
+                Header = $"Words: {GetWordCount()}",
                 IsEnabled = false
             }
         );
         countsMenuItem.Items.Add(
             new MenuItem()
             {
-                Header = "Chars: " + GetCharCount().ToString(),
+                Header = $"Chars: {GetCharCount()}",
                 IsEnabled = false
             }
         );

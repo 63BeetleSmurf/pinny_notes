@@ -87,12 +87,12 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private string EnumerateLine(string line, int index, bool? additional = null)
     {
-        return (index + 1).ToString() + ". " + line;
+        return $"{index + 1}. {line}";
     }
 
     private string DashLine(string line, int index, bool? additional = null)
     {
-        return "- " + line;
+        return $"- {line}";
     }
 
     private string RemoveFirstWordInLine(string line, int index, bool? additional = null)
