@@ -76,6 +76,7 @@ public partial class MainWindow : Window
             new JsonTool(NoteTextBox),
             new ListTool(NoteTextBox),
             new QuoteTool(NoteTextBox),
+            new SlashTool(NoteTextBox),
             new SplitTool(NoteTextBox),
             new TrimTool(NoteTextBox)
         ];
