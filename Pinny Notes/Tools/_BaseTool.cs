@@ -8,7 +8,7 @@ public abstract class BaseTool(TextBox noteTextBox)
 {
     protected TextBox _noteTextBox = noteTextBox;
 
-    protected void ApplyFunctionToNoteText(Func<string, string?, string> function, string? additional = null)
+    protected void ApplyFunctionToNoteText<TAdditional>(Func<string, TAdditional?, string> function, TAdditional? additional = default)
     {
         if (_noteTextBox.SelectionLength > 0)
             _noteTextBox.SelectedText = function(_noteTextBox.SelectedText, additional);
@@ -24,7 +24,7 @@ public abstract class BaseTool(TextBox noteTextBox)
         }
     }
 
-    protected void ApplyFunctionToEachLine(Func<string, int, string?, string?> function, string? additional = null)
+    protected void ApplyFunctionToEachLine<TAdditional>(Func<string, int, TAdditional?, string?> function, TAdditional? additional = default)
     {
         string[] lines;
         List<string> newLines = [];

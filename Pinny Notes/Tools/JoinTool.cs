@@ -40,19 +40,19 @@ public class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool JoinCommaAction()
     {
-        ApplyFunctionToNoteText(JoinText, ",");
+        ApplyFunctionToNoteText<string>(JoinText, ",");
         return true;
     }
 
     private bool JoinSpaceAction()
     {
-        ApplyFunctionToNoteText(JoinText, " ");
+        ApplyFunctionToNoteText<string>(JoinText, " ");
         return true;
     }
 
     private bool JoinTabAction()
     {
-        ApplyFunctionToNoteText(JoinText, "\t");
+        ApplyFunctionToNoteText<string>(JoinText, "\t");
         return true;
     }
 

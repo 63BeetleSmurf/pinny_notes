@@ -32,18 +32,18 @@ public class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool QuoteDoubleAction()
     {
-        ApplyFunctionToEachLine(QuoteText, "\"");
+        ApplyFunctionToEachLine<char>(QuoteText, '"');
         return true;
     }
 
     private bool QuoteSingleAction()
     {
-        ApplyFunctionToEachLine(QuoteText, "'");
+        ApplyFunctionToEachLine<char>(QuoteText, '\'');
         return true;
     }
 
-    private string? QuoteText(string line, int index, string? additional)
+    private string? QuoteText(string line, int index, char quoteChar)
     {
-        return additional + line + additional;
+        return $"{quoteChar}{line}{quoteChar}";
     }
 }

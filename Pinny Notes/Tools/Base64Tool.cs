@@ -32,23 +32,23 @@ public class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool Base64EncodeAction()
     {
-        ApplyFunctionToNoteText(Base64EncodeText);
+        ApplyFunctionToNoteText<bool?>(Base64EncodeText);
         return true;
     }
 
     private bool Base64DecodeAction()
     {
-        ApplyFunctionToNoteText(Base64DecodeText);
+        ApplyFunctionToNoteText<bool?>(Base64DecodeText);
         return true;
     }
 
-    private string Base64EncodeText(string text, string? additional = null)
+    private string Base64EncodeText(string text, bool? additional = null)
     {
         byte[] textBytes = System.Text.Encoding.UTF8.GetBytes(text);
         return System.Convert.ToBase64String(textBytes);
     }
 
-    private string Base64DecodeText(string text, string? additional = null)
+    private string Base64DecodeText(string text, bool? additional = null)
     {
         byte[] base64Bytes = System.Convert.FromBase64String(text);
         return System.Text.Encoding.UTF8.GetString(base64Bytes);
