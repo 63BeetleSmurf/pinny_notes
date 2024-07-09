@@ -33,21 +33,21 @@ public class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool HtmlEntityEncodeAction()
     {
-        ApplyFunctionToNoteText(HtmlEntityEncodeText);
+        ApplyFunctionToNoteText<bool?>(HtmlEntityEncodeText);
         return true;
     }
 
     private bool HtmlEntityDecodeAction()
     {
-        ApplyFunctionToNoteText(HtmlEntityDecodeText);
+        ApplyFunctionToNoteText<bool?>(HtmlEntityDecodeText);
         return true;
     }
 
-    private string HtmlEntityEncodeText(string text, string? additional = null)
+    private string HtmlEntityEncodeText(string text, bool? additional = null)
     {
         return WebUtility.HtmlEncode(text);
     }
-    private string HtmlEntityDecodeText(string text, string? additional = null)
+    private string HtmlEntityDecodeText(string text, bool? additional = null)
     {
         return WebUtility.HtmlDecode(text);
     }

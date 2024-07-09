@@ -38,19 +38,19 @@ public class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
     }
     private bool Indent2SpacesAction()
     {
-        ApplyFunctionToEachLine(IndentText, "  ");
+        ApplyFunctionToEachLine<string>(IndentText, "  ");
         return true;
     }
 
     private bool Indent4SpacesAction()
     {
-        ApplyFunctionToEachLine(IndentText, "    ");
+        ApplyFunctionToEachLine<string>(IndentText, "    ");
         return true;
     }
 
     private bool IndentTabAction()
     {
-        ApplyFunctionToEachLine(IndentText, "\t");
+        ApplyFunctionToEachLine<string>(IndentText, "\t");
         return true;
     }
 

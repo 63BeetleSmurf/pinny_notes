@@ -57,54 +57,54 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool ListEnumerateAction()
     {
-        ApplyFunctionToEachLine(EnumerateLine);
+        ApplyFunctionToEachLine<bool?>(EnumerateLine);
         return true;
     }
 
     private bool ListDashAction()
     {
-        ApplyFunctionToEachLine(DashLine);
+        ApplyFunctionToEachLine<bool?>(DashLine);
         return true;
     }
 
     private bool ListRemoveAction()
     {
-        ApplyFunctionToEachLine(RemoveFirstWordInLine);
+        ApplyFunctionToEachLine<bool?>(RemoveFirstWordInLine);
         return true;
     }
 
     private bool ListSortAscAction()
     {
-        ApplyFunctionToNoteText(SortNoteText);
+        ApplyFunctionToNoteText<bool>(SortNoteText);
         return true;
     }
 
     private bool ListSortDecAction()
     {
-        ApplyFunctionToNoteText(SortNoteText, "rev");
+        ApplyFunctionToNoteText<bool>(SortNoteText, true);
         return true;
     }
 
-    private string EnumerateLine(string line, int index, string? additional)
+    private string EnumerateLine(string line, int index, bool? additional = null)
     {
         return (index + 1).ToString() + ". " + line;
     }
 
-    private string DashLine(string line, int index, string? additional)
+    private string DashLine(string line, int index, bool? additional = null)
     {
         return "- " + line;
     }
 
-    private string RemoveFirstWordInLine(string line, int index, string? additional)
+    private string RemoveFirstWordInLine(string line, int index, bool? additional = null)
     {
         return line[(line.IndexOf(' ') + 1)..];
     }
 
-    private string SortNoteText(string text, string? reverse = null)
+    private string SortNoteText(string text, bool reverse = false)
     {
         string[] lines = text.Split(Environment.NewLine);
         Array.Sort(lines);
-        if (reverse == "rev")
+        if (reverse)
             Array.Reverse(lines);
         return string.Join(Environment.NewLine, lines);
     }

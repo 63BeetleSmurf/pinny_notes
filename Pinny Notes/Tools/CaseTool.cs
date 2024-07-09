@@ -4,6 +4,13 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
+enum Cases
+{
+    Lower = 0,
+    Upper = 1,
+    Proper = 2
+}
+
 public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
     public MenuItem GetMenuItem()
@@ -40,29 +47,29 @@ public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool CaseLowerAction()
     {
-        ApplyFunctionToEachLine(SetTextCase, "l");
+        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Lower);
         return true;
     }
 
     private bool CaseUpperAction()
     {
-        ApplyFunctionToEachLine(SetTextCase, "u");
+        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Upper);
         return true;
     }
 
     private bool CaseProperAction()
     {
-        ApplyFunctionToEachLine(SetTextCase, "p");
+        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Proper);
         return true;
     }
 
-    private string? SetTextCase(string line, int index, string? textCase)
+    private string? SetTextCase(string line, int index, Cases textCase)
     {
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         return textCase switch
         {
-            "u" => textInfo.ToUpper(line),
-            "p" => textInfo.ToTitleCase(textInfo.ToLower(line)),
+            Cases.Upper => textInfo.ToUpper(line),
+            Cases.Proper => textInfo.ToTitleCase(textInfo.ToLower(line)),
             _ => textInfo.ToLower(line),
         };
     }

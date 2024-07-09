@@ -3,6 +3,14 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
+enum Trims
+{
+    Start = 0,
+    End = 1,
+    Both = 2,
+    Lines = 3
+}
+
 public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
     public MenuItem GetMenuItem()
@@ -46,39 +54,39 @@ public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool TrimStartAction()
     {
-        ApplyFunctionToEachLine(TrimText, "Start");
+        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Start);
         return true;
     }
 
     private bool TrimEndAction()
     {
-        ApplyFunctionToEachLine(TrimText, "End");
+        ApplyFunctionToEachLine<Trims>(TrimText, Trims.End);
         return true;
     }
 
     private bool TrimBothAction()
     {
-        ApplyFunctionToEachLine(TrimText, "Both");
+        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Both);
         return true;
     }
 
     private bool TrimEmptyLinesAction()
     {
-        ApplyFunctionToEachLine(TrimText, "Lines");
+        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Lines);
         return true;
     }
 
-    private string? TrimText(string line, int index, string? trimType)
+    private string? TrimText(string line, int index, Trims trimType)
     {
         switch (trimType)
         {
-            case "Start":
+            case Trims.Start:
                 return line.TrimStart();
-            case "End":
+            case Trims.End:
                 return line.TrimEnd();
-            case "Both":
+            case Trims.Both:
                 return line.Trim();
-            case "Lines":
+            case Trims.Lines:
                 if (string.IsNullOrEmpty(line))
                     return null;
                 else

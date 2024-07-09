@@ -50,19 +50,19 @@ public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool SplitCommaAction()
     {
-        ApplyFunctionToEachLine(SplitText, ",");
+        ApplyFunctionToEachLine<string>(SplitText, ",");
         return true;
     }
 
     private bool SplitSpaceAction()
     {
-        ApplyFunctionToEachLine(SplitText, " ");
+        ApplyFunctionToEachLine<string>(SplitText, " ");
         return true;
     }
 
     private bool SplitTabAction()
     {
-        ApplyFunctionToEachLine(SplitText, "\t");
+        ApplyFunctionToEachLine<string>(SplitText, "\t");
         return true;
     }
 

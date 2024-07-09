@@ -31,11 +31,11 @@ public class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private bool JsonPrettifyAction()
     {
-        ApplyFunctionToNoteText(JsonPrettifyText);
+        ApplyFunctionToNoteText<bool?>(JsonPrettifyText);
         return true;
     }
 
-    private string JsonPrettifyText(string text, string? additional = null)
+    private string JsonPrettifyText(string text, bool? additional = null)
     {
         try
         {
