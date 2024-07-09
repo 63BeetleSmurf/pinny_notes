@@ -11,7 +11,6 @@ using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using Pinny_Notes.Enums;
 using Pinny_Notes.Commands;
-using Pinny_Notes.Helpers;
 using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
 
@@ -41,6 +40,9 @@ public partial class MainWindow : Window
     private readonly CustomCommand _copyCommand = new();
     private readonly CustomCommand _cutCommand = new();
     private readonly CustomCommand _pasteCommand = new();
+
+    private readonly CustomCommand _clearCommand = new();
+    private readonly CustomCommand _saveCommand = new();
 
     private IEnumerable<ITool> _tools = [];
 
@@ -86,6 +88,11 @@ public partial class MainWindow : Window
         NoteTextBox.InputBindings.Add(new InputBinding(_cutCommand, new KeyGesture(Key.X, ModifierKeys.Control)));
         _pasteCommand.ExecuteMethod = NoteTextBox_Paste;
         NoteTextBox.InputBindings.Add(new InputBinding(_pasteCommand, new KeyGesture(Key.V, ModifierKeys.Control)));
+
+        _clearCommand.ExecuteMethod = NoteTextBox_Clear;
+        ClearMenuItem.Command = _clearCommand;
+        _saveCommand.ExecuteMethod = NoteTextBox_Save;
+        SaveMenuItem.Command = _saveCommand;
     }
 
     private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -329,16 +336,6 @@ public partial class MainWindow : Window
     }
 
     #region ContextMenu
-
-    private void ClearMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        NoteTextBox.Clear();
-    }
-
-    private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        SaveNote();
-    }
 
     #region Colours
 
@@ -640,6 +637,24 @@ public partial class MainWindow : Window
         return true;
     }
 
+    public bool NoteTextBox_SelectAll()
+    {
+        NoteTextBox.SelectAll();
+        return true;
+    }
+
+    public bool NoteTextBox_Clear()
+    {
+        NoteTextBox.Clear();
+        return true;
+    }
+
+    public bool NoteTextBox_Save()
+    {
+        SaveNote();
+        return true;
+    }
+
     #region ContextMenu
 
     private ContextMenu GetNoteTextBoxContextMenu()
@@ -652,97 +667,112 @@ public partial class MainWindow : Window
         {
             if (spellingError.Suggestions.Any())
                 menu.Items.Add(
-                        ContextMenuHelper.CreateMenuItem(
-                            header: "(no spelling suggestions)",
-                            enabled: false
-                        )
+                        new MenuItem()
+                        {
+                            Header = "(no spelling suggestions)",
+                            IsEnabled = false
+                        }
                     );
             else
                 foreach (string spellingSuggestion in spellingError.Suggestions)
                 {
                     menu.Items.Add(
-                        ContextMenuHelper.CreateMenuItem(
-                            header: spellingSuggestion,
-                            headerBold: true,
-                            command: EditingCommands.CorrectSpellingError,
-                            commandParameter: spellingSuggestion,
-                            commandTarget: NoteTextBox
-                        )
+                        new MenuItem()
+                        {
+                            Header = spellingSuggestion,
+                            FontWeight = FontWeights.Bold,
+                            Command = EditingCommands.CorrectSpellingError,
+                            CommandParameter = spellingSuggestion,
+                            CommandTarget = NoteTextBox
+                        }
                     );
                 }
             menu.Items.Add(new Separator());
         }
 
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Copy",
-                command: _copyCommand,
-                inputGestureText: "Ctrl+C",
-                enabled: (NoteTextBox.SelectionLength > 0)
-            )
+            new MenuItem()
+            {
+                Header = "Copy",
+                Command = _copyCommand,
+                InputGestureText = "Ctrl+C",
+                IsEnabled = (NoteTextBox.SelectionLength > 0)
+            }
         );
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Cut",
-                command: _cutCommand,
-                inputGestureText: "Ctrl+X",
-                enabled: (NoteTextBox.SelectionLength > 0)
-            )
+            new MenuItem()
+            {
+                Header = "Cut",
+                Command = _cutCommand,
+                InputGestureText = "Ctrl+X",
+                IsEnabled = (NoteTextBox.SelectionLength > 0)
+            }
         );
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Paste",
-                command: _pasteCommand,
-                inputGestureText: "Ctrl+V",
-                enabled: (Clipboard.ContainsText())
-            )
+            new MenuItem()
+            {
+                Header = "Paste",
+                Command = _pasteCommand,
+                InputGestureText = "Ctrl+V",
+                IsEnabled = Clipboard.ContainsText()
+            }
         );
             
         menu.Items.Add(new Separator());
 
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Select All",
-                clickEventHandler: new RoutedEventHandler(SelectAllMenuItem_Click),
-                enabled: (NoteTextBox.Text.Length > 0)
-            )
+            new MenuItem()
+            {
+                Header = "Select All",
+                Command = new CustomCommand() { ExecuteMethod = NoteTextBox_SelectAll },
+                IsEnabled = (NoteTextBox.Text.Length > 0)
+            }
         );
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Clear",
-                clickEventHandler: new RoutedEventHandler(ClearMenuItem_Click),
-                enabled: (NoteTextBox.Text.Length > 0)
-            )
+            new MenuItem()
+            {
+                Header = "Clear",
+                Command = _clearCommand,
+                IsEnabled = (NoteTextBox.Text.Length > 0)
+            }
         );
         menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Save",
-                clickEventHandler: new RoutedEventHandler(SaveMenuItem_Click),
-                enabled: (NoteTextBox.Text.Length > 0)
-            )
+            new MenuItem()
+            {
+                Header = "Save",
+                Command = _saveCommand,
+                IsEnabled = (NoteTextBox.Text.Length > 0)
+            }
         );
 
         menu.Items.Add(new Separator());
 
-        menu.Items.Add(
-            ContextMenuHelper.CreateMenuItem(
-                header: "Counts",
-                children: [
-                    ContextMenuHelper.CreateMenuItem(
-                        header: "Lines: " + GetLineCount().ToString(),
-                        enabled: false
-                    ),
-                    ContextMenuHelper.CreateMenuItem(
-                        header: "Words: " + GetWordCount().ToString(),
-                        enabled: false
-                    ),
-                    ContextMenuHelper.CreateMenuItem(
-                        header: "Chars: " + GetCharCount().ToString(),
-                        enabled: false
-                    )
-                ]
-            )
+        MenuItem countsMenuItem = new()
+        {
+            Header = "Counts"
+        };
+        countsMenuItem.Items.Add(
+            new MenuItem()
+            {
+                Header = "Lines: " + GetLineCount().ToString(),
+                IsEnabled = false
+            }
         );
+        countsMenuItem.Items.Add(
+            new MenuItem()
+            {
+                Header = "Words: " + GetWordCount().ToString(),
+                IsEnabled = false
+            }
+        );
+        countsMenuItem.Items.Add(
+            new MenuItem()
+            {
+                Header = "Chars: " + GetCharCount().ToString(),
+                IsEnabled = false
+            }
+        );
+        menu.Items.Add(countsMenuItem);
 
         menu.Items.Add(new Separator());
 
@@ -807,16 +837,6 @@ public partial class MainWindow : Window
     {
         NoteTextBox.ContextMenu = GetNoteTextBoxContextMenu();
     }
-
-    #region SelectAll Clear Save
-
-    private void SelectAllMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        NoteTextBox.SelectionStart = 0;
-        NoteTextBox.SelectionLength = NoteTextBox.Text.Length;
-    }
-
-    #endregion
 
     #endregion
 
