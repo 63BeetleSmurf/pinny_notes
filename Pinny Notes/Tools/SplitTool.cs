@@ -4,37 +4,40 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class SplitTool : BaseTool, ITool
+public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public SplitTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Split",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Comma",
                 Command = new CustomCommand() { ExecuteMethod = SplitCommaAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
                 Command = new CustomCommand() { ExecuteMethod = SplitSpaceAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
                 Command = new CustomCommand() { ExecuteMethod = SplitTabAction }
             }
         );
-        MenuItem.Items.Add(new Separator());
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(new Separator());
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Selected",
@@ -42,6 +45,7 @@ public class SplitTool : BaseTool, ITool
             }
         );
 
+        return menuItem;
     }
 
     private bool SplitCommaAction()

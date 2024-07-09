@@ -4,22 +4,23 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class HtmlEntityTool : BaseTool, ITool
+public class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public HtmlEntityTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "HTML Entity",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Encode",
                 Command = new CustomCommand() { ExecuteMethod = HtmlEntityEncodeAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
@@ -27,6 +28,7 @@ public class HtmlEntityTool : BaseTool, ITool
             }
         );
 
+        return menuItem;
     }
 
     private bool HtmlEntityEncodeAction()

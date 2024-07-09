@@ -751,7 +751,9 @@ public partial class MainWindow : Window
             Header = "Tools"
         };
         foreach (ITool tool in _tools)
-            toolsMenu.Items.Add(tool.MenuItem);
+            toolsMenu.Items.Add(
+                tool.GetMenuItem()
+            );
         menu.Items.Add(toolsMenu);
 
         return menu;

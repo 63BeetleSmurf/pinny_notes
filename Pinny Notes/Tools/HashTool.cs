@@ -6,49 +6,52 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class HashTool : BaseTool, ITool
+public class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public HashTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Hash",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA512",
                 Command = new CustomCommand() { ExecuteMethod = HashSHA512Action }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA384",
                 Command = new CustomCommand() { ExecuteMethod = HashSHA384Action }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA256",
                 Command = new CustomCommand() { ExecuteMethod = HashSHA256Action }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA1",
                 Command = new CustomCommand() { ExecuteMethod = HashSHA1Action }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "MD5",
                 Command = new CustomCommand() { ExecuteMethod = HashMD5Action }
             }
         );
+
+        return menuItem;
     }
 
     private bool HashSHA512Action()

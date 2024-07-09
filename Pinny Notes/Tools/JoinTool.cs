@@ -4,35 +4,38 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class JoinTool : BaseTool, ITool
+public class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public JoinTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Join",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Comma",
                 Command = new CustomCommand() { ExecuteMethod = JoinCommaAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
                 Command = new CustomCommand() { ExecuteMethod = JoinSpaceAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
                 Command = new CustomCommand() { ExecuteMethod = JoinTabAction }
             }
         );
+
+        return menuItem;
     }
 
     private bool JoinCommaAction()

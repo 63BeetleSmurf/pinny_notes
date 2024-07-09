@@ -3,22 +3,23 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class QuoteTool : BaseTool, ITool
+public class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public QuoteTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Quote",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Double",
                 Command = new CustomCommand() { ExecuteMethod = QuoteDoubleAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Single",
@@ -26,6 +27,7 @@ public class QuoteTool : BaseTool, ITool
             }
         );
 
+        return menuItem;
     }
 
     private bool QuoteDoubleAction()

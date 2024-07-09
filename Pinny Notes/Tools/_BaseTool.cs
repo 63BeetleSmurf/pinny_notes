@@ -4,10 +4,8 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public abstract class BaseTool(TextBox noteTextBox) : ITool
+public abstract class BaseTool(TextBox noteTextBox)
 {
-    public MenuItem MenuItem { get; init; } = null!;
-
     protected TextBox _noteTextBox = noteTextBox;
 
     protected void ApplyFunctionToNoteText(Func<string, string?, string> function, string? additional = null)

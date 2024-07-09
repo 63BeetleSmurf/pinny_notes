@@ -4,35 +4,38 @@ using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
-public class CaseTool : BaseTool, ITool
+public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    public CaseTool(TextBox noteTextBox) : base(noteTextBox)
+    public MenuItem GetMenuItem()
     {
-        MenuItem = new()
+        MenuItem menuItem = new()
         {
             Header = "Case",
         };
-        MenuItem.Items.Add(
+
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Lower",
                 Command = new CustomCommand() { ExecuteMethod = CaseLowerAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Upper",
                 Command = new CustomCommand() { ExecuteMethod = CaseUpperAction }
             }
         );
-        MenuItem.Items.Add(
+        menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Proper",
                 Command = new CustomCommand() { ExecuteMethod = CaseProperAction }
             }
         );
+
+        return menuItem;
     }
 
     private bool CaseLowerAction()
