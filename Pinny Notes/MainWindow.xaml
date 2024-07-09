@@ -60,8 +60,8 @@
             </Button>
             <Grid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Name="ClearMenuItem" Header="Clear" Click="ClearMenuItem_Click"/>
-                    <MenuItem Name="SaveMenuItem" Header="Save" Click="SaveMenuItem_Click"/>
+                    <MenuItem Name="ClearMenuItem" Header="Clear"/>
+                    <MenuItem Name="SaveMenuItem" Header="Save"/>
                     <Separator />
                     <MenuItem Name="ColoursMenuItem" Header="Colours">
                         <MenuItem Name="ColourYellowMenuItem" Header="Yellow" IsCheckable="True" Click="ColourMenuItem_Click"/>
