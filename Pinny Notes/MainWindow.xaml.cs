@@ -3,30 +3,23 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Text;
-using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Windows.Media;
 using System.Linq;
 using System.Windows.Controls;
-using System.Net;
 using System.Windows.Documents;
-using System.Globalization;
-using System.Text.Json;
 using System.Windows.Media.Imaging;
 using Pinny_Notes.Enums;
 using Pinny_Notes.Commands;
+using Pinny_Notes.Helpers;
 using Pinny_Notes.Themes;
+using Pinny_Notes.Tools;
 
 namespace Pinny_Notes;
 
 public partial class MainWindow : Window
 {
     private readonly char[] _wordSeparators = [' ', '\t', '\r', '\n'];
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-    {
-        WriteIndented = true
-    };
 
     // Title Bar, Background, Border
     private readonly Dictionary<ThemeColors, NoteTheme> _noteThemes = new()
@@ -49,6 +42,8 @@ public partial class MainWindow : Window
     private readonly CustomCommand _cutCommand = new();
     private readonly CustomCommand _pasteCommand = new();
 
+    private IEnumerable<ITool> _tools = [];
+
     #region MainWindow
 
     public MainWindow()
@@ -68,7 +63,22 @@ public partial class MainWindow : Window
     private void MainWindowInitialize()
     {
         InitializeComponent();
-        NoteTextBox.ContextMenu = GetNoteTextBoxContextMenu();
+
+        _tools = [
+            new Base64Tool(NoteTextBox),
+            new CaseTool(NoteTextBox),
+            new HashTool(NoteTextBox),
+            new HtmlEntityTool(NoteTextBox),
+            new IndentTool(NoteTextBox),
+            new JoinTool(NoteTextBox),
+            new JsonTool(NoteTextBox),
+            new ListTool(NoteTextBox),
+            new QuoteTool(NoteTextBox),
+            new SplitTool(NoteTextBox),
+            new TrimTool(NoteTextBox)
+        ];
+
+        NoteTextBox.ContextMenu = new();
 
         _copyCommand.ExecuteMethod = NoteTextBox_Copy;
         NoteTextBox.InputBindings.Add(new InputBinding(_copyCommand, new KeyGesture(Key.C, ModifierKeys.Control)));
@@ -259,53 +269,6 @@ public partial class MainWindow : Window
             return MessageBoxResult.OK;
         }
         return MessageBoxResult.Cancel;
-    }
-
-    private void ApplyFunctionToNoteText(Func<string, string?, string> function, string? additional = null)
-    {
-        if (NoteTextBox.SelectionLength > 0)
-            NoteTextBox.SelectedText = function(NoteTextBox.SelectedText, additional);
-        else
-        {
-            string noteText = NoteTextBox.Text;
-            // Ignore trailing new line if it was automatically added
-            if (Properties.Settings.Default.NewLine && NoteTextBox.Text.EndsWith(Environment.NewLine))
-                noteText = noteText.Remove(noteText.Length - Environment.NewLine.Length);
-            NoteTextBox.Text = function(noteText, additional);
-            if (NoteTextBox.Text.Length > 0)
-                NoteTextBox.CaretIndex = NoteTextBox.Text.Length - 1;
-        }
-    }
-
-    private void ApplyFunctionToEachLine(Func<string, int, string?, string?> function, string? additional = null)
-    {
-        string[] lines;
-        List<string> newLines = [];
-
-        if (NoteTextBox.SelectionLength > 0)
-            lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
-        else
-            lines = NoteTextBox.Text.Split(Environment.NewLine);
-
-        int lineCount = lines.Length;
-        // Ignore trailing new line if it was automatically added
-        if (Properties.Settings.Default.NewLine && lines[lineCount - 1] == "")
-            lineCount--;
-        for (int i = 0; i < lineCount; i++)
-        {
-            string? line = function(lines[i], i, additional);
-            if (line != null)
-                newLines.Add(line);
-        }
-
-        if (NoteTextBox.SelectionLength > 0)
-            NoteTextBox.SelectedText = string.Join(Environment.NewLine, newLines);
-        else
-        {
-            NoteTextBox.Text = string.Join(Environment.NewLine, newLines);
-            if (NoteTextBox.Text.Length > 0)
-                NoteTextBox.CaretIndex = NoteTextBox.Text.Length - 1;
-        }
     }
 
     #endregion
@@ -689,7 +652,7 @@ public partial class MainWindow : Window
         {
             if (spellingError.Suggestions.Any())
                 menu.Items.Add(
-                        CreateMenuItem(
+                        ContextMenuHelper.CreateMenuItem(
                             header: "(no spelling suggestions)",
                             enabled: false
                         )
@@ -698,7 +661,7 @@ public partial class MainWindow : Window
                 foreach (string spellingSuggestion in spellingError.Suggestions)
                 {
                     menu.Items.Add(
-                        CreateMenuItem(
+                        ContextMenuHelper.CreateMenuItem(
                             header: spellingSuggestion,
                             headerBold: true,
                             command: EditingCommands.CorrectSpellingError,
@@ -711,7 +674,7 @@ public partial class MainWindow : Window
         }
 
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Copy",
                 command: _copyCommand,
                 inputGestureText: "Ctrl+C",
@@ -719,7 +682,7 @@ public partial class MainWindow : Window
             )
         );
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Cut",
                 command: _cutCommand,
                 inputGestureText: "Ctrl+X",
@@ -727,7 +690,7 @@ public partial class MainWindow : Window
             )
         );
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Paste",
                 command: _pasteCommand,
                 inputGestureText: "Ctrl+V",
@@ -738,21 +701,21 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
 
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Select All",
                 clickEventHandler: new RoutedEventHandler(SelectAllMenuItem_Click),
                 enabled: (NoteTextBox.Text.Length > 0)
             )
         );
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Clear",
                 clickEventHandler: new RoutedEventHandler(ClearMenuItem_Click),
                 enabled: (NoteTextBox.Text.Length > 0)
             )
         );
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Save",
                 clickEventHandler: new RoutedEventHandler(SaveMenuItem_Click),
                 enabled: (NoteTextBox.Text.Length > 0)
@@ -762,18 +725,18 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
 
         menu.Items.Add(
-            CreateMenuItem(
+            ContextMenuHelper.CreateMenuItem(
                 header: "Counts",
                 children: [
-                    CreateMenuItem(
+                    ContextMenuHelper.CreateMenuItem(
                         header: "Lines: " + GetLineCount().ToString(),
                         enabled: false
                     ),
-                    CreateMenuItem(
+                    ContextMenuHelper.CreateMenuItem(
                         header: "Words: " + GetWordCount().ToString(),
                         enabled: false
                     ),
-                    CreateMenuItem(
+                    ContextMenuHelper.CreateMenuItem(
                         header: "Chars: " + GetCharCount().ToString(),
                         enabled: false
                     )
@@ -783,142 +746,15 @@ public partial class MainWindow : Window
 
         menu.Items.Add(new Separator());
 
-        menu.Items.Add(
-            CreateMenuItem(
-                header: "Tools",
-                children: [
-                    CreateMenuItem(
-                        header: "Base64",
-                        children: [
-                            CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(Base64EncodeMenuItem_Click)),
-                            CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(Base64DecodeMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Case",
-                        children: [
-                            CreateMenuItem(header: "Lower", clickEventHandler: new RoutedEventHandler(CaseLowerMenuItem_Click)),
-                            CreateMenuItem(header: "Upper", clickEventHandler: new RoutedEventHandler(CaseUpperMenuItem_Click)),
-                            CreateMenuItem(header: "Proper", clickEventHandler: new RoutedEventHandler(CaseProperMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Hash",
-                        children:[
-                            CreateMenuItem(header: "SHA512", clickEventHandler: new RoutedEventHandler(HashSHA512MenuItem_Click)),
-                            CreateMenuItem(header: "SHA384", clickEventHandler: new RoutedEventHandler(HashSHA384MenuItem_Click)),
-                            CreateMenuItem(header: "SHA256", clickEventHandler: new RoutedEventHandler(HashSHA256MenuItem_Click)),
-                            CreateMenuItem(header: "SHA1", clickEventHandler: new RoutedEventHandler(HashSHA1MenuItem_Click)),
-                            CreateMenuItem(header: "MD5", clickEventHandler: new RoutedEventHandler(HashMD5MenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "HTML Entity",
-                        children: [
-                            CreateMenuItem(header: "Encode", clickEventHandler: new RoutedEventHandler(HTMLEntityEncodeMenuItem_Click)),
-                            CreateMenuItem(header: "Decode", clickEventHandler: new RoutedEventHandler(HTMLEntityDecodeMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Indent",
-                        children: [
-                            CreateMenuItem(header: "2 Spaces", clickEventHandler: new RoutedEventHandler(Indent2SpacesMenuItem_Click)),
-                            CreateMenuItem(header: "4 Spaces", clickEventHandler: new RoutedEventHandler(Indent4SpacesMenuItem_Click)),
-                            CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(IndentTabMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Join",
-                        children: [
-                            CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(JoinCommaMenuItem_Click)),
-                            CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(JoinSpaceMenuItem_Click)),
-                            CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(JoinTabMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "JSON",
-                        children: [
-                            CreateMenuItem(header: "Prettify", clickEventHandler: new RoutedEventHandler(JSONPrettifyMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "List",
-                        children: [
-                            CreateMenuItem(header: "Enumerate", clickEventHandler: new RoutedEventHandler(ListEnumerateMenuItem_Click)),
-                            CreateMenuItem(header: "Dash", clickEventHandler: new RoutedEventHandler(ListDashMenuItem_Click)),
-                            CreateMenuItem(header: "Remove", clickEventHandler: new RoutedEventHandler(ListRemoveMenuItem_Click)),
-                            new Separator(),
-                            CreateMenuItem(header: "Sort Asc.", clickEventHandler: new RoutedEventHandler(ListSortAscMenuItem_Click)),
-                            CreateMenuItem(header: "Sort Des.", clickEventHandler: new RoutedEventHandler(ListSortDecMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Quote",
-                        children: [
-                            CreateMenuItem(header: "Double", clickEventHandler: new RoutedEventHandler(QuoteDoubleMenuItem_Click)),
-                            CreateMenuItem(header: "Single", clickEventHandler: new RoutedEventHandler(QuoteSingleMenuItem_Click)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Split",
-                        children: [
-                            CreateMenuItem(header: "Comma", clickEventHandler: new RoutedEventHandler(SplitCommaMenuItem_Click)),
-                            CreateMenuItem(header: "Space", clickEventHandler: new RoutedEventHandler(SplitSpaceMenuItem_Click)),
-                            CreateMenuItem(header: "Tab", clickEventHandler: new RoutedEventHandler(SplitTabMenuItem_Click)),
-                            new Separator(),
-                            CreateMenuItem(header: "Selected", clickEventHandler: new RoutedEventHandler(SplitSelectedMenuItem_Click), enabled: (NoteTextBox.SelectionLength > 0)),
-                        ]
-                    ),
-                    CreateMenuItem(
-                        header: "Trim",
-                        children: [
-                            CreateMenuItem(header: "Start", clickEventHandler: new RoutedEventHandler(TrimStartMenuItem_Click)),
-                            CreateMenuItem(header: "End", clickEventHandler: new RoutedEventHandler(TrimEndMenuItem_Click)),
-                            CreateMenuItem(header: "Both", clickEventHandler: new RoutedEventHandler(TrimBothMenuItem_Click)),
-                            CreateMenuItem(header: "Empty Lines", clickEventHandler: new RoutedEventHandler(TrimEmptyLinesMenuItem_Click)),
-                        ]
-                    ),
-                ]
-            )
-        );
+        MenuItem toolsMenu = new()
+        {
+            Header = "Tools"
+        };
+        foreach (ITool tool in _tools)
+            toolsMenu.Items.Add(tool.MenuItem);
+        menu.Items.Add(toolsMenu);
 
         return menu;
-    }
-
-    private static MenuItem CreateMenuItem(string header, bool headerBold = false, bool enabled = true,
-        RoutedEventHandler? clickEventHandler = null, List<object>? children = null,
-        ICommand? command = null, object? commandParameter = null, IInputElement? commandTarget = null,
-        string? inputGestureText = null
-        )
-    {
-        MenuItem menuItem = new()
-        {
-            Header = header
-        };
-        if (headerBold)
-            menuItem.FontWeight = FontWeights.Bold;
-            
-        if (clickEventHandler != null)
-            menuItem.Click += clickEventHandler;
-            
-        if (children != null)
-            foreach (object child in children)
-                menuItem.Items.Add(child);
-
-        if (!enabled)
-            menuItem.IsEnabled = false;
-
-        if (command != null)
-            menuItem.Command = command;
-        if (commandParameter!= null)
-            menuItem.CommandParameter = commandParameter;
-        if (commandTarget != null)
-            menuItem.CommandTarget = commandTarget;
-
-        if (inputGestureText != null)
-            menuItem.InputGestureText = inputGestureText;
-
-        return menuItem;
     }
 
     private int GetLineCount()
@@ -976,358 +812,6 @@ public partial class MainWindow : Window
     {
         NoteTextBox.SelectionStart = 0;
         NoteTextBox.SelectionLength = NoteTextBox.Text.Length;
-    }
-
-    #endregion
-
-    #region Base64
-
-    private void Base64EncodeMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(Base64EncodeText);
-    }
-
-    private void Base64DecodeMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(Base64DecodeText);
-    }
-
-    private string Base64EncodeText(string text, string? additional = null)
-    {
-        byte[] textBytes = System.Text.Encoding.UTF8.GetBytes(text);
-        return System.Convert.ToBase64String(textBytes);
-    }
-
-    private string Base64DecodeText(string text, string? additional = null)
-    {
-        byte[] base64Bytes = System.Convert.FromBase64String(text);
-        return System.Text.Encoding.UTF8.GetString(base64Bytes);
-    }
-
-    #endregion
-
-    #region Case
-
-    private void CaseLowerMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SetTextCase, "l");
-    }
-
-    private void CaseUpperMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SetTextCase, "u");
-    }
-
-    private void CaseProperMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SetTextCase, "p");
-    }
-
-    private string? SetTextCase(string line, int index, string? textCase)
-    {
-        TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-        return textCase switch
-        {
-            "u" => textInfo.ToUpper(line),
-            "p" => textInfo.ToTitleCase(textInfo.ToLower(line)),
-            _ => textInfo.ToLower(line),
-        };
-    }
-
-    #endregion
-
-    #region Hash
-
-    private void HashSHA512MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HashText, "sha512");
-    }
-
-    private void HashSHA384MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HashText, "sha384");
-    }
-
-    private void HashSHA256MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HashText, "sha256");
-    }
-
-    private void HashSHA1MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HashText, "sha1");
-    }
-
-    private void HashMD5MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HashText, "md5");
-    }
-
-    private string HashText(string text, string? algorithm)
-    {
-        HashAlgorithm hasher;
-        switch (algorithm)
-        {
-            case "sha512":
-                hasher = SHA512.Create();
-                break;
-            case "sha384":
-                hasher = SHA384.Create();
-                break;
-            case "sha256":
-                hasher = SHA256.Create();
-                break;
-            case "sha1":
-                hasher = SHA1.Create();
-                break;
-            case "md5":
-                hasher = MD5.Create();
-                break;
-            default:
-                return text;
-        }
-        return BitConverter.ToString(
-            hasher.ComputeHash(Encoding.UTF8.GetBytes(NoteTextBox.Text))
-        ).Replace("-", "");
-    }
-
-    #endregion
-
-    #region HTML Entity
-
-    private void HTMLEntityEncodeMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HTMLEntityEncodeText);
-    }
-
-    private void HTMLEntityDecodeMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(HTMLEntityDecodeText);
-    }
-
-    private string HTMLEntityEncodeText(string text, string? additional = null)
-    {
-        return WebUtility.HtmlEncode(text);
-    }
-    private string HTMLEntityDecodeText(string text, string? additional = null)
-    {
-        return WebUtility.HtmlDecode(text);
-    }
-
-    #endregion
-
-    #region Indent
-
-    private void Indent2SpacesMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(IndentText, "  ");
-    }
-
-    private void Indent4SpacesMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(IndentText, "    ");
-    }
-
-    private void IndentTabMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(IndentText, "\t");
-    }
-
-    private string? IndentText(string line, int index, string? indentString)
-    {
-        return indentString + line;
-    }
-
-    #endregion
-
-    #region Join
-
-    private void JoinCommaMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(JoinText, ",");
-    }
-
-    private void JoinSpaceMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(JoinText, " ");
-    }
-
-    private void JoinTabMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(JoinText, "\t");
-    }
-
-    private string JoinText(string text, string? joinString)
-    {
-        return text.Replace(Environment.NewLine, joinString);
-    }
-
-    #endregion
-
-    #region JSON
-
-    private void JSONPrettifyMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(JSONPrettifyText);
-    }
-
-    private string JSONPrettifyText(string text, string? additional = null)
-    {
-        try
-        {
-            object? jsonObject = JsonSerializer.Deserialize<object>(text);
-            if (jsonObject != null)
-                return JsonSerializer.Serialize<object>(jsonObject, _jsonSerializerOptions);
-        }
-        catch
-        {
-        }
-        return text;
-    }
-
-    #endregion
-
-    #region List
-
-    private void ListEnumerateMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(EnumerateLine);
-    }
-
-    private string EnumerateLine(string line, int index, string? additional)
-    {
-        return (index + 1).ToString() + ". " + line;
-    }
-
-    private void ListDashMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(IndentText, "- ");
-    }
-
-    private void ListRemoveMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(RemoveFirstWordInLine);
-    }
-
-    private string RemoveFirstWordInLine(string line, int index, string? additional)
-    {
-        return line[(line.IndexOf(' ') + 1)..];
-    }
-
-    private void ListSortAscMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(SortNoteText);
-    }
-
-    private void ListSortDecMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToNoteText(SortNoteText, "rev");
-    }
-
-    private string SortNoteText(string text, string? reverse = null)
-    {
-        string[] lines = text.Split(Environment.NewLine);
-        Array.Sort(lines);
-        if (reverse == "rev")
-            Array.Reverse(lines);
-        return string.Join(Environment.NewLine, lines);
-    }
-
-    #endregion
-
-    #region Quote
-
-    private void QuoteDoubleMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(QuoteText, "\"");
-    }
-
-    private void QuoteSingleMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(QuoteText, "'");
-    }
-
-    private string? QuoteText(string line, int index, string? additional)
-    {
-        return additional + line + additional;
-    }
-
-    #endregion
-
-    #region Split
-
-    private void SplitCommaMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SplitText, ",");
-    }
-
-    private void SplitSpaceMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SplitText, " ");
-    }
-
-    private void SplitTabMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(SplitText, "\t");
-    }
-
-    private void SplitSelectedMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        string splitString = NoteTextBox.SelectedText;
-        NoteTextBox.SelectionLength = 0;
-        ApplyFunctionToEachLine(SplitText, splitString);
-    }
-
-    private string? SplitText(string line, int index, string? splitString)
-    {
-        if (splitString == null)
-            return null;
-        return line.Replace(splitString, Environment.NewLine);
-    }
-
-    #endregion
-
-    #region Trim
-
-    private void TrimStartMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(TrimText, "Start");
-    }
-
-    private void TrimEndMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(TrimText, "End");
-    }
-
-    private void TrimBothMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(TrimText, "Both");
-    }
-
-    private void TrimEmptyLinesMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ApplyFunctionToEachLine(TrimText, "Lines");
-    }
-
-    private string? TrimText(string line, int index, string? trimType)
-    {
-        switch (trimType)
-        {
-            case "Start":
-                return line.TrimStart();
-            case "End":
-                return line.TrimEnd();
-            case "Both":
-                return line.Trim();
-            case "Lines":
-                if (string.IsNullOrEmpty(line))
-                    return null;
-                else
-                    return line;
-            default:
-                return line;
-
-        }
     }
 
     #endregion
