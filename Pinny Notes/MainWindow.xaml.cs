@@ -308,9 +308,9 @@ public partial class MainWindow : Window
         Topmost = !Topmost;
 
         if (Topmost)
-            TopButton.Content = (BitmapImage)FindResource("PinImageSource");
+            TopButton.Content = (BitmapImage)Resources["PinImageSource"];
         else
-            TopButton.Content = (BitmapImage)FindResource("Pin45ImageSource");
+            TopButton.Content = (BitmapImage)Resources["Pin45ImageSource"];
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
