@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Images\plus-solid.png" />
     <Resource Include="Images\thumbtack-solid-45.png" />
     <Resource Include="Images\thumbtack-solid.png" />
