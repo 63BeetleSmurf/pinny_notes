@@ -50,30 +50,30 @@ public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private void SplitCommaAction()
     {
-        ApplyFunctionToEachLine<string>(SplitText, ",");
+        ApplyFunctionToNoteText<string>(SplitText, ",");
     }
 
     private void SplitSpaceAction()
     {
-        ApplyFunctionToEachLine<string>(SplitText, " ");
+        ApplyFunctionToNoteText<string>(SplitText, " ");
     }
 
     private void SplitTabAction()
     {
-        ApplyFunctionToEachLine<string>(SplitText, "\t");
+        ApplyFunctionToNoteText<string>(SplitText, "\t");
     }
 
     private void SplitSelectedAction()
     {
         string splitString = _noteTextBox.SelectedText;
         _noteTextBox.SelectionLength = 0;
-        ApplyFunctionToEachLine(SplitText, splitString);
+        ApplyFunctionToNoteText(SplitText, splitString);
     }
 
-    private string? SplitText(string line, int index, string? splitString)
+    private string SplitText(string line, string? splitString)
     {
         if (splitString == null)
-            return null;
+            return line;
         return line.Replace(splitString, Environment.NewLine);
     }
 }

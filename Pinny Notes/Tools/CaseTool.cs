@@ -47,27 +47,27 @@ public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 
     private void CaseLowerAction()
     {
-        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Lower);
+        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Lower);
     }
 
     private void CaseUpperAction()
     {
-        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Upper);
+        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Upper);
     }
 
     private void CaseProperAction()
     {
-        ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Proper);
+        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Proper);
     }
 
-    private string? SetTextCase(string line, int index, Cases textCase)
+    private string SetTextCase(string text, Cases textCase)
     {
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
         return textCase switch
         {
-            Cases.Upper => textInfo.ToUpper(line),
-            Cases.Proper => textInfo.ToTitleCase(textInfo.ToLower(line)),
-            _ => textInfo.ToLower(line),
+            Cases.Upper => textInfo.ToUpper(text),
+            Cases.Proper => textInfo.ToTitleCase(textInfo.ToLower(text)),
+            _ => textInfo.ToLower(text),
         };
     }
 }
