@@ -54,4 +54,20 @@ public abstract class BaseTool(TextBox noteTextBox)
                 _noteTextBox.CaretIndex = _noteTextBox.Text.Length - 1;
         }
     }
+
+    protected void InsertIntoNoteText(string text)
+    {
+        if (_noteTextBox.SelectionLength > 0)
+        {
+            int selectionStart = _noteTextBox.SelectionStart;
+            _noteTextBox.Text = $"{_noteTextBox.Text[..selectionStart]}{text}{_noteTextBox.Text[(selectionStart + _noteTextBox.SelectionLength)..]}";
+            _noteTextBox.CaretIndex = selectionStart + text.Length;
+        }
+        else
+        {
+            int caretIndex = _noteTextBox.CaretIndex;
+            _noteTextBox.Text = $"{_noteTextBox.Text[..caretIndex]}{text}{_noteTextBox.Text[caretIndex..]}";
+            _noteTextBox.CaretIndex = caretIndex + text.Length;
+        }
+    }
 }
