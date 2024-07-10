@@ -802,40 +802,24 @@ public partial class MainWindow : Window
                 -  NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.SelectionStart)
                 + 1;
         else
-            count = NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.Text.Length);
+            count = NoteTextBox.GetLineIndexFromCharacterIndex(NoteTextBox.Text.Length) + 1;
         return count;
     }
 
     private int GetWordCount()
     {
-        int count = 0;
-        string text;
-        if (NoteTextBox.SelectionLength > 0)
-            text = NoteTextBox.SelectedText;
-        else
-            text = NoteTextBox.Text;
-        if (!string.IsNullOrEmpty(text.Trim()))
-        {
-            string[] words = text.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries);
-            count = words.Length;
-        }
-        return count;
+        string text = (NoteTextBox.SelectionLength > 0) ? NoteTextBox.SelectedText : NoteTextBox.Text;
+        if (text.Length == 0)
+            return 0;
+        return text.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries).Length;
     }
 
     private int GetCharCount()
     {
-        int count = 0;
-        string text;
-        if (NoteTextBox.SelectionLength > 0)
-            text = NoteTextBox.SelectedText;
-        else
-            text = NoteTextBox.Text;
-        if (!string.IsNullOrEmpty(text))
-        {
-            text = text.Replace(Environment.NewLine, "");
-            count = text.Length;
-        }
-        return count;
+        string text = (NoteTextBox.SelectionLength > 0) ? NoteTextBox.SelectedText : NoteTextBox.Text;
+        if (text.Length == 0)
+            return 0;
+        return text.Length - text.Count(c => c == '\n' || c == '\r'); // Substract new lines from count.
     }
 
     private void NoteTextBox_ContextMenuOpening(object sender, RoutedEventArgs e)
