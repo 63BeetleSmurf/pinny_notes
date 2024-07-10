@@ -87,19 +87,19 @@ public partial class MainWindow : Window
 
         NoteTextBox.ContextMenu = new();
 
-        _copyCommand = new(NoteTextBox_Copy);
+        _copyCommand = new(CopyCommandExecute);
         NoteTextBox.InputBindings.Add(new InputBinding(_copyCommand, new KeyGesture(Key.C, ModifierKeys.Control)));
-        _cutCommand = new(NoteTextBox_Cut);
+        _cutCommand = new(CutCommandExecute);
         NoteTextBox.InputBindings.Add(new InputBinding(_cutCommand, new KeyGesture(Key.X, ModifierKeys.Control)));
-        _pasteCommand = new(NoteTextBox_Paste);
+        _pasteCommand = new(PasteCommandExecute);
         NoteTextBox.InputBindings.Add(new InputBinding(_pasteCommand, new KeyGesture(Key.V, ModifierKeys.Control)));
 
-        _clearCommand = new(NoteTextBox_Clear);
+        _clearCommand = new(ClearCommandExecute);
         ClearMenuItem.Command = _clearCommand;
-        _saveCommand = new(NoteTextBox_Save);
+        _saveCommand = new(SaveCommandExecute);
         SaveMenuItem.Command = _saveCommand;
 
-        _changeThemeColorCommand = new(ChangeThemeColor);
+        _changeThemeColorCommand = new(ChangeThemeColorCommandExecute);
         ColourYellowMenuItem.Command = _changeThemeColorCommand;
         ColourYellowMenuItem.CommandParameter = ThemeColors.Yellow;
         ColourOrangeMenuItem.Command = _changeThemeColorCommand;
@@ -116,11 +116,6 @@ public partial class MainWindow : Window
         ColourAquaMenuItem.CommandParameter = ThemeColors.Aqua;
         ColourGreenMenuItem.Command = _changeThemeColorCommand;
         ColourGreenMenuItem.CommandParameter = ThemeColors.Green;
-    }
-
-    private void ChangeThemeColor(ThemeColors color)
-    {
-        SetColour(color);
     }
 
     private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -145,6 +140,75 @@ public partial class MainWindow : Window
                 gravityTop
             );
         }
+    }
+
+    #endregion
+
+    #region Commands
+
+    public void CopyCommandExecute()
+    {
+        string copiedText = NoteTextBox.SelectedText;
+        if (Properties.Settings.Default.TrimCopiedText)
+            copiedText = copiedText.Trim();
+        Clipboard.SetDataObject(copiedText);
+    }
+
+    public void CutCommandExecute()
+    {
+        string copiedText = NoteTextBox.SelectedText;
+        if (Properties.Settings.Default.TrimCopiedText)
+            copiedText = copiedText.Trim();
+        Clipboard.SetDataObject(copiedText);
+        int selectionStart = NoteTextBox.SelectionStart;
+        NoteTextBox.Text = $"{NoteTextBox.Text[..selectionStart]}{NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..]}";
+        NoteTextBox.CaretIndex = selectionStart;
+    }
+
+    public void PasteCommandExecute()
+    {
+        IDataObject clipboardData = Clipboard.GetDataObject();
+        if (clipboardData.GetDataPresent(DataFormats.Text))
+        {
+            string clipboardString = (String)clipboardData.GetData(DataFormats.Text);
+            if (Properties.Settings.Default.TrimPastedText)
+                clipboardString = clipboardString.Trim();
+
+            if (NoteTextBox.SelectionLength == 0)
+            {
+                int caretIndex = NoteTextBox.CaretIndex;
+                bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
+                NoteTextBox.Text = $"{NoteTextBox.Text[..caretIndex]}{clipboardString}{NoteTextBox.Text[caretIndex..]}";
+                NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
+                if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                    NoteTextBox.ScrollToEnd();
+            }
+            else
+            {
+                int selectionStart = NoteTextBox.SelectionStart;
+                NoteTextBox.Text = $"{NoteTextBox.Text[..selectionStart]}{clipboardString}{NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..]}";
+                NoteTextBox.CaretIndex = selectionStart + clipboardString.Length;
+            }
+        }
+    }
+
+    public void SelectAllCommandExecute()
+    {
+        NoteTextBox.SelectAll();
+    }
+
+    public void ClearCommandExecute()
+    {
+        NoteTextBox.Clear();
+    }
+
+    public void SaveCommandExecute()
+    {
+        SaveNote();
+    }
+    private void ChangeThemeColorCommandExecute(ThemeColors color)
+    {
+        SetColour(color);
     }
 
     #endregion
@@ -497,7 +561,7 @@ public partial class MainWindow : Window
     private void NoteTextBox_SelectionChanged(object sender, RoutedEventArgs e)
     {
         if (Properties.Settings.Default.AutoCopy && NoteTextBox.SelectionLength > 0)
-            NoteTextBox_Copy();
+            _copyCommand.Execute(null);
     }
 
     private void NoteTextBox_DragOver(object sender, DragEventArgs e)
@@ -525,7 +589,7 @@ public partial class MainWindow : Window
         if (NoteTextBox.SelectionLength > 0
             && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
         )
-            NoteTextBox_Copy();
+            _copyCommand.Execute(null);
     }
 
     private void NoteTextBox_MouseDown(object sender, MouseButtonEventArgs e)
@@ -565,7 +629,7 @@ public partial class MainWindow : Window
     private void NoteTextBox_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (Properties.Settings.Default.MiddleClickPaste && e.ChangedButton == MouseButton.Middle)
-            NoteTextBox_Paste();
+            _pasteCommand.Execute(null);
     }
 
     private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -597,67 +661,6 @@ public partial class MainWindow : Window
             textBox.Text = textBox.Text.Insert(caretIndex, indent);
             textBox.CaretIndex = caretIndex + indent.Length;
         }
-    }
-
-    public void NoteTextBox_Copy()
-    {
-        string copiedText = NoteTextBox.SelectedText;
-        if (Properties.Settings.Default.TrimCopiedText)
-            copiedText = copiedText.Trim();
-        Clipboard.SetDataObject(copiedText);
-    }
-
-    public void NoteTextBox_Cut()
-    {
-        string copiedText = NoteTextBox.SelectedText;
-        if (Properties.Settings.Default.TrimCopiedText)
-            copiedText = copiedText.Trim();
-        Clipboard.SetDataObject(copiedText);
-        int selectionStart = NoteTextBox.SelectionStart;
-        NoteTextBox.Text = $"{ NoteTextBox.Text[..selectionStart] }{ NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..] }";
-        NoteTextBox.CaretIndex = selectionStart;
-    }
-
-    public void NoteTextBox_Paste()
-    {
-        IDataObject clipboardData = Clipboard.GetDataObject();
-        if (clipboardData.GetDataPresent(DataFormats.Text))
-        {
-            string clipboardString = (String)clipboardData.GetData(DataFormats.Text);
-            if (Properties.Settings.Default.TrimPastedText)
-                clipboardString = clipboardString.Trim();
-
-            if (NoteTextBox.SelectionLength == 0)
-            {
-                int caretIndex = NoteTextBox.CaretIndex;
-                bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
-                NoteTextBox.Text = $"{ NoteTextBox.Text[..caretIndex] }{ clipboardString }{ NoteTextBox.Text[caretIndex..] }";
-                NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
-                if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
-                    NoteTextBox.ScrollToEnd();
-            }
-            else
-            {
-                int selectionStart = NoteTextBox.SelectionStart;
-                NoteTextBox.Text = $"{ NoteTextBox.Text[..selectionStart] }{ clipboardString }{ NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..] }";
-                NoteTextBox.CaretIndex = selectionStart + clipboardString.Length;
-            }
-        }
-    }
-
-    public void NoteTextBox_SelectAll()
-    {
-        NoteTextBox.SelectAll();
-    }
-
-    public void NoteTextBox_Clear()
-    {
-        NoteTextBox.Clear();
-    }
-
-    public void NoteTextBox_Save()
-    {
-        SaveNote();
     }
 
     #region ContextMenu
@@ -729,7 +732,7 @@ public partial class MainWindow : Window
             new MenuItem()
             {
                 Header = "Select All",
-                Command = new RelayCommand(NoteTextBox_SelectAll),
+                Command = new RelayCommand(SelectAllCommandExecute),
                 IsEnabled = (NoteTextBox.Text.Length > 0)
             }
         );
