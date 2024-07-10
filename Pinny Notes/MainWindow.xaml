@@ -64,14 +64,46 @@
                     <MenuItem Name="SaveMenuItem" Header="Save"/>
                     <Separator />
                     <MenuItem Name="ColoursMenuItem" Header="Colours">
-                        <MenuItem Name="ColourYellowMenuItem" Header="Yellow" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourOrangeMenuItem" Header="Orange" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourRedMenuItem" Header="Red" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourPinkMenuItem" Header="Pink" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourPurpleMenuItem" Header="Purple" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourBlueMenuItem" Header="Blue" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourAquaMenuItem" Header="Aqua" IsCheckable="True" Click="ColourMenuItem_Click"/>
-                        <MenuItem Name="ColourGreenMenuItem" Header="Green" IsCheckable="True" Click="ColourMenuItem_Click"/>
+                        <MenuItem Name="ColourYellowMenuItem" Header="Yellow">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#fef7b1" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourOrangeMenuItem" Header="Orange">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#ffd179" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourRedMenuItem" Header="Red">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#ff7c81" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourPinkMenuItem" Header="Pink">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#d986cc" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourPurpleMenuItem" Header="Purple">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#9d9add" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourBlueMenuItem" Header="Blue">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#7ac3e6" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourAquaMenuItem" Header="Aqua">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#97cfc6" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Name="ColourGreenMenuItem" Header="Green">
+                            <MenuItem.Icon>
+                                <Rectangle Width="16" Height="16" Fill="#c6d67d" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <Separator />
                         <MenuItem Name="ColourCycleMenuItem" Header="Cycle" IsCheckable="True" Click="ColourCycleMenuItem_Click"/>
                     </MenuItem>

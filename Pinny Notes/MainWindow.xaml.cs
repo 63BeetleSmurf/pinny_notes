@@ -23,14 +23,14 @@ public partial class MainWindow : Window
     // Title Bar, Background, Border
     private readonly Dictionary<ThemeColors, NoteTheme> _noteThemes = new()
     {
-        {ThemeColors.Yellow, new NoteTheme("Yellow", Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},  // #fef7b1 #fffcdd #feea00
-        {ThemeColors.Orange, new NoteTheme("Orange", Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},  // #ffd179 #fee8b9 #ffab00
-        {ThemeColors.Red, new NoteTheme("Red", Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},        // #ff7c81 #ffc4c6 #e33036
-        {ThemeColors.Pink, new NoteTheme("Pink", Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
-        {ThemeColors.Purple, new NoteTheme("Purple", Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},  // #9d9add #d0cef3 #625bb8
-        {ThemeColors.Blue, new NoteTheme("Blue", Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
-        {ThemeColors.Aqua, new NoteTheme("Aqua", Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
-        {ThemeColors.Green, new NoteTheme("Green", Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}     // #c6d67d #e3ebc6 #aacc04
+        {ThemeColors.Yellow, new NoteTheme(Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},    // #fef7b1 #fffcdd #feea00
+        {ThemeColors.Orange, new NoteTheme(Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},    // #ffd179 #fee8b9 #ffab00
+        {ThemeColors.Red, new NoteTheme(Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},       // #ff7c81 #ffc4c6 #e33036
+        {ThemeColors.Pink, new NoteTheme(Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
+        {ThemeColors.Purple, new NoteTheme(Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},    // #9d9add #d0cef3 #625bb8
+        {ThemeColors.Blue, new NoteTheme(Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
+        {ThemeColors.Aqua, new NoteTheme(Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
+        {ThemeColors.Green, new NoteTheme(Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}      // #c6d67d #e3ebc6 #aacc04
     };
 
     private ThemeColors _noteCurrentTheme;
@@ -43,6 +43,8 @@ public partial class MainWindow : Window
 
     private RelayCommand _clearCommand = null!;
     private RelayCommand _saveCommand = null!;
+
+    private RelayCommand<ThemeColors> _changeThemeColorCommand = null!;
 
     private IEnumerable<ITool> _tools = [];
 
@@ -96,6 +98,29 @@ public partial class MainWindow : Window
         ClearMenuItem.Command = _clearCommand;
         _saveCommand = new(NoteTextBox_Save);
         SaveMenuItem.Command = _saveCommand;
+
+        _changeThemeColorCommand = new(ChangeThemeColor);
+        ColourYellowMenuItem.Command = _changeThemeColorCommand;
+        ColourYellowMenuItem.CommandParameter = ThemeColors.Yellow;
+        ColourOrangeMenuItem.Command = _changeThemeColorCommand;
+        ColourOrangeMenuItem.CommandParameter = ThemeColors.Orange;
+        ColourRedMenuItem.Command = _changeThemeColorCommand;
+        ColourRedMenuItem.CommandParameter = ThemeColors.Red;
+        ColourPinkMenuItem.Command = _changeThemeColorCommand;
+        ColourPinkMenuItem.CommandParameter = ThemeColors.Pink;
+        ColourPurpleMenuItem.Command = _changeThemeColorCommand;
+        ColourPurpleMenuItem.CommandParameter = ThemeColors.Purple;
+        ColourBlueMenuItem.Command = _changeThemeColorCommand;
+        ColourBlueMenuItem.CommandParameter = ThemeColors.Blue;
+        ColourAquaMenuItem.Command = _changeThemeColorCommand;
+        ColourAquaMenuItem.CommandParameter = ThemeColors.Aqua;
+        ColourGreenMenuItem.Command = _changeThemeColorCommand;
+        ColourGreenMenuItem.CommandParameter = ThemeColors.Green;
+    }
+
+    private void ChangeThemeColor(ThemeColors color)
+    {
+        SetColour(color);
     }
 
     private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -195,9 +220,9 @@ public partial class MainWindow : Window
             _noteCurrentTheme = (ThemeColors)nextColour;
         }
 
-        TitleBarGrid.Background = new SolidColorBrush(_noteThemes[_noteCurrentTheme].TitleBarColor);
-        Background = new SolidColorBrush(_noteThemes[_noteCurrentTheme].BackgroundColor);
-        BorderBrush = new SolidColorBrush(_noteThemes[_noteCurrentTheme].BorderColor);
+        TitleBarGrid.Background = _noteThemes[_noteCurrentTheme].TitleBarColorBrush;
+        Background = _noteThemes[_noteCurrentTheme].BackgroundColorBrush;
+        BorderBrush = _noteThemes[_noteCurrentTheme].BorderColorBrush;
 
         Properties.Settings.Default.Colour = (int)_noteCurrentTheme;
         Properties.Settings.Default.Save();
@@ -205,14 +230,18 @@ public partial class MainWindow : Window
         // Tick correct menu item for colour or note.
         foreach (object childObject in ColoursMenuItem.Items)
         {
-            if (childObject.GetType().Name != "MenuItem")
-                continue;
+            if (childObject is MenuItem)
+            {
+                MenuItem childMenuItem = (MenuItem)childObject;
 
-            MenuItem childMenuItem = (MenuItem)childObject;
-            if (childMenuItem.Header.ToString() != "Cycle" && childMenuItem.Header.ToString() != _noteThemes[_noteCurrentTheme].Name)
-                childMenuItem.IsChecked = false;
-            else if (childMenuItem.Header.ToString() == _noteThemes[_noteCurrentTheme].Name)
-                childMenuItem.IsChecked = true;
+                if (childMenuItem.CommandParameter == null)
+                    continue;
+
+                if ((ThemeColors)childMenuItem.CommandParameter == _noteCurrentTheme)
+                    childMenuItem.IsEnabled = false;
+                else
+                    childMenuItem.IsEnabled = true;
+            }
         }
     }
 
@@ -346,27 +375,6 @@ public partial class MainWindow : Window
     {
         Properties.Settings.Default.CycleColours = ColourCycleMenuItem.IsChecked;
         Properties.Settings.Default.Save();
-    }
-
-    private void ColourMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        // Don't allow uncheckign active item.
-        MenuItem menuItem = (MenuItem)sender;
-        if (!menuItem.IsChecked)
-        {
-            menuItem.IsChecked = true;
-            return;
-        }
-
-        // To Do - Implement commands which will pass parameter for color.
-        foreach (KeyValuePair<ThemeColors, NoteTheme> noteTheme in _noteThemes)
-        {
-            if (noteTheme.Value.Name == menuItem.Header.ToString())
-            {
-                SetColour(noteTheme.Key);
-                break;
-            }
-        }
     }
 
     #endregion
