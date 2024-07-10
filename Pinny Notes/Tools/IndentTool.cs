@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Pinny_Notes.Commands;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
@@ -16,42 +16,39 @@ public class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "2 Spaces",
-                Command = new CustomCommand() { ExecuteMethod = Indent2SpacesAction }
+                Command = new RelayCommand(Indent2SpacesAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "4 Spaces",
-                Command = new CustomCommand() { ExecuteMethod = Indent4SpacesAction }
+                Command = new RelayCommand(Indent4SpacesAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new CustomCommand() { ExecuteMethod = IndentTabAction }
+                Command = new RelayCommand(IndentTabAction)
             }
         );
 
         return menuItem;
     }
-    private bool Indent2SpacesAction()
+    private void Indent2SpacesAction()
     {
         ApplyFunctionToEachLine<string>(IndentText, "  ");
-        return true;
     }
 
-    private bool Indent4SpacesAction()
+    private void Indent4SpacesAction()
     {
         ApplyFunctionToEachLine<string>(IndentText, "    ");
-        return true;
     }
 
-    private bool IndentTabAction()
+    private void IndentTabAction()
     {
         ApplyFunctionToEachLine<string>(IndentText, "\t");
-        return true;
     }
 
     private string? IndentText(string line, int index, string? indentString)

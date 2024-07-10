@@ -1,6 +1,6 @@
-﻿using System.Net;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Net;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -17,30 +17,28 @@ public class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Encode",
-                Command = new CustomCommand() { ExecuteMethod = HtmlEntityEncodeAction }
+                Command = new RelayCommand(HtmlEntityEncodeAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
-                Command = new CustomCommand() { ExecuteMethod = HtmlEntityDecodeAction }
+                Command = new RelayCommand(HtmlEntityDecodeAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool HtmlEntityEncodeAction()
+    private void HtmlEntityEncodeAction()
     {
         ApplyFunctionToNoteText<bool?>(HtmlEntityEncodeText);
-        return true;
     }
 
-    private bool HtmlEntityDecodeAction()
+    private void HtmlEntityDecodeAction()
     {
         ApplyFunctionToNoteText<bool?>(HtmlEntityDecodeText);
-        return true;
     }
 
     private string HtmlEntityEncodeText(string text, bool? additional = null)

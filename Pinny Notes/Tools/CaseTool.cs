@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Globalization;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -24,43 +24,40 @@ public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Lower",
-                Command = new CustomCommand() { ExecuteMethod = CaseLowerAction }
+                Command = new RelayCommand(CaseLowerAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Upper",
-                Command = new CustomCommand() { ExecuteMethod = CaseUpperAction }
+                Command = new RelayCommand(CaseUpperAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Proper",
-                Command = new CustomCommand() { ExecuteMethod = CaseProperAction }
+                Command = new RelayCommand(CaseProperAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool CaseLowerAction()
+    private void CaseLowerAction()
     {
         ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Lower);
-        return true;
     }
 
-    private bool CaseUpperAction()
+    private void CaseUpperAction()
     {
         ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Upper);
-        return true;
     }
 
-    private bool CaseProperAction()
+    private void CaseProperAction()
     {
         ApplyFunctionToEachLine<Cases>(SetTextCase, Cases.Proper);
-        return true;
     }
 
     private string? SetTextCase(string line, int index, Cases textCase)

@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Pinny_Notes.Commands;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
@@ -16,30 +16,28 @@ public class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Encode",
-                Command = new CustomCommand() { ExecuteMethod = Base64EncodeAction }
+                Command = new RelayCommand(Base64EncodeAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
-                Command = new CustomCommand() { ExecuteMethod = Base64DecodeAction }
+                Command = new RelayCommand(Base64DecodeAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool Base64EncodeAction()
+    private void Base64EncodeAction()
     {
         ApplyFunctionToNoteText<bool?>(Base64EncodeText);
-        return true;
     }
 
-    private bool Base64DecodeAction()
+    private void Base64DecodeAction()
     {
         ApplyFunctionToNoteText<bool?>(Base64DecodeText);
-        return true;
     }
 
     private string Base64EncodeText(string text, bool? additional = null)

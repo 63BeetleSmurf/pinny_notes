@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -17,21 +17,21 @@ public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Comma",
-                Command = new CustomCommand() { ExecuteMethod = SplitCommaAction }
+                Command = new RelayCommand(SplitCommaAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
-                Command = new CustomCommand() { ExecuteMethod = SplitSpaceAction }
+                Command = new RelayCommand(SplitSpaceAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new CustomCommand() { ExecuteMethod = SplitTabAction }
+                Command = new RelayCommand(SplitTabAction)
             }
         );
 
@@ -41,37 +41,33 @@ public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Selected",
-                Command = new CustomCommand() { ExecuteMethod = SplitSelectedAction }
+                Command = new RelayCommand(SplitSelectedAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool SplitCommaAction()
+    private void SplitCommaAction()
     {
         ApplyFunctionToEachLine<string>(SplitText, ",");
-        return true;
     }
 
-    private bool SplitSpaceAction()
+    private void SplitSpaceAction()
     {
         ApplyFunctionToEachLine<string>(SplitText, " ");
-        return true;
     }
 
-    private bool SplitTabAction()
+    private void SplitTabAction()
     {
         ApplyFunctionToEachLine<string>(SplitText, "\t");
-        return true;
     }
 
-    private bool SplitSelectedAction()
+    private void SplitSelectedAction()
     {
         string splitString = _noteTextBox.SelectedText;
         _noteTextBox.SelectionLength = 0;
         ApplyFunctionToEachLine(SplitText, splitString);
-        return true;
     }
 
     private string? SplitText(string line, int index, string? splitString)

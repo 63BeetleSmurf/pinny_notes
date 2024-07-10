@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Pinny_Notes.Commands;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
@@ -16,30 +16,28 @@ public class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Double",
-                Command = new CustomCommand() { ExecuteMethod = QuoteDoubleAction }
+                Command = new RelayCommand(QuoteDoubleAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Single",
-                Command = new CustomCommand() { ExecuteMethod = QuoteSingleAction }
+                Command = new RelayCommand(QuoteSingleAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool QuoteDoubleAction()
+    private void QuoteDoubleAction()
     {
         ApplyFunctionToEachLine<char>(QuoteText, '"');
-        return true;
     }
 
-    private bool QuoteSingleAction()
+    private void QuoteSingleAction()
     {
         ApplyFunctionToEachLine<char>(QuoteText, '\'');
-        return true;
     }
 
     private string? QuoteText(string line, int index, char quoteChar)

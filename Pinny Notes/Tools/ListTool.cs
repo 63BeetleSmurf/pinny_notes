@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -17,21 +17,21 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Enumerate",
-                Command = new CustomCommand() { ExecuteMethod = ListEnumerateAction }
+                Command = new RelayCommand(ListEnumerateAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Dash",
-                Command = new CustomCommand() { ExecuteMethod = ListDashAction }
+                Command = new RelayCommand(ListDashAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove",
-                Command = new CustomCommand() { ExecuteMethod = ListRemoveAction }
+                Command = new RelayCommand(ListRemoveAction)
             }
         );
 
@@ -41,48 +41,43 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Sort Asc.",
-                Command = new CustomCommand() { ExecuteMethod = ListSortAscAction }
+                Command = new RelayCommand(ListSortAscAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Sort Dec.",
-                Command = new CustomCommand() { ExecuteMethod = ListSortDecAction }
+                Command = new RelayCommand(ListSortDecAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool ListEnumerateAction()
+    private void ListEnumerateAction()
     {
         ApplyFunctionToEachLine<bool?>(EnumerateLine);
-        return true;
     }
 
-    private bool ListDashAction()
+    private void ListDashAction()
     {
         ApplyFunctionToEachLine<bool?>(DashLine);
-        return true;
     }
 
-    private bool ListRemoveAction()
+    private void ListRemoveAction()
     {
         ApplyFunctionToEachLine<bool?>(RemoveFirstWordInLine);
-        return true;
     }
 
-    private bool ListSortAscAction()
+    private void ListSortAscAction()
     {
         ApplyFunctionToNoteText<bool>(SortNoteText);
-        return true;
     }
 
-    private bool ListSortDecAction()
+    private void ListSortDecAction()
     {
         ApplyFunctionToNoteText<bool>(SortNoteText, true);
-        return true;
     }
 
     private string EnumerateLine(string line, int index, bool? additional = null)

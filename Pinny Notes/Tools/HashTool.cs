@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -28,69 +28,64 @@ public class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "SHA512",
-                Command = new CustomCommand() { ExecuteMethod = HashSHA512Action }
+                Command = new RelayCommand(HashSHA512Action)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA384",
-                Command = new CustomCommand() { ExecuteMethod = HashSHA384Action }
+                Command = new RelayCommand(HashSHA384Action)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA256",
-                Command = new CustomCommand() { ExecuteMethod = HashSHA256Action }
+                Command = new RelayCommand(HashSHA256Action)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA1",
-                Command = new CustomCommand() { ExecuteMethod = HashSHA1Action }
+                Command = new RelayCommand(HashSHA1Action)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "MD5",
-                Command = new CustomCommand() { ExecuteMethod = HashMD5Action }
+                Command = new RelayCommand(HashMD5Action)
             }
         );
 
         return menuItem;
     }
 
-    private bool HashSHA512Action()
+    private void HashSHA512Action()
     {
         ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA512);
-        return true;
     }
 
-    private bool HashSHA384Action()
+    private void HashSHA384Action()
     {
         ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA384);
-        return true;
     }
 
-    private bool HashSHA256Action()
+    private void HashSHA256Action()
     {
         ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA256);
-        return true;
     }
 
-    private bool HashSHA1Action()
+    private void HashSHA1Action()
     {
         ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA1);
-        return true;
     }
 
-    private bool HashMD5Action()
+    private void HashMD5Action()
     {
         ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.MD5);
-        return true;
     }
 
     private string HashText(string text, HashAlgorithms algorithm)

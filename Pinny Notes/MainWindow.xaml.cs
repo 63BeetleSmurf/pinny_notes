@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Windows;
@@ -10,7 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using Pinny_Notes.Enums;
-using Pinny_Notes.Commands;
 using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
 
@@ -37,12 +37,12 @@ public partial class MainWindow : Window
     private Tuple<bool, bool> _noteGravity = new(true, true);
     private bool _noteSaved = false;
 
-    private readonly CustomCommand _copyCommand = new();
-    private readonly CustomCommand _cutCommand = new();
-    private readonly CustomCommand _pasteCommand = new();
+    private RelayCommand _copyCommand = null!;
+    private RelayCommand _cutCommand = null!;
+    private RelayCommand _pasteCommand = null!;
 
-    private readonly CustomCommand _clearCommand = new();
-    private readonly CustomCommand _saveCommand = new();
+    private RelayCommand _clearCommand = null!;
+    private RelayCommand _saveCommand = null!;
 
     private IEnumerable<ITool> _tools = [];
 
@@ -83,16 +83,16 @@ public partial class MainWindow : Window
 
         NoteTextBox.ContextMenu = new();
 
-        _copyCommand.ExecuteMethod = NoteTextBox_Copy;
+        _copyCommand = new(NoteTextBox_Copy);
         NoteTextBox.InputBindings.Add(new InputBinding(_copyCommand, new KeyGesture(Key.C, ModifierKeys.Control)));
-        _cutCommand.ExecuteMethod = NoteTextBox_Cut;
+        _cutCommand = new(NoteTextBox_Cut);
         NoteTextBox.InputBindings.Add(new InputBinding(_cutCommand, new KeyGesture(Key.X, ModifierKeys.Control)));
-        _pasteCommand.ExecuteMethod = NoteTextBox_Paste;
+        _pasteCommand = new(NoteTextBox_Paste);
         NoteTextBox.InputBindings.Add(new InputBinding(_pasteCommand, new KeyGesture(Key.V, ModifierKeys.Control)));
 
-        _clearCommand.ExecuteMethod = NoteTextBox_Clear;
+        _clearCommand = new(NoteTextBox_Clear);
         ClearMenuItem.Command = _clearCommand;
-        _saveCommand.ExecuteMethod = NoteTextBox_Save;
+        _saveCommand = new(NoteTextBox_Save);
         SaveMenuItem.Command = _saveCommand;
     }
 
@@ -589,16 +589,15 @@ public partial class MainWindow : Window
         }
     }
 
-    public bool NoteTextBox_Copy()
+    public void NoteTextBox_Copy()
     {
         string copiedText = NoteTextBox.SelectedText;
         if (Properties.Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
         Clipboard.SetDataObject(copiedText);
-        return true;
     }
 
-    public bool NoteTextBox_Cut()
+    public void NoteTextBox_Cut()
     {
         string copiedText = NoteTextBox.SelectedText;
         if (Properties.Settings.Default.TrimCopiedText)
@@ -607,10 +606,9 @@ public partial class MainWindow : Window
         int selectionStart = NoteTextBox.SelectionStart;
         NoteTextBox.Text = $"{ NoteTextBox.Text[..selectionStart] }{ NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..] }";
         NoteTextBox.CaretIndex = selectionStart;
-        return true;
     }
 
-    public bool NoteTextBox_Paste()
+    public void NoteTextBox_Paste()
     {
         IDataObject clipboardData = Clipboard.GetDataObject();
         if (clipboardData.GetDataPresent(DataFormats.Text))
@@ -635,25 +633,21 @@ public partial class MainWindow : Window
                 NoteTextBox.CaretIndex = selectionStart + clipboardString.Length;
             }
         }
-        return true;
     }
 
-    public bool NoteTextBox_SelectAll()
+    public void NoteTextBox_SelectAll()
     {
         NoteTextBox.SelectAll();
-        return true;
     }
 
-    public bool NoteTextBox_Clear()
+    public void NoteTextBox_Clear()
     {
         NoteTextBox.Clear();
-        return true;
     }
 
-    public bool NoteTextBox_Save()
+    public void NoteTextBox_Save()
     {
         SaveNote();
-        return true;
     }
 
     #region ContextMenu
@@ -725,7 +719,7 @@ public partial class MainWindow : Window
             new MenuItem()
             {
                 Header = "Select All",
-                Command = new CustomCommand() { ExecuteMethod = NoteTextBox_SelectAll },
+                Command = new RelayCommand(NoteTextBox_SelectAll),
                 IsEnabled = (NoteTextBox.Text.Length > 0)
             }
         );

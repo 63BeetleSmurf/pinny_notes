@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -17,43 +17,40 @@ public class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Comma",
-                Command = new CustomCommand() { ExecuteMethod = JoinCommaAction }
+                Command = new RelayCommand(JoinCommaAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
-                Command = new CustomCommand() { ExecuteMethod = JoinSpaceAction }
+                Command = new RelayCommand(JoinSpaceAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new CustomCommand() { ExecuteMethod = JoinTabAction }
+                Command = new RelayCommand(JoinTabAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool JoinCommaAction()
+    private void JoinCommaAction()
     {
         ApplyFunctionToNoteText<string>(JoinText, ",");
-        return true;
     }
 
-    private bool JoinSpaceAction()
+    private void JoinSpaceAction()
     {
         ApplyFunctionToNoteText<string>(JoinText, " ");
-        return true;
     }
 
-    private bool JoinTabAction()
+    private void JoinTabAction()
     {
         ApplyFunctionToNoteText<string>(JoinText, "\t");
-        return true;
     }
 
     private string JoinText(string text, string? joinString)

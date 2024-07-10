@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -17,21 +17,21 @@ public class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "All Forward (/)",
-                Command = new CustomCommand() { ExecuteMethod = SlashAllForwardAction }
+                Command = new RelayCommand(SlashAllForwardAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "All Back (\\)",
-                Command = new CustomCommand() { ExecuteMethod = SlashAllBackAction }
+                Command = new RelayCommand(SlashAllBackAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Swap",
-                Command = new CustomCommand() { ExecuteMethod = SlashSwapAction }
+                Command = new RelayCommand(SlashSwapAction)
             }
         );
 
@@ -41,60 +41,55 @@ public class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Remove Forward (/)",
-                Command = new CustomCommand() { ExecuteMethod = SlashRemoveForwardAction }
+                Command = new RelayCommand(SlashRemoveForwardAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove Back (\\)",
-                Command = new CustomCommand() { ExecuteMethod = SlashRemoveBackAction }
+                Command = new RelayCommand(SlashRemoveBackAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove All",
-                Command = new CustomCommand() { ExecuteMethod = SlashRemoveAllAction }
+                Command = new RelayCommand(SlashRemoveAllAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool SlashAllForwardAction()
+    private void SlashAllForwardAction()
     {
         ApplyFunctionToNoteText<Tuple<string, string>>(ReplaceCharacters, new("\\", "/"));
-        return true;
     }
 
-    private bool SlashAllBackAction()
+    private void SlashAllBackAction()
     {
         ApplyFunctionToNoteText<Tuple<string, string>>(ReplaceCharacters, new("/", "\\"));
-        return true;
     }
 
-    private bool SlashSwapAction()
+    private void SlashSwapAction()
     {
         ApplyFunctionToNoteText<Tuple<string, string>>(SwapCharacters, new("\\", "/"));
-        return true;
     }
-    private bool SlashRemoveForwardAction()
+
+    private void SlashRemoveForwardAction()
     {
         ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["/"]);
-        return true;
     }
 
-    private bool SlashRemoveBackAction()
+    private void SlashRemoveBackAction()
     {
         ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["\\"]);
-        return true;
     }
 
-    private bool SlashRemoveAllAction()
+    private void SlashRemoveAllAction()
     {
         ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["\\", "/"]);
-        return true;
     }
 
     private string ReplaceCharacters(string text, Tuple<string, string>? characters)

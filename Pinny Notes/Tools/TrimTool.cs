@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Pinny_Notes.Commands;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
@@ -24,56 +24,52 @@ public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Start",
-                Command = new CustomCommand() { ExecuteMethod = TrimStartAction }
+                Command = new RelayCommand(TrimStartAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "End",
-                Command = new CustomCommand() { ExecuteMethod = TrimEndAction }
+                Command = new RelayCommand(TrimEndAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Both",
-                Command = new CustomCommand() { ExecuteMethod = TrimBothAction }
+                Command = new RelayCommand(TrimBothAction)
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Empty Lines",
-                Command = new CustomCommand() { ExecuteMethod = TrimEmptyLinesAction }
+                Command = new RelayCommand(TrimEmptyLinesAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool TrimStartAction()
+    private void TrimStartAction()
     {
         ApplyFunctionToEachLine<Trims>(TrimText, Trims.Start);
-        return true;
     }
 
-    private bool TrimEndAction()
+    private void TrimEndAction()
     {
         ApplyFunctionToEachLine<Trims>(TrimText, Trims.End);
-        return true;
     }
 
-    private bool TrimBothAction()
+    private void TrimBothAction()
     {
         ApplyFunctionToEachLine<Trims>(TrimText, Trims.Both);
-        return true;
     }
 
-    private bool TrimEmptyLinesAction()
+    private void TrimEmptyLinesAction()
     {
         ApplyFunctionToEachLine<Trims>(TrimText, Trims.Lines);
-        return true;
     }
 
     private string? TrimText(string line, int index, Trims trimType)

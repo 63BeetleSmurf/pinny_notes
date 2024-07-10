@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+﻿using CommunityToolkit.Mvvm.Input;
+using System.Text.Json;
 using System.Windows.Controls;
-using Pinny_Notes.Commands;
 
 namespace Pinny_Notes.Tools;
 
@@ -22,17 +22,16 @@ public class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Prettify",
-                Command = new CustomCommand() { ExecuteMethod = JsonPrettifyAction }
+                Command = new RelayCommand(JsonPrettifyAction)
             }
         );
 
         return menuItem;
     }
 
-    private bool JsonPrettifyAction()
+    private void JsonPrettifyAction()
     {
         ApplyFunctionToNoteText<bool?>(JsonPrettifyText);
-        return true;
     }
 
     private string JsonPrettifyText(string text, bool? additional = null)
