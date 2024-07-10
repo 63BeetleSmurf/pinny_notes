@@ -69,6 +69,7 @@ public partial class MainWindow : Window
         _tools = [
             new Base64Tool(NoteTextBox),
             new CaseTool(NoteTextBox),
+            new DateTimeTool(NoteTextBox),
             new GibberishTool(NoteTextBox),
             new HashTool(NoteTextBox),
             new HtmlEntityTool(NoteTextBox),
