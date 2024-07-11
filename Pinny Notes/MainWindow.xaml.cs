@@ -1,19 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
-using System.IO;
-using System.Windows;
-using System.Windows.Input;
 using System.Collections.Generic;
-using System.Windows.Media;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Pinny_Notes.Enums;
 using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Pinny_Notes;
 

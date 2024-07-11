@@ -1,5 +1,4 @@
 ﻿using System.Windows.Media;
-using Pinny_Notes.Enums;
 
 namespace Pinny_Notes.Themes;
 
