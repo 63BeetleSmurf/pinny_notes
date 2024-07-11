@@ -290,7 +290,7 @@ public partial class MainWindow : Window
                 if (childMenuItem.CommandParameter == null)
                     continue;
 
-                childMenuItem.IsEnabled = ((ThemeColors)childMenuItem.CommandParameter == _noteCurrentTheme);
+                childMenuItem.IsEnabled = ((ThemeColors)childMenuItem.CommandParameter != _noteCurrentTheme);
             }
         }
     }
