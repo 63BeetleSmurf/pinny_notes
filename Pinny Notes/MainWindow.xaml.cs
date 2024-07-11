@@ -148,47 +148,53 @@ public partial class MainWindow : Window
 
     public void CopyCommandExecute()
     {
+        if (NoteTextBox.SelectionLength == 0)
+            return;
+
         string copiedText = NoteTextBox.SelectedText;
         if (Properties.Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
-        Clipboard.SetDataObject(copiedText);
+        Clipboard.SetText(copiedText);
     }
 
     public void CutCommandExecute()
     {
+        if (NoteTextBox.SelectionLength == 0)
+            return;
+
         string copiedText = NoteTextBox.SelectedText;
         if (Properties.Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
-        Clipboard.SetDataObject(copiedText);
-        int selectionStart = NoteTextBox.SelectionStart;
-        NoteTextBox.Text = $"{NoteTextBox.Text[..selectionStart]}{NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..]}";
-        NoteTextBox.CaretIndex = selectionStart;
+        Clipboard.SetText(copiedText);
+        NoteTextBox.SelectedText = "";
     }
 
     public void PasteCommandExecute()
     {
-        IDataObject clipboardData = Clipboard.GetDataObject();
-        if (clipboardData.GetDataPresent(DataFormats.Text))
-        {
-            string clipboardString = (String)clipboardData.GetData(DataFormats.Text);
-            if (Properties.Settings.Default.TrimPastedText)
-                clipboardString = clipboardString.Trim();
+        // Do nothing if clipboard does not contain text.
+        if (!Clipboard.ContainsText())
+            return;
 
-            if (NoteTextBox.SelectionLength == 0)
-            {
-                int caretIndex = NoteTextBox.CaretIndex;
-                bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
-                NoteTextBox.Text = $"{NoteTextBox.Text[..caretIndex]}{clipboardString}{NoteTextBox.Text[caretIndex..]}";
-                NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
-                if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
-                    NoteTextBox.ScrollToEnd();
-            }
-            else
-            {
-                int selectionStart = NoteTextBox.SelectionStart;
-                NoteTextBox.Text = $"{NoteTextBox.Text[..selectionStart]}{clipboardString}{NoteTextBox.Text[(selectionStart + NoteTextBox.SelectionLength)..]}";
-                NoteTextBox.CaretIndex = selectionStart + clipboardString.Length;
-            }
+        // Get text from clipboard and trim if specified
+        string clipboardString = Clipboard.GetText();
+        if (Properties.Settings.Default.TrimPastedText)
+            clipboardString = clipboardString.Trim();
+
+        if (NoteTextBox.SelectionLength == 0)
+        {
+            int caretIndex = NoteTextBox.CaretIndex;
+            bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
+
+            NoteTextBox.SelectedText = clipboardString;
+
+            NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
+            if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+                NoteTextBox.ScrollToEnd();
+        }
+        else
+        {
+            NoteTextBox.SelectedText = clipboardString;
+            NoteTextBox.CaretIndex = NoteTextBox.SelectionStart + clipboardString.Length;
         }
     }
 
@@ -266,22 +272,10 @@ public partial class MainWindow : Window
         else
         {
             // Get the next colour ensuring it is not the same as the parent notes colour.
-            ThemeColors? nextColour = null;
-            int nextColourIndex = _noteThemes.Keys.ToList().IndexOf((ThemeColors)Properties.Settings.Default.Colour) + 1;
-            while (nextColour == null)
-            {
-                nextColour = _noteThemes.Keys.ElementAtOrDefault(nextColourIndex);
-                if (nextColour == null)
-                {
-                    nextColourIndex = 0;
-                }
-                else if (nextColour == parentColour)
-                {
-                    nextColour = null;
-                    nextColourIndex++;
-                }
-            }
-            _noteCurrentTheme = (ThemeColors)nextColour;
+            List<ThemeColors> colours = _noteThemes.Keys.ToList();
+            int nextColourIndex = colours.IndexOf((ThemeColors)Properties.Settings.Default.Colour) + 1;
+            // Get colour thats not equal to parent and has a higher index, or return the first element by default.
+            _noteCurrentTheme = colours.FirstOrDefault(c => c != parentColour && colours.IndexOf(c) >= nextColourIndex);
         }
 
         TitleBarGrid.Background = _noteThemes[_noteCurrentTheme].TitleBarColorBrush;
@@ -301,10 +295,7 @@ public partial class MainWindow : Window
                 if (childMenuItem.CommandParameter == null)
                     continue;
 
-                if ((ThemeColors)childMenuItem.CommandParameter == _noteCurrentTheme)
-                    childMenuItem.IsEnabled = false;
-                else
-                    childMenuItem.IsEnabled = true;
+                childMenuItem.IsEnabled = ((ThemeColors)childMenuItem.CommandParameter == _noteCurrentTheme);
             }
         }
     }
