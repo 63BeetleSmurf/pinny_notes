@@ -651,8 +651,9 @@ public partial class MainWindow : Window
         // Store caret position for positioning later
         int caretIndex = textBox.CaretIndex;
 
-        // Get the current line of text
-        string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
+        // Get the current line of text, trimming any new lines
+        string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex)).TrimEnd(Environment.NewLine.ToCharArray());
+
         // Get the whitespace from the beginning of the line and create our indent string
         string preceedingWhitespace = new(line.TakeWhile(char.IsWhiteSpace).ToArray());
         string indent = Environment.NewLine + preceedingWhitespace;
