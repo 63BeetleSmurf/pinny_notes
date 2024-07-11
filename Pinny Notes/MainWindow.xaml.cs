@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using Pinny_Notes.Enums;
 using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Pinny_Notes;
 
@@ -180,22 +181,16 @@ public partial class MainWindow : Window
         if (Properties.Settings.Default.TrimPastedText)
             clipboardString = clipboardString.Trim();
 
-        if (NoteTextBox.SelectionLength == 0)
-        {
-            int caretIndex = NoteTextBox.CaretIndex;
-            bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
+        bool hasSelectedText = (NoteTextBox.SelectionLength > 0);
+        int caretIndex = (hasSelectedText) ? NoteTextBox.SelectionStart : NoteTextBox.CaretIndex;
+        bool caretAtEnd = (caretIndex == NoteTextBox.Text.Length);
 
-            NoteTextBox.SelectedText = clipboardString;
+        NoteTextBox.SelectedText = clipboardString;
 
-            NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
-            if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
-                NoteTextBox.ScrollToEnd();
-        }
-        else
-        {
-            NoteTextBox.SelectedText = clipboardString;
-            NoteTextBox.CaretIndex = NoteTextBox.SelectionStart + clipboardString.Length;
-        }
+        NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
+        if (!hasSelectedText && Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+            NoteTextBox.ScrollToEnd();
+
     }
 
     public void SelectAllCommandExecute()

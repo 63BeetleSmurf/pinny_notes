@@ -11,7 +11,9 @@ public abstract class BaseTool(TextBox noteTextBox)
     protected void ApplyFunctionToNoteText<TAdditional>(Func<string, TAdditional?, string> function, TAdditional? additional = default)
     {
         if (_noteTextBox.SelectionLength > 0)
+        {
             _noteTextBox.SelectedText = function(_noteTextBox.SelectedText, additional);
+        }
         else
         {
             string noteText = _noteTextBox.Text;
@@ -26,30 +28,29 @@ public abstract class BaseTool(TextBox noteTextBox)
 
     protected void ApplyFunctionToEachLine<TAdditional>(Func<string, int, TAdditional?, string?> function, TAdditional? additional = default)
     {
-        string[] lines;
-        List<string> newLines = [];
+        bool hasSelectedText = (_noteTextBox.SelectionLength > 0);
+        string noteText = (hasSelectedText) ? _noteTextBox.SelectedText : _noteTextBox.Text;
 
-        if (_noteTextBox.SelectionLength > 0)
-            lines = _noteTextBox.SelectedText.Split(Environment.NewLine);
-        else
-            lines = _noteTextBox.Text.Split(Environment.NewLine);
-
-        int lineCount = lines.Length;
+        string[] lines = noteText.Split(Environment.NewLine);
         // Ignore trailing new line if it was automatically added
-        if (Properties.Settings.Default.NewLine && lines[lineCount - 1] == "")
-            lineCount--;
-        for (int i = 0; i < lineCount; i++)
+        if (Properties.Settings.Default.NewLine && lines[^1] == "")
+            lines = lines[..^1];
+
+        List<string> newLines = [];
+        for (int i = 0; i < lines.Length; i++)
         {
             string? line = function(lines[i], i, additional);
             if (line != null)
                 newLines.Add(line);
         }
 
-        if (_noteTextBox.SelectionLength > 0)
-            _noteTextBox.SelectedText = string.Join(Environment.NewLine, newLines);
+        noteText = string.Join(Environment.NewLine, newLines);
+
+        if (hasSelectedText)
+            _noteTextBox.SelectedText = noteText;
         else
         {
-            _noteTextBox.Text = string.Join(Environment.NewLine, newLines);
+            _noteTextBox.Text = noteText;
             if (_noteTextBox.Text.Length > 0)
                 _noteTextBox.CaretIndex = _noteTextBox.Text.Length - 1;
         }
@@ -57,17 +58,14 @@ public abstract class BaseTool(TextBox noteTextBox)
 
     protected void InsertIntoNoteText(string text)
     {
-        if (_noteTextBox.SelectionLength > 0)
-        {
-            int selectionStart = _noteTextBox.SelectionStart;
-            _noteTextBox.Text = $"{_noteTextBox.Text[..selectionStart]}{text}{_noteTextBox.Text[(selectionStart + _noteTextBox.SelectionLength)..]}";
-            _noteTextBox.CaretIndex = selectionStart + text.Length;
-        }
-        else
-        {
-            int caretIndex = _noteTextBox.CaretIndex;
-            _noteTextBox.Text = $"{_noteTextBox.Text[..caretIndex]}{text}{_noteTextBox.Text[caretIndex..]}";
-            _noteTextBox.CaretIndex = caretIndex + text.Length;
-        }
+        bool hasSelectedText = (_noteTextBox.SelectionLength > 0);
+        int caretIndex = (hasSelectedText) ? _noteTextBox.SelectionStart : _noteTextBox.CaretIndex;
+        bool caretAtEnd = (caretIndex == _noteTextBox.Text.Length);
+
+        _noteTextBox.SelectedText = text;
+
+        _noteTextBox.CaretIndex = caretIndex + text.Length;
+        if (!hasSelectedText && Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+            _noteTextBox.ScrollToEnd();
     }
 }
