@@ -658,7 +658,7 @@ public partial class MainWindow : Window
         SpellingError spellingError = NoteTextBox.GetSpellingError(caretIndex);
         if (spellingError != null)
         {
-            if (spellingError.Suggestions.Any())
+            if (!spellingError.Suggestions.Any())
                 menu.Items.Add(
                         new MenuItem()
                         {
