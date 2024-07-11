@@ -18,6 +18,8 @@
 - Tools;
   - Base64: Encode and decode to and from Base64.
   - Case: Change text case to lower, upper or proper.
+  - DateTime: Get the current date in a sortable format (2024-07-11T12:00:00).
+  - Gibberish: Generate gibberish words, sentences, paragraphs, articles and names.
   - Hash: Generate SHA512/384/256, SHA1 and MD5 hashes.
   - HTML Entities: Encode and decode.
   - Indent: Indent all lines by 2 or 4 spaces, or a tab.
@@ -25,6 +27,7 @@
   - JSON: Prettify JSON.
   - List: Enumerate, Dash (markdown), sort ascending or descending or remove list markers.
   - Quote: Wrap text with double or single quotes.
+  - Slash: Toggle or remove forward and back slashes.
   - Split: Split a lines into multiple line by a comma, space, tab or highlighted text.
   - Trim: Trim whitespace from start or/and end of each line or remove all blank lines.
 
