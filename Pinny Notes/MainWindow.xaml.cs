@@ -541,21 +541,21 @@ public partial class MainWindow : Window
     private void NoteTextBox_TextChanged(object sender, RoutedEventArgs e)
     {
         _noteSaved = false;
-        if (Properties.Settings.Default.NewLine && NoteTextBox.Text != "" && !NoteTextBox.Text.EndsWith(Environment.NewLine))
-        {
-            bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
-            // Preserving selection when adding new line
-            int selectionStart = NoteTextBox.SelectionStart;
-            int selectionLength = NoteTextBox.SelectionLength;
+        if (!Properties.Settings.Default.NewLine || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
+            return;
 
-            NoteTextBox.Text += Environment.NewLine;
+        bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
+        // Preserving selection when adding new line
+        int selectionStart = NoteTextBox.SelectionStart;
+        int selectionLength = NoteTextBox.SelectionLength;
 
-            NoteTextBox.SelectionStart = selectionStart;
-            NoteTextBox.SelectionLength = selectionLength;
+        NoteTextBox.AppendText(Environment.NewLine);
 
-            if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
-                NoteTextBox.ScrollToEnd();
-        }
+        NoteTextBox.SelectionStart = selectionStart;
+        NoteTextBox.SelectionLength = selectionLength;
+
+        if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+            NoteTextBox.ScrollToEnd();
     }
 
     private void NoteTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -595,72 +595,71 @@ public partial class MainWindow : Window
     private void NoteTextBox_MouseDown(object sender, MouseButtonEventArgs e)
     {
         // Triple click to select line, quadruple click to select entire wrapped line
-        if (e.ClickCount >= 3)
+        if (e.ClickCount < 3 || e.ClickCount > 4)
+            return;
+
+        TextBox textBox = (TextBox)sender;
+
+        int lineIndex = textBox.GetLineIndexFromCharacterIndex(textBox.CaretIndex);
+        int lineLength = textBox.GetLineLength(lineIndex);
+
+        // If there was no new line and is not the last row, line must be wrapped.
+        if (e.ClickCount == 4 && lineIndex < textBox.LineCount - 1 && !textBox.GetLineText(lineIndex).EndsWith(Environment.NewLine))
         {
-            TextBox textBox = (TextBox)sender;
-            int lineIndex = textBox.GetLineIndexFromCharacterIndex(textBox.CaretIndex);
-            int lineLength = textBox.GetLineLength(lineIndex);
-
-            // Don't select new line char(s)
-            if (textBox.GetLineText(lineIndex).EndsWith(Environment.NewLine))
-                lineLength -= 2;
-            // If no following new line and not the last row, line must be wrapped.
-            else if (e.ClickCount == 4 && lineIndex < textBox.LineCount - 1)
+            // Expand length until new line or last line found
+            int nextLineIndex = lineIndex;
+            do
             {
-                // Expand length until new line or last line found
-                int nextLineIndex = lineIndex;
-                do
-                {
-                    nextLineIndex++;
-                    lineLength += textBox.GetLineLength(nextLineIndex);
-                } while (!textBox.GetLineText(nextLineIndex).EndsWith(Environment.NewLine) && nextLineIndex < textBox.LineCount - 1);
-                // Don't select new line char(s)
-                if (textBox.GetLineText(nextLineIndex).EndsWith(Environment.NewLine))
-                    lineLength -= 2;
-            }
-
-            textBox.SelectionStart = textBox.GetCharacterIndexFromLineIndex(lineIndex);
-            textBox.SelectionLength = lineLength;
-
-            NoteTextBox_MouseDoubleClick(sender, e);
+                nextLineIndex++;
+                lineLength += textBox.GetLineLength(nextLineIndex);
+            } while (nextLineIndex < textBox.LineCount - 1 && !textBox.GetLineText(nextLineIndex).EndsWith(Environment.NewLine));
         }
+
+        textBox.SelectionStart = textBox.GetCharacterIndexFromLineIndex(lineIndex);
+        textBox.SelectionLength = lineLength;
+
+        // Don't select new line char(s)
+        if (textBox.SelectedText.EndsWith(Environment.NewLine))
+            textBox.SelectionLength -= Environment.NewLine.Length;
+
+        NoteTextBox_MouseDoubleClick(sender, e);
     }
 
     private void NoteTextBox_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (Properties.Settings.Default.MiddleClickPaste && e.ChangedButton == MouseButton.Middle)
+        if (e.ChangedButton == MouseButton.Middle && Properties.Settings.Default.MiddleClickPaste)
             _pasteCommand.Execute(null);
     }
 
     private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Return && Properties.Settings.Default.AutoIndent)
+        // Only takeover event if auto indentation is active and return was pressed
+        if (e.Key != Key.Return || !Properties.Settings.Default.AutoIndent)
+            return;
+
+        e.Handled = true;
+        TextBox textBox = (TextBox)sender;
+
+        // If there is selected text remove it and set caret to correct position
+        if (textBox.SelectionLength > 0)
         {
-            e.Handled = true;
-
-            TextBox textBox = (TextBox)sender;
-
-            if (textBox.SelectionLength > 0)
-            {
-                int selectionStart = textBox.SelectionStart;
-                textBox.Text = $"{textBox.Text[..selectionStart]}{textBox.Text[(selectionStart + textBox.SelectionLength)..]}";
-                textBox.CaretIndex = selectionStart;
-            }
-
-            int caretIndex = textBox.CaretIndex;
-            string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
-
-            int i = 0;
-            string indent = Environment.NewLine;
-            while (i < line.Length && (line[i] == ' ' || line[i] == '\t'))
-            {
-                indent += line[i];
-                i++;
-            }
-
-            textBox.Text = textBox.Text.Insert(caretIndex, indent);
-            textBox.CaretIndex = caretIndex + indent.Length;
+            int selectionStart = textBox.SelectionStart;
+            textBox.Text = textBox.Text.Remove(selectionStart, textBox.SelectionLength);
+            textBox.CaretIndex = selectionStart;
         }
+
+        // Store caret position for positioning later
+        int caretIndex = textBox.CaretIndex;
+
+        // Get the current line of text
+        string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex));
+        // Get the whitespace from the beginning of the line and create our indent string
+        string preceedingWhitespace = new(line.TakeWhile(char.IsWhiteSpace).ToArray());
+        string indent = Environment.NewLine + preceedingWhitespace;
+
+        // Add the indent and restore caret position
+        textBox.Text = textBox.Text.Insert(caretIndex, indent);
+        textBox.CaretIndex = caretIndex + indent.Length;
     }
 
     #region ContextMenu
