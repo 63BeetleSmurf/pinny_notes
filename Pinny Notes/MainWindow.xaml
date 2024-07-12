@@ -12,6 +12,7 @@
         AllowsTransparency="True"
         FocusManager.FocusedElement="{Binding ElementName=NoteTextBox}"
         BorderThickness="1"
+        StateChanged="MainWindow_StateChanged"
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
@@ -126,6 +127,7 @@
                             <MenuItem Name="NewLineKeepVisibleMenuItem" Header="Keep Visible" IsCheckable="True" Click="NewLineKeepVisibleMenuItem_Click"/>
                         </MenuItem>
                         <MenuItem Name="AutoIndentMenuItem" Header="Auto Indent" IsCheckable="True" Click="AutoIndentMenuItem_Click"/>
+                        <MenuItem Name="AllowMinimizeWhenPinnedMenuItem" Header="Allow Minimize When Pinned" IsCheckable="True" Click="AllowMinimizeWhenPinnedMenuItem_Click"/>
                     </MenuItem>
                 </ContextMenu>
             </Grid.ContextMenu>

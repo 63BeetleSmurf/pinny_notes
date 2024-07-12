@@ -142,6 +142,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private void MainWindow_StateChanged(object sender, EventArgs e)
+    {
+        if (WindowState == WindowState.Minimized && Topmost && !Properties.Settings.Default.AllowMinimizeWhenPinned)
+            WindowState = WindowState.Normal;
+    }
+
     #endregion
 
     #region Commands
@@ -226,6 +232,7 @@ public partial class MainWindow : Window
         NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
         NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
         AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
+        AllowMinimizeWhenPinnedMenuItem.IsChecked = Properties.Settings.Default.AllowMinimizeWhenPinned;
         ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
         SetColour(parentColour: parentColour);
         if (parentGravity == null)
@@ -511,6 +518,12 @@ public partial class MainWindow : Window
     private void AutoIndentMenuItem_Click(object sender, RoutedEventArgs e)
     {
         Properties.Settings.Default.AutoIndent = AutoIndentMenuItem.IsChecked;
+        Properties.Settings.Default.Save();
+    }
+
+    private void AllowMinimizeWhenPinnedMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        Properties.Settings.Default.AllowMinimizeWhenPinned = AllowMinimizeWhenPinnedMenuItem.IsChecked;
         Properties.Settings.Default.Save();
     }
 

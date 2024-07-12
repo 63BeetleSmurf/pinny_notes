@@ -166,5 +166,17 @@ namespace Pinny_Notes.Properties {
                 this["MiddleClickPaste"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowMinimizeWhenPinned {
+            get {
+                return ((bool)(this["AllowMinimizeWhenPinned"]));
+            }
+            set {
+                this["AllowMinimizeWhenPinned"] = value;
+            }
+        }
     }
 }
