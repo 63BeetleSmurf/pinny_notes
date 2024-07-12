@@ -759,7 +759,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_986FCBA950114798AC8BD4B2D210DD8A"
             {
-            "SourcePath" = "8:..\\Pinny Notes\\obj\\Release\\net8.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\Pinny Notes\\obj\\Debug\\net8.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7785C5DEE194483AA2B024842491A9A3"
