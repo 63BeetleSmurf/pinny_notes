@@ -16,7 +16,7 @@ using Pinny_Notes.Tools;
 
 namespace Pinny_Notes.Views;
 
-public partial class MainWindow : Window
+public partial class NoteWindow : Window
 {
     private readonly char[] _wordSeparators = [' ', '\t', '\r', '\n'];
 
@@ -50,23 +50,23 @@ public partial class MainWindow : Window
 
     private bool _isPinned = false;
 
-    #region MainWindow
+    #region NoteWindow
 
-    public MainWindow()
+    public NoteWindow()
     {
-        MainWindowInitialize();
+        NoteWindowInitialize();
         LoadSettings();
         PositionNote();
     }
 
-    public MainWindow(double parentLeft, double parentTop, ThemeColors? parentColour, Tuple<bool, bool>? parentGravity)
+    public NoteWindow(double parentLeft, double parentTop, ThemeColors? parentColour, Tuple<bool, bool>? parentGravity)
     {
-        MainWindowInitialize();
+        NoteWindowInitialize();
         LoadSettings(parentColour, parentGravity);
         PositionNote(parentLeft, parentTop);
     }
 
-    private void MainWindowInitialize()
+    private void NoteWindowInitialize()
     {
         InitializeComponent();
 
@@ -120,7 +120,7 @@ public partial class MainWindow : Window
         ColourGreenMenuItem.CommandParameter = ThemeColors.Green;
     }
 
-    private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+    private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
     {
         // Check mouse button is pressed as a missed click of a button
         // can cause issues with DragMove().
@@ -144,13 +144,13 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MainWindow_StateChanged(object sender, EventArgs e)
+    private void NoteWindow_StateChanged(object sender, EventArgs e)
     {
         if (WindowState == WindowState.Minimized && Topmost && !Properties.Settings.Default.AllowMinimizeWhenPinned)
             WindowState = WindowState.Normal;
     }
 
-    private void MainWindow_ActivatedChanged(object sender, EventArgs e)
+    private void NoteWindow_ActivatedChanged(object sender, EventArgs e)
     {
         if (IsActive)
             Topmost = true;
@@ -393,7 +393,7 @@ public partial class MainWindow : Window
 
     private void NewButton_Click(object sender, RoutedEventArgs e)
     {
-        new MainWindow(
+        new NoteWindow(
             Left,
             Top,
             _noteCurrentTheme,

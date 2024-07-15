@@ -1,4 +1,4 @@
-﻿<Window x:Class="Pinny_Notes.Views.MainWindow"
+﻿<Window x:Class="Pinny_Notes.Views.NoteWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -7,14 +7,14 @@
         Height="300" Width="300"
         MinHeight="150" MinWidth="150"
         WindowStyle="None"
-        MouseDown="MainWindow_MouseDown"
+        MouseDown="NoteWindow_MouseDown"
         ResizeMode="CanResizeWithGrip"
         AllowsTransparency="True"
         FocusManager.FocusedElement="{Binding ElementName=NoteTextBox}"
         BorderThickness="1"
-        StateChanged="MainWindow_StateChanged"
-        Activated="MainWindow_ActivatedChanged"
-        Deactivated="MainWindow_ActivatedChanged"
+        StateChanged="NoteWindow_StateChanged"
+        Activated="NoteWindow_ActivatedChanged"
+        Deactivated="NoteWindow_ActivatedChanged"
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
