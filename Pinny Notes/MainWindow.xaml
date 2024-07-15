@@ -25,8 +25,14 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <BitmapImage x:Key="PinImageSource" UriSource="/Images/thumbtack-solid.png" />
-        <BitmapImage x:Key="Pin45ImageSource" UriSource="/Images/thumbtack-solid-45.png" />
+        <Style x:Key="FadeOutToggleButton" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Opacity" Value="0.2"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -42,21 +48,35 @@
                     <ControlTemplate>
                         <Grid>
                             <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 10,2 L 10,18 M 2,10 L 18,10" Stroke="Black" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
+                            <Path Data="M 10,2 v 16 M 2,10 h 16" Stroke="Black" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Button Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Center" Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0"  Style="{StaticResource FadeOutButton}" Focusable="False">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Image Source="{TemplateBinding Content}"/>
+            <ToggleButton Name="TopButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Center" Click="TopButton_Click" ToolTip="Toggle On Top" Padding="0,0,0,0"  Style="{StaticResource FadeOutToggleButton}" Focusable="False">
+                <ToggleButton.Template>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Rectangle Width="20" Height="20" Fill="Transparent" />
+                            <Path Data="M 5,0 h 10 c 1,0 1,2 0,2 h -2 l 1,6 c 0,0 4,1 4,5 0,1 -7,1 -7,1 0,0 0,6 -1,6 C 9,20 9,14 9,14 9,14 2,14 2,13 2,9 6,8 6,8 L 7,2 H 5 C 4,2 4,0 5,0 Z" Fill="Black" RenderTransformOrigin="0.5,0.5">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=IsChecked}" Value="True">
+                                                <Setter Property="RenderTransform">
+                                                    <Setter.Value>
+                                                        <RotateTransform Angle="45"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </Grid>
                     </ControlTemplate>
-                </Button.Template>
-                <Button.Content>
-                    <StaticResource ResourceKey="Pin45ImageSource" />
-                </Button.Content>
-            </Button>
+                </ToggleButton.Template>
+            </ToggleButton>
             <Button Name="CloseButton" Background="Transparent" Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,10,0" Click="CloseButton_Click" ToolTip="Close" Padding="0,0,0,0" Style="{StaticResource FadeOutButton}" Focusable="False">
                 <Button.Template>
                     <ControlTemplate>

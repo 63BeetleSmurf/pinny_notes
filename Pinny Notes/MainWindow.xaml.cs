@@ -403,12 +403,7 @@ public partial class MainWindow : Window
 
     private void TopButton_Click(object sender, RoutedEventArgs e)
     {
-        _isPinned = !_isPinned;
-
-        if (_isPinned)
-            TopButton.Content = (BitmapImage)Resources["PinImageSource"];
-        else
-            TopButton.Content = (BitmapImage)Resources["Pin45ImageSource"];
+        _isPinned = TopButton.IsChecked ?? false;
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
