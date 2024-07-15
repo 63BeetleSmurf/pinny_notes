@@ -14,7 +14,7 @@ using Pinny_Notes.Enums;
 using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
 
-namespace Pinny_Notes;
+namespace Pinny_Notes.Views;
 
 public partial class MainWindow : Window
 {
