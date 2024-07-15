@@ -13,6 +13,8 @@
         FocusManager.FocusedElement="{Binding ElementName=NoteTextBox}"
         BorderThickness="1"
         StateChanged="MainWindow_StateChanged"
+        Activated="MainWindow_ActivatedChanged"
+        Deactivated="MainWindow_ActivatedChanged"
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">

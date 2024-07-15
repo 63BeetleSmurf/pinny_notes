@@ -48,6 +48,8 @@ public partial class MainWindow : Window
 
     private IEnumerable<ITool> _tools = [];
 
+    private bool _isPinned = false;
+
     #region MainWindow
 
     public MainWindow()
@@ -146,6 +148,14 @@ public partial class MainWindow : Window
     {
         if (WindowState == WindowState.Minimized && Topmost && !Properties.Settings.Default.AllowMinimizeWhenPinned)
             WindowState = WindowState.Normal;
+    }
+
+    private void MainWindow_ActivatedChanged(object sender, EventArgs e)
+    {
+        if (IsActive)
+            Topmost = true;
+        else if (!_isPinned)
+            Topmost = false;
     }
 
     #endregion
@@ -393,9 +403,9 @@ public partial class MainWindow : Window
 
     private void TopButton_Click(object sender, RoutedEventArgs e)
     {
-        Topmost = !Topmost;
+        _isPinned = !_isPinned;
 
-        if (Topmost)
+        if (_isPinned)
             TopButton.Content = (BitmapImage)Resources["PinImageSource"];
         else
             TopButton.Content = (BitmapImage)Resources["Pin45ImageSource"];
