@@ -8,34 +8,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Pinny_Notes.Enums;
-using Pinny_Notes.Themes;
 using Pinny_Notes.Tools;
+using Pinny_Notes.ViewModels;
 
 namespace Pinny_Notes.Views;
 
 public partial class NoteWindow : Window
 {
-    private readonly char[] _wordSeparators = [' ', '\t', '\r', '\n'];
-
-    // Title Bar, Background, Border
-    private readonly Dictionary<ThemeColors, NoteTheme> _noteThemes = new()
-    {
-        {ThemeColors.Yellow, new NoteTheme(Color.FromRgb(254, 247, 177), Color.FromRgb(255, 252, 221), Color.FromRgb(254, 234, 0))},    // #fef7b1 #fffcdd #feea00
-        {ThemeColors.Orange, new NoteTheme(Color.FromRgb(255, 209, 121), Color.FromRgb(254, 232, 185), Color.FromRgb(255, 171, 0))},    // #ffd179 #fee8b9 #ffab00
-        {ThemeColors.Red, new NoteTheme(Color.FromRgb(255, 124, 129), Color.FromRgb(255, 196, 198), Color.FromRgb(227, 48, 54))},       // #ff7c81 #ffc4c6 #e33036
-        {ThemeColors.Pink, new NoteTheme(Color.FromRgb(217, 134, 204), Color.FromRgb(235, 191, 227), Color.FromRgb(167, 41, 149))},     // #d986cc #ebbfe3 #a72995
-        {ThemeColors.Purple, new NoteTheme(Color.FromRgb(157, 154, 221), Color.FromRgb(208, 206, 243), Color.FromRgb(98, 91, 184))},    // #9d9add #d0cef3 #625bb8
-        {ThemeColors.Blue, new NoteTheme(Color.FromRgb(122, 195, 230), Color.FromRgb(179, 217, 236), Color.FromRgb(17, 149, 221))},     // #7ac3e6 #b3d9ec #1195dd
-        {ThemeColors.Aqua, new NoteTheme(Color.FromRgb(151, 207, 198), Color.FromRgb(192, 226, 225), Color.FromRgb(22, 176, 152))},     // #97cfc6 #c0e2e1 #16b098
-        {ThemeColors.Green, new NoteTheme(Color.FromRgb(198, 214, 125), Color.FromRgb(227, 235, 198), Color.FromRgb(170, 204, 4))}      // #c6d67d #e3ebc6 #aacc04
-    };
-
-    private ThemeColors _noteCurrentTheme;
-    private Tuple<bool, bool> _noteGravity = new(true, true);
-    private bool _noteSaved = false;
+    private NoteViewModel _viewModel { get; }
 
     private RelayCommand _copyCommand = null!;
     private RelayCommand _cutCommand = null!;
@@ -44,30 +24,14 @@ public partial class NoteWindow : Window
     private RelayCommand _clearCommand = null!;
     private RelayCommand _saveCommand = null!;
 
-    private RelayCommand<ThemeColors> _changeThemeColorCommand = null!;
-
     private IEnumerable<ITool> _tools = [];
 
-    private bool _isPinned = false;
-
     #region NoteWindow
-
-    public NoteWindow()
+    public NoteWindow() : this(null) { }
+    public NoteWindow(NoteViewModel? parentViewModel = null)
     {
-        NoteWindowInitialize();
-        LoadSettings();
-        PositionNote();
-    }
+        DataContext = _viewModel = new NoteViewModel(parentViewModel);
 
-    public NoteWindow(double parentLeft, double parentTop, ThemeColors? parentColor, Tuple<bool, bool>? parentGravity)
-    {
-        NoteWindowInitialize();
-        LoadSettings(parentColor, parentGravity);
-        PositionNote(parentLeft, parentTop);
-    }
-
-    private void NoteWindowInitialize()
-    {
         InitializeComponent();
 
         _tools = [
@@ -96,28 +60,12 @@ public partial class NoteWindow : Window
         _pasteCommand = new(PasteCommandExecute);
         NoteTextBox.InputBindings.Add(new InputBinding(_pasteCommand, new KeyGesture(Key.V, ModifierKeys.Control)));
 
-        _clearCommand = new(ClearCommandExecute);
+        _clearCommand = new(NoteTextBox.Clear);
         ClearMenuItem.Command = _clearCommand;
         _saveCommand = new(SaveCommandExecute);
         SaveMenuItem.Command = _saveCommand;
 
-        _changeThemeColorCommand = new(ChangeThemeColorCommandExecute);
-        ColorYellowMenuItem.Command = _changeThemeColorCommand;
-        ColorYellowMenuItem.CommandParameter = ThemeColors.Yellow;
-        ColorOrangeMenuItem.Command = _changeThemeColorCommand;
-        ColorOrangeMenuItem.CommandParameter = ThemeColors.Orange;
-        ColorRedMenuItem.Command = _changeThemeColorCommand;
-        ColorRedMenuItem.CommandParameter = ThemeColors.Red;
-        ColorPinkMenuItem.Command = _changeThemeColorCommand;
-        ColorPinkMenuItem.CommandParameter = ThemeColors.Pink;
-        ColorPurpleMenuItem.Command = _changeThemeColorCommand;
-        ColorPurpleMenuItem.CommandParameter = ThemeColors.Purple;
-        ColorBlueMenuItem.Command = _changeThemeColorCommand;
-        ColorBlueMenuItem.CommandParameter = ThemeColors.Blue;
-        ColorAquaMenuItem.Command = _changeThemeColorCommand;
-        ColorAquaMenuItem.CommandParameter = ThemeColors.Aqua;
-        ColorGreenMenuItem.Command = _changeThemeColorCommand;
-        ColorGreenMenuItem.CommandParameter = ThemeColors.Green;
+        LoadSettings();
     }
 
     private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -131,16 +79,10 @@ public partial class NoteWindow : Window
             // Reset gravity depending what position the note was moved to.
             // This does not effect the saved start up setting, only what
             // direction new child notes will go towards.
-            bool gravityLeft = true;
-            bool gravityTop = true;
-            if (Left > SystemParameters.PrimaryScreenWidth / 2)
-                gravityLeft = false;
-            if (Top > SystemParameters.PrimaryScreenHeight / 2)
-                gravityTop = false;
-            _noteGravity = new Tuple<bool, bool>(
-                gravityLeft,
-                gravityTop
-            );
+            _viewModel.X = Left;
+            _viewModel.Y = Top;
+            _viewModel.GravityX = (Left < SystemParameters.PrimaryScreenWidth / 2) ? 1 : -1;
+            _viewModel.GravityY = (Top < SystemParameters.PrimaryScreenHeight / 2) ? 1 : -1;
         }
     }
 
@@ -154,7 +96,7 @@ public partial class NoteWindow : Window
     {
         if (IsActive)
             Topmost = true;
-        else if (!_isPinned)
+        else if (!_viewModel.IsPinned)
             Topmost = false;
     }
 
@@ -208,30 +150,16 @@ public partial class NoteWindow : Window
 
     }
 
-    public void SelectAllCommandExecute()
-    {
-        NoteTextBox.SelectAll();
-    }
-
-    public void ClearCommandExecute()
-    {
-        NoteTextBox.Clear();
-    }
-
     public void SaveCommandExecute()
     {
         SaveNote();
-    }
-    private void ChangeThemeColorCommandExecute(ThemeColors color)
-    {
-        SetColor(color);
     }
 
     #endregion
 
     #region MiscFunctions
 
-    private void LoadSettings(ThemeColors? parentColor = null, Tuple<bool, bool>? parentGravity = null)
+    private void LoadSettings()
     {
         AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
         TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
@@ -244,14 +172,6 @@ public partial class NoteWindow : Window
         AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
         AllowMinimizeWhenPinnedMenuItem.IsChecked = Properties.Settings.Default.AllowMinimizeWhenPinned;
         ColorCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColors;
-        SetColor(parentColor: parentColor);
-        if (parentGravity == null)
-            _noteGravity = new Tuple<bool, bool>(
-                Properties.Settings.Default.StartupPositionLeft,
-                Properties.Settings.Default.StartupPositionTop
-            );
-        else
-            _noteGravity = parentGravity;
 
         if (Properties.Settings.Default.StartupPositionLeft)
         {
@@ -270,97 +190,6 @@ public partial class NoteWindow : Window
 
     }
 
-    private void SetColor(ThemeColors? color = null, ThemeColors? parentColor = null)
-    {
-        if (color != null)
-        {
-            _noteCurrentTheme = (ThemeColors)color;
-        }
-        else if (!Properties.Settings.Default.CycleColors)
-        {
-            _noteCurrentTheme = (ThemeColors)Properties.Settings.Default.Color;
-        }
-        else
-        {
-            // Get the next color ensuring it is not the same as the parent notes color.
-            List<ThemeColors> colors = _noteThemes.Keys.ToList();
-            int nextColorIndex = colors.IndexOf((ThemeColors)Properties.Settings.Default.Color) + 1;
-            // Get color thats not equal to parent and has a higher index, or return the first element by default.
-            _noteCurrentTheme = colors.FirstOrDefault(c => c != parentColor && colors.IndexOf(c) >= nextColorIndex);
-        }
-
-        TitleBarGrid.Background = _noteThemes[_noteCurrentTheme].TitleBarColorBrush;
-        Background = _noteThemes[_noteCurrentTheme].BackgroundColorBrush;
-        BorderBrush = _noteThemes[_noteCurrentTheme].BorderColorBrush;
-
-        Properties.Settings.Default.Color = (int)_noteCurrentTheme;
-        Properties.Settings.Default.Save();
-
-        // Tick correct menu item for color or note.
-        foreach (object childObject in ColorsMenuItem.Items)
-        {
-            if (childObject is MenuItem)
-            {
-                MenuItem childMenuItem = (MenuItem)childObject;
-
-                if (childMenuItem.CommandParameter == null)
-                    continue;
-
-                childMenuItem.IsEnabled = ((ThemeColors)childMenuItem.CommandParameter != _noteCurrentTheme);
-            }
-        }
-    }
-
-    private void PositionNote(double? parentLeft = null, double? parentTop = null)
-    {
-        double positionTop;
-        double positionLeft;
-
-        // If there is no parent, position relative to screen
-        if (parentLeft == null || parentTop == null)
-        {
-            int screenMargin = 78;
-            if (_noteGravity.Item1) // Left
-                positionLeft = screenMargin;
-            else // Right
-                positionLeft = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
-
-            if (_noteGravity.Item2) // Top
-                positionTop = screenMargin;
-            else // Bottom
-                positionTop = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
-        }
-        // Position relative to parent
-        else
-        {
-            if (_noteGravity.Item1)
-                positionLeft = (double)parentLeft + 45;
-            else
-                positionLeft = (double)parentLeft - 45;
-
-            if (_noteGravity.Item2)
-                positionTop = (double)parentTop + 45;
-            else
-                positionTop = (double)parentTop - 45;
-        }
-
-        // Don't allow note to open off screen. Will eventually end up stuck
-        // in a corner, but that's only after opening a silly number of notes.
-        if (positionLeft < 0)
-            Left = 0;
-        else if (positionLeft + Width > SystemParameters.PrimaryScreenWidth)
-            Left = SystemParameters.PrimaryScreenWidth - Width;
-        else
-            Left = positionLeft;
-
-        if (positionTop < 0)
-            Top = 0;
-        else if (positionTop + Height > SystemParameters.PrimaryScreenHeight)
-            Top = SystemParameters.PrimaryScreenHeight - Height;
-        else
-            Top = positionTop;
-    }
-
     private MessageBoxResult SaveNote()
     {
         SaveFileDialog saveFileDialog = new()
@@ -370,7 +199,7 @@ public partial class NoteWindow : Window
         if (saveFileDialog.ShowDialog(this) == true)
         {
             File.WriteAllText(saveFileDialog.FileName, NoteTextBox.Text);
-            _noteSaved = true;
+            _viewModel.IsSaved = true;
             return MessageBoxResult.OK;
         }
         return MessageBoxResult.Cancel;
@@ -393,22 +222,12 @@ public partial class NoteWindow : Window
 
     private void NewButton_Click(object sender, RoutedEventArgs e)
     {
-        new NoteWindow(
-            Left,
-            Top,
-            _noteCurrentTheme,
-            _noteGravity
-        ).Show();
-    }
-
-    private void TopButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isPinned = TopButton.IsChecked ?? false;
+        new NoteWindow(_viewModel).Show();
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_noteSaved && NoteTextBox.Text != "")
+        if (!_viewModel.IsSaved && NoteTextBox.Text != "")
         {
             MessageBoxResult messageBoxResult = MessageBox.Show(
                 this,
@@ -543,7 +362,7 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_TextChanged(object sender, RoutedEventArgs e)
     {
-        _noteSaved = false;
+        _viewModel.IsSaved = false;
         if (!Properties.Settings.Default.NewLine || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
             return;
 
@@ -735,7 +554,7 @@ public partial class NoteWindow : Window
             new MenuItem()
             {
                 Header = "Select All",
-                Command = new RelayCommand(SelectAllCommandExecute),
+                Command = new RelayCommand(NoteTextBox.SelectAll),
                 IsEnabled = (NoteTextBox.Text.Length > 0)
             }
         );
@@ -817,7 +636,7 @@ public partial class NoteWindow : Window
         string text = (NoteTextBox.SelectionLength > 0) ? NoteTextBox.SelectedText : NoteTextBox.Text;
         if (text.Length == 0)
             return 0;
-        return text.Split(_wordSeparators, StringSplitOptions.RemoveEmptyEntries).Length;
+        return text.Split((char[])[' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries).Length;
     }
 
     private int GetCharCount()
