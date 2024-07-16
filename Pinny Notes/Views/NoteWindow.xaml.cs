@@ -59,10 +59,10 @@ public partial class NoteWindow : Window
         PositionNote();
     }
 
-    public NoteWindow(double parentLeft, double parentTop, ThemeColors? parentColour, Tuple<bool, bool>? parentGravity)
+    public NoteWindow(double parentLeft, double parentTop, ThemeColors? parentColor, Tuple<bool, bool>? parentGravity)
     {
         NoteWindowInitialize();
-        LoadSettings(parentColour, parentGravity);
+        LoadSettings(parentColor, parentGravity);
         PositionNote(parentLeft, parentTop);
     }
 
@@ -102,22 +102,22 @@ public partial class NoteWindow : Window
         SaveMenuItem.Command = _saveCommand;
 
         _changeThemeColorCommand = new(ChangeThemeColorCommandExecute);
-        ColourYellowMenuItem.Command = _changeThemeColorCommand;
-        ColourYellowMenuItem.CommandParameter = ThemeColors.Yellow;
-        ColourOrangeMenuItem.Command = _changeThemeColorCommand;
-        ColourOrangeMenuItem.CommandParameter = ThemeColors.Orange;
-        ColourRedMenuItem.Command = _changeThemeColorCommand;
-        ColourRedMenuItem.CommandParameter = ThemeColors.Red;
-        ColourPinkMenuItem.Command = _changeThemeColorCommand;
-        ColourPinkMenuItem.CommandParameter = ThemeColors.Pink;
-        ColourPurpleMenuItem.Command = _changeThemeColorCommand;
-        ColourPurpleMenuItem.CommandParameter = ThemeColors.Purple;
-        ColourBlueMenuItem.Command = _changeThemeColorCommand;
-        ColourBlueMenuItem.CommandParameter = ThemeColors.Blue;
-        ColourAquaMenuItem.Command = _changeThemeColorCommand;
-        ColourAquaMenuItem.CommandParameter = ThemeColors.Aqua;
-        ColourGreenMenuItem.Command = _changeThemeColorCommand;
-        ColourGreenMenuItem.CommandParameter = ThemeColors.Green;
+        ColorYellowMenuItem.Command = _changeThemeColorCommand;
+        ColorYellowMenuItem.CommandParameter = ThemeColors.Yellow;
+        ColorOrangeMenuItem.Command = _changeThemeColorCommand;
+        ColorOrangeMenuItem.CommandParameter = ThemeColors.Orange;
+        ColorRedMenuItem.Command = _changeThemeColorCommand;
+        ColorRedMenuItem.CommandParameter = ThemeColors.Red;
+        ColorPinkMenuItem.Command = _changeThemeColorCommand;
+        ColorPinkMenuItem.CommandParameter = ThemeColors.Pink;
+        ColorPurpleMenuItem.Command = _changeThemeColorCommand;
+        ColorPurpleMenuItem.CommandParameter = ThemeColors.Purple;
+        ColorBlueMenuItem.Command = _changeThemeColorCommand;
+        ColorBlueMenuItem.CommandParameter = ThemeColors.Blue;
+        ColorAquaMenuItem.Command = _changeThemeColorCommand;
+        ColorAquaMenuItem.CommandParameter = ThemeColors.Aqua;
+        ColorGreenMenuItem.Command = _changeThemeColorCommand;
+        ColorGreenMenuItem.CommandParameter = ThemeColors.Green;
     }
 
     private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -224,14 +224,14 @@ public partial class NoteWindow : Window
     }
     private void ChangeThemeColorCommandExecute(ThemeColors color)
     {
-        SetColour(color);
+        SetColor(color);
     }
 
     #endregion
 
     #region MiscFunctions
 
-    private void LoadSettings(ThemeColors? parentColour = null, Tuple<bool, bool>? parentGravity = null)
+    private void LoadSettings(ThemeColors? parentColor = null, Tuple<bool, bool>? parentGravity = null)
     {
         AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
         TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
@@ -243,8 +243,8 @@ public partial class NoteWindow : Window
         NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
         AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
         AllowMinimizeWhenPinnedMenuItem.IsChecked = Properties.Settings.Default.AllowMinimizeWhenPinned;
-        ColourCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColours;
-        SetColour(parentColour: parentColour);
+        ColorCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColors;
+        SetColor(parentColor: parentColor);
         if (parentGravity == null)
             _noteGravity = new Tuple<bool, bool>(
                 Properties.Settings.Default.StartupPositionLeft,
@@ -270,34 +270,34 @@ public partial class NoteWindow : Window
 
     }
 
-    private void SetColour(ThemeColors? colour = null, ThemeColors? parentColour = null)
+    private void SetColor(ThemeColors? color = null, ThemeColors? parentColor = null)
     {
-        if (colour != null)
+        if (color != null)
         {
-            _noteCurrentTheme = (ThemeColors)colour;
+            _noteCurrentTheme = (ThemeColors)color;
         }
-        else if (!Properties.Settings.Default.CycleColours)
+        else if (!Properties.Settings.Default.CycleColors)
         {
-            _noteCurrentTheme = (ThemeColors)Properties.Settings.Default.Colour;
+            _noteCurrentTheme = (ThemeColors)Properties.Settings.Default.Color;
         }
         else
         {
-            // Get the next colour ensuring it is not the same as the parent notes colour.
-            List<ThemeColors> colours = _noteThemes.Keys.ToList();
-            int nextColourIndex = colours.IndexOf((ThemeColors)Properties.Settings.Default.Colour) + 1;
-            // Get colour thats not equal to parent and has a higher index, or return the first element by default.
-            _noteCurrentTheme = colours.FirstOrDefault(c => c != parentColour && colours.IndexOf(c) >= nextColourIndex);
+            // Get the next color ensuring it is not the same as the parent notes color.
+            List<ThemeColors> colors = _noteThemes.Keys.ToList();
+            int nextColorIndex = colors.IndexOf((ThemeColors)Properties.Settings.Default.Color) + 1;
+            // Get color thats not equal to parent and has a higher index, or return the first element by default.
+            _noteCurrentTheme = colors.FirstOrDefault(c => c != parentColor && colors.IndexOf(c) >= nextColorIndex);
         }
 
         TitleBarGrid.Background = _noteThemes[_noteCurrentTheme].TitleBarColorBrush;
         Background = _noteThemes[_noteCurrentTheme].BackgroundColorBrush;
         BorderBrush = _noteThemes[_noteCurrentTheme].BorderColorBrush;
 
-        Properties.Settings.Default.Colour = (int)_noteCurrentTheme;
+        Properties.Settings.Default.Color = (int)_noteCurrentTheme;
         Properties.Settings.Default.Save();
 
-        // Tick correct menu item for colour or note.
-        foreach (object childObject in ColoursMenuItem.Items)
+        // Tick correct menu item for color or note.
+        foreach (object childObject in ColorsMenuItem.Items)
         {
             if (childObject is MenuItem)
             {
@@ -430,11 +430,11 @@ public partial class NoteWindow : Window
 
     #region ContextMenu
 
-    #region Colours
+    #region Colors
 
-    private void ColourCycleMenuItem_Click(object sender, RoutedEventArgs e)
+    private void ColorCycleMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        Properties.Settings.Default.CycleColours = ColourCycleMenuItem.IsChecked;
+        Properties.Settings.Default.CycleColors = ColorCycleMenuItem.IsChecked;
         Properties.Settings.Default.Save();
     }
 

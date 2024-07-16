@@ -8,10 +8,10 @@
     <Setting Name="SpellCheck" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="Colour" Type="System.Int32" Scope="User">
+    <Setting Name="Color" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="CycleColours" Type="System.Boolean" Scope="User">
+    <Setting Name="CycleColors" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="NewLine" Type="System.Boolean" Scope="User">

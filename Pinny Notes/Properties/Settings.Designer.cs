@@ -50,24 +50,24 @@ namespace Pinny_Notes.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Colour {
+        public int Color {
             get {
-                return ((int)(this["Colour"]));
+                return ((int)(this["Color"]));
             }
             set {
-                this["Colour"] = value;
+                this["Color"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CycleColours {
+        public bool CycleColors {
             get {
-                return ((bool)(this["CycleColours"]));
+                return ((bool)(this["CycleColors"]));
             }
             set {
-                this["CycleColours"] = value;
+                this["CycleColors"] = value;
             }
         }
         

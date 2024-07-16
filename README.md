@@ -3,7 +3,7 @@
 
 ## Features
 - Pin / Always on Top: Easily accessible pin button allowing you keep a note above all other windows.
-- Colours: Select from multiple colours or cycle to have each note be a different colour.
+- Colors: Select from multiple colors or cycle to have each note be a different color.
 - Start Position: Choose which corner of the screen to start your notes in.
 - Copy/Paste Trim: Option to automatically trim text being coped from or pasted into a note.
 - Auto Copy: Option to automatically copy text when highlighted.

@@ -92,49 +92,49 @@
                     <MenuItem Name="ClearMenuItem" Header="Clear"/>
                     <MenuItem Name="SaveMenuItem" Header="Save"/>
                     <Separator />
-                    <MenuItem Name="ColoursMenuItem" Header="Colours">
-                        <MenuItem Name="ColourYellowMenuItem" Header="Yellow">
+                    <MenuItem Name="ColorsMenuItem" Header="Colors">
+                        <MenuItem Name="ColorYellowMenuItem" Header="Yellow">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#fef7b1" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourOrangeMenuItem" Header="Orange">
+                        <MenuItem Name="ColorOrangeMenuItem" Header="Orange">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#ffd179" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourRedMenuItem" Header="Red">
+                        <MenuItem Name="ColorRedMenuItem" Header="Red">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#ff7c81" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourPinkMenuItem" Header="Pink">
+                        <MenuItem Name="ColorPinkMenuItem" Header="Pink">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#d986cc" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourPurpleMenuItem" Header="Purple">
+                        <MenuItem Name="ColorPurpleMenuItem" Header="Purple">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#9d9add" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourBlueMenuItem" Header="Blue">
+                        <MenuItem Name="ColorBlueMenuItem" Header="Blue">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#7ac3e6" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourAquaMenuItem" Header="Aqua">
+                        <MenuItem Name="ColorAquaMenuItem" Header="Aqua">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#97cfc6" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Name="ColourGreenMenuItem" Header="Green">
+                        <MenuItem Name="ColorGreenMenuItem" Header="Green">
                             <MenuItem.Icon>
                                 <Rectangle Width="16" Height="16" Fill="#c6d67d" />
                             </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
-                        <MenuItem Name="ColourCycleMenuItem" Header="Cycle" IsCheckable="True" Click="ColourCycleMenuItem_Click"/>
+                        <MenuItem Name="ColorCycleMenuItem" Header="Cycle" IsCheckable="True" Click="ColorCycleMenuItem_Click"/>
                     </MenuItem>
                     <MenuItem Header="Settings">
                         <MenuItem Name="StartupPositionMenuItem" Header="Startup Position">
