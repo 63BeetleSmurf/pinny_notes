@@ -455,34 +455,73 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Only takeover event if auto indentation is active and return was pressed
-        if (e.Key != Key.Return || !Properties.Settings.Default.AutoIndent)
-            return;
-
-        e.Handled = true;
-        TextBox textBox = (TextBox)sender;
-
-        // If there is selected text remove it and set caret to correct position
-        if (textBox.SelectionLength > 0)
+        if (e.Key == Key.Tab && NoteTextBox.SelectionLength > 0)
         {
-            int selectionStart = textBox.SelectionStart;
-            textBox.Text = textBox.Text.Remove(selectionStart, textBox.SelectionLength);
-            textBox.CaretIndex = selectionStart;
+            int selectionStart = NoteTextBox.SelectionStart;
+            int selectionEnd = NoteTextBox.SelectionStart + NoteTextBox.SelectionLength;
+
+            // Fix the selection so full lines, not wrapped lines, are selected
+            // Find the starting line by making sure the previous line ends with a new line
+            int startLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionStart);
+            while (startLineIndex > 0 && !NoteTextBox.GetLineText(startLineIndex - 1).Contains(Environment.NewLine))
+                startLineIndex--;
+            selectionStart = NoteTextBox.GetCharacterIndexFromLineIndex(startLineIndex);
+
+            // Find the end line by making sure it ends with a new line
+            int endLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionEnd);
+            int lineCount = GetLineCount();
+            while (endLineIndex < lineCount - 1 && !NoteTextBox.GetLineText(endLineIndex).Contains(Environment.NewLine))
+                endLineIndex++;
+            selectionEnd = NoteTextBox.GetCharacterIndexFromLineIndex(endLineIndex) + NoteTextBox.GetLineLength(endLineIndex) - Environment.NewLine.Length;
+
+            // Select the full lines so we can now easily get the required selected text
+            NoteTextBox.Select(selectionStart, selectionEnd - selectionStart);
+
+            // Loop though each line adding or removing a tab where required
+            string[] lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Shift)
+                {
+                    if (lines[i].Length > 0 && lines[i][0] == '\t')
+                        lines[i] = lines[i].Remove(0, 1);
+                }
+                else
+                {
+                    lines[i] = $"\t{lines[i]}";
+                }
+            }
+
+            NoteTextBox.SelectedText = string.Join(Environment.NewLine, lines);
+
+            e.Handled = true;
         }
+        else if (e.Key == Key.Return && Properties.Settings.Default.AutoIndent)
+        {
+            // If there is selected text remove it and set caret to correct position
+            if (NoteTextBox.SelectionLength > 0)
+            {
+                int selectionStart = NoteTextBox.SelectionStart;
+                NoteTextBox.Text = NoteTextBox.Text.Remove(selectionStart, NoteTextBox.SelectionLength);
+                NoteTextBox.CaretIndex = selectionStart;
+            }
 
-        // Store caret position for positioning later
-        int caretIndex = textBox.CaretIndex;
+            // Store caret position for positioning later
+            int caretIndex = NoteTextBox.CaretIndex;
 
-        // Get the current line of text, trimming any new lines
-        string line = textBox.GetLineText(textBox.GetLineIndexFromCharacterIndex(caretIndex)).TrimEnd(Environment.NewLine.ToCharArray());
+            // Get the current line of text, trimming any new lines
+            string line = NoteTextBox.GetLineText(NoteTextBox.GetLineIndexFromCharacterIndex(caretIndex)).TrimEnd(Environment.NewLine.ToCharArray());
 
-        // Get the whitespace from the beginning of the line and create our indent string
-        string preceedingWhitespace = new(line.TakeWhile(char.IsWhiteSpace).ToArray());
-        string indent = Environment.NewLine + preceedingWhitespace;
+            // Get the whitespace from the beginning of the line and create our indent string
+            string preceedingWhitespace = new(line.TakeWhile(char.IsWhiteSpace).ToArray());
+            string indent = Environment.NewLine + preceedingWhitespace;
 
-        // Add the indent and restore caret position
-        textBox.Text = textBox.Text.Insert(caretIndex, indent);
-        textBox.CaretIndex = caretIndex + indent.Length;
+            // Add the indent and restore caret position
+            NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, indent);
+            NoteTextBox.CaretIndex = caretIndex + indent.Length;
+
+            e.Handled = true;
+        }
     }
 
     #region ContextMenu
