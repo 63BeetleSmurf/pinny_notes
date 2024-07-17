@@ -7,8 +7,40 @@ namespace Pinny_Notes.Tools;
 public abstract class BaseTool(TextBox noteTextBox)
 {
     protected TextBox _noteTextBox = noteTextBox;
+    protected string _name = null!;
+    protected List<ToolMenuAction> _menuActions = [];
 
-    protected void ApplyFunctionToNoteText<TAction>(Func<string, TAction, string> function, TAction action)
+    public MenuItem GetMenuItem()
+    {
+        MenuItem menuItem = new()
+        {
+            Header = _name,
+        };
+
+        foreach (ToolMenuAction menuAction in _menuActions)
+        {
+            if (menuAction.Name == "-" && menuAction.Command == null && menuAction.Action == null)
+            {
+                menuItem.Items.Add(new Separator());
+                continue;
+            }
+
+            MenuItem actionMenuItem = new()
+            {
+                Header = menuAction.Name
+            };
+            if (menuAction.Command != null)
+                actionMenuItem.Command = menuAction.Command;
+            if (menuAction.Action != null)
+                actionMenuItem.CommandParameter = menuAction.Action;
+
+            menuItem.Items.Add(actionMenuItem);
+        }
+
+        return menuItem;
+    }
+
+    protected void ApplyFunctionToNoteText(Func<string, Enum, string> function, Enum action)
     {
         if (_noteTextBox.SelectionLength > 0)
         {
@@ -26,7 +58,7 @@ public abstract class BaseTool(TextBox noteTextBox)
         }
     }
 
-    protected void ApplyFunctionToEachLine<TAction>(Func<string, int, TAction, string?> function, TAction action)
+    protected void ApplyFunctionToEachLine(Func<string, int, Enum, string?> function, Enum action)
     {
         bool hasSelectedText = (_noteTextBox.SelectionLength > 0);
         string noteText = (hasSelectedText) ? _noteTextBox.SelectedText : _noteTextBox.Text;

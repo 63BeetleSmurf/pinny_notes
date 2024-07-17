@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class QuoteTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -11,31 +12,11 @@ public partial class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         QuoteSingle
     }
 
-    public MenuItem GetMenuItem()
+    public QuoteTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Quote",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Double",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.QuoteDouble
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Single",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.QuoteSingle
-            }
-        );
-
-        return menuItem;
+        _name = "Quote";
+        _menuActions.Add(new("Double", MenuActionCommand, ToolActions.QuoteDouble));
+        _menuActions.Add(new("Single", MenuActionCommand, ToolActions.QuoteSingle));
     }
 
     [RelayCommand]
@@ -44,7 +25,7 @@ public partial class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private string? ModifyLineCallback(string line, int index, ToolActions action)
+    private string? ModifyLineCallback(string line, int index, Enum action)
     {
         switch (action)
         {

@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class SlashTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -17,66 +18,16 @@ public partial class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         SlashRemoveAll
     }
 
-    public MenuItem GetMenuItem()
+    public SlashTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Slash",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "All Forward (/)",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashAllForward
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "All Back (\\)",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashAllBack
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Swap",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashSwap
-            }
-        );
-
-        menuItem.Items.Add(new Separator());
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Remove Forward (/)",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashRemoveForward
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Remove Back (\\)",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashRemoveBack
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Remove All",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SlashRemoveAll
-            }
-        );
-
-        return menuItem;
+        _name = "Slash";
+        _menuActions.Add(new("All Forward (/)", MenuActionCommand, ToolActions.SlashAllForward));
+        _menuActions.Add(new("All Back (\\)", MenuActionCommand, ToolActions.SlashAllBack));
+        _menuActions.Add(new("Swap", MenuActionCommand, ToolActions.SlashSwap));
+        _menuActions.Add(new("-"));
+        _menuActions.Add(new("Remove Forward (/)", MenuActionCommand, ToolActions.SlashRemoveForward));
+        _menuActions.Add(new("Remove Back (\\)", MenuActionCommand, ToolActions.SlashRemoveBack));
+        _menuActions.Add(new("Remove All", MenuActionCommand, ToolActions.SlashRemoveAll));
     }
 
     [RelayCommand]
@@ -85,7 +36,7 @@ public partial class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {

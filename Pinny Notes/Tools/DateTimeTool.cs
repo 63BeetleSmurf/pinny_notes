@@ -4,30 +4,17 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class DateTimeTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class DateTimeTool : BaseTool, ITool
 {
     public enum ToolActions
     {
         DateTimeSortableDateTime
     }
 
-    public MenuItem GetMenuItem()
+    public DateTimeTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Date Time",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Sortable Date Time",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.DateTimeSortableDateTime
-            }
-        );
-
-        return menuItem;
+        _name = "Date Time";
+        _menuActions.Add(new("Sortable Date Time", MenuActionCommand, ToolActions.DateTimeSortableDateTime));
     }
 
     [RelayCommand]

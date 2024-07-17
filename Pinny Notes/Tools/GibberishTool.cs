@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class GibberishTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -21,66 +21,16 @@ public partial class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox),
 
     private Random random = new();
 
-    public MenuItem GetMenuItem()
+    public GibberishTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Gibberish",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Word",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishWord
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Title",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishTitle
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Sentence",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishSentence
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Paragraph",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishParagraph
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Article",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishArticle
-            }
-        );
-
-        menuItem.Items.Add(new Separator());
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Name",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.GibberishName
-            }
-        );
-
-        return menuItem;
+        _name = "Gibberish";
+        _menuActions.Add(new("Word", MenuActionCommand, ToolActions.GibberishWord));
+        _menuActions.Add(new("Title", MenuActionCommand, ToolActions.GibberishTitle));
+        _menuActions.Add(new("Sentence", MenuActionCommand, ToolActions.GibberishSentence));
+        _menuActions.Add(new("Paragraph", MenuActionCommand, ToolActions.GibberishParagraph));
+        _menuActions.Add(new("Article", MenuActionCommand, ToolActions.GibberishArticle));
+        _menuActions.Add(new("-"));
+        _menuActions.Add(new("Name", MenuActionCommand, ToolActions.GibberishName));
     }
 
     [RelayCommand]

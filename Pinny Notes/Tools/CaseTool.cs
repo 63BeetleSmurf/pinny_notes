@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Globalization;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class CaseTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -13,39 +14,12 @@ public partial class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         CaseTitle
     }
 
-    public MenuItem GetMenuItem()
+    public CaseTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Case",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Lower",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.CaseLower
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Upper",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.CaseUpper
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Title",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.CaseTitle
-            }
-        );
-
-        return menuItem;
+        _name = "Case";
+        _menuActions.Add(new("Lower", MenuActionCommand, ToolActions.CaseLower));
+        _menuActions.Add(new("Upper", MenuActionCommand, ToolActions.CaseUpper));
+        _menuActions.Add(new("Title", MenuActionCommand, ToolActions.CaseTitle));
     }
 
     [RelayCommand]
@@ -54,7 +28,7 @@ public partial class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 

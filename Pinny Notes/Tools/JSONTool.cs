@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Text.Json;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class JsonTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -16,23 +17,10 @@ public partial class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         WriteIndented = true
     };
 
-    public MenuItem GetMenuItem()
+    public JsonTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "JSON",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Prettify",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.JsonPrettify
-            }
-        );
-
-        return menuItem;
+        _name = "JSON";
+        _menuActions.Add(new("Prettify", MenuActionCommand, ToolActions.JsonPrettify));
     }
 
     [RelayCommand]
@@ -41,7 +29,7 @@ public partial class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         try
         {

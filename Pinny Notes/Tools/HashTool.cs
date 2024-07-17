@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class HashTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -17,55 +17,14 @@ public partial class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         HashMD5
     }
 
-    public MenuItem GetMenuItem()
+    public HashTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Hash",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "SHA512",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.HashSHA512
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "SHA384",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.HashSHA384
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "SHA256",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.HashSHA256
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "SHA1",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.HashSHA1
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "MD5",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.HashMD5
-            }
-        );
-
-        return menuItem;
+        _name = "Hash";
+        _menuActions.Add(new("SHA512", MenuActionCommand, ToolActions.HashSHA512));
+        _menuActions.Add(new("SHA384", MenuActionCommand, ToolActions.HashSHA384));
+        _menuActions.Add(new("SHA256", MenuActionCommand, ToolActions.HashSHA256));
+        _menuActions.Add(new("SHA1", MenuActionCommand, ToolActions.HashSHA1));
+        _menuActions.Add(new("MD5", MenuActionCommand, ToolActions.HashMD5));
     }
 
     [RelayCommand]
@@ -74,7 +33,7 @@ public partial class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         HashAlgorithm hasher;
         switch (action)

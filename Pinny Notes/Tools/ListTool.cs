@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class ListTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -15,58 +15,15 @@ public partial class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ListSortDec
     }
 
-    public MenuItem GetMenuItem()
+    public ListTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "List",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Enumerate",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.ListEnumerate
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Dash",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.ListDash
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Remove",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.ListRemove
-            }
-        );
-
-        menuItem.Items.Add(new Separator());
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Sort Asc.",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.ListSortAsc
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Sort Dec.",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.ListSortDec
-            }
-        );
-
-        return menuItem;
+        _name = "List";
+        _menuActions.Add(new("Enumerate", MenuActionCommand, ToolActions.ListEnumerate));
+        _menuActions.Add(new("Dash", MenuActionCommand, ToolActions.ListDash));
+        _menuActions.Add(new("Remove", MenuActionCommand, ToolActions.ListRemove));
+        _menuActions.Add(new("-"));
+        _menuActions.Add(new("Sort Asc.", MenuActionCommand, ToolActions.ListSortAsc));
+        _menuActions.Add(new("Sort Dec.", MenuActionCommand, ToolActions.ListSortDec));
     }
 
     [RelayCommand]
@@ -78,7 +35,7 @@ public partial class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
             ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {
@@ -91,7 +48,7 @@ public partial class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         return text;
     }
 
-    private string? ModifyLineCallback(string line, int index, ToolActions action)
+    private string? ModifyLineCallback(string line, int index, Enum action)
     {
         switch (action)
         {

@@ -6,7 +6,7 @@ namespace Pinny_Notes.Tools;
 
 // TO DO: Need to fix split by selected text. Possibly TextAction needs to get both text and selected text.
 
-public partial class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class SplitTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -16,50 +16,14 @@ public partial class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         SplitSelected
     }
 
-    public MenuItem GetMenuItem()
+    public SplitTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Split",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Comma",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SplitComma
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Space",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SplitSpace
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Tab",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.SplitTab
-            }
-        );
-
-        //menuItem.Items.Add(new Separator());
-
-        //menuItem.Items.Add(
-        //    new MenuItem()
-        //    {
-        //        Header = "Selected",
-        //        Command = MenuActionCommand,
-        //        CommandParameter = ToolActions.SplitSelected
-        //    }
-        //);
-
-        return menuItem;
+        _name = "Split";
+        _menuActions.Add(new("Comma", MenuActionCommand, ToolActions.SplitComma));
+        _menuActions.Add(new("Space", MenuActionCommand, ToolActions.SplitSpace));
+        _menuActions.Add(new("Tab", MenuActionCommand, ToolActions.SplitTab));
+        //_menuActions.Add(new("-"));
+        //_menuActions.Add(new("Selected", MenuActionCommand, ToolActions.SplitSelected));
     }
 
     [RelayCommand]
@@ -68,7 +32,7 @@ public partial class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {

@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Net;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class HtmlEntityTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -12,31 +13,11 @@ public partial class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox)
         EntityDecode
     }
 
-    public MenuItem GetMenuItem()
+    public HtmlEntityTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "HTML Entity",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Encode",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.EntityEncode
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Decode",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.EntityDecode
-            }
-        );
-
-        return menuItem;
+        _name = "HTML Entity";
+        _menuActions.Add(new("Encode", MenuActionCommand, ToolActions.EntityEncode));
+        _menuActions.Add(new("Decode", MenuActionCommand, ToolActions.EntityDecode));
     }
 
     [RelayCommand]
@@ -45,7 +26,7 @@ public partial class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox)
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {

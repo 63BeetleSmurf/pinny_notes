@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class JoinTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -13,39 +13,12 @@ public partial class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         JoinTab
     }
 
-    public MenuItem GetMenuItem()
+    public JoinTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Join",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Comma",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.JoinComma
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Space",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.JoinComma
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Tab",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.JoinComma
-            }
-        );
-
-        return menuItem;
+        _name = "Join";
+        _menuActions.Add(new("Comma", MenuActionCommand, ToolActions.JoinComma));
+        _menuActions.Add(new("Space", MenuActionCommand, ToolActions.JoinSpace));
+        _menuActions.Add(new("Tab", MenuActionCommand, ToolActions.JoinTab));
     }
 
     [RelayCommand]
@@ -54,7 +27,7 @@ public partial class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {

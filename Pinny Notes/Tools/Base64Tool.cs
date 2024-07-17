@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class Base64Tool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -11,40 +12,20 @@ public partial class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), IT
         Base64Decode
     }
 
-    public MenuItem GetMenuItem()
+    public Base64Tool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Base64",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Encode",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.Base64Encode
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Decode",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.Base64Decode
-            }
-        );
-
-        return menuItem;
+        _name = "Base64";
+        _menuActions.Add(new("Encode", MenuActionCommand, ToolActions.Base64Encode));
+        _menuActions.Add(new("Decode", MenuActionCommand, ToolActions.Base64Decode));
     }
 
     [RelayCommand]
-    private void MenuAction(ToolActions action)
+    private void MenuAction(Enum action)
     {
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string ModifyTextCallback(string text, ToolActions action)
+    private string ModifyTextCallback(string text, Enum action)
     {
         switch (action)
         {

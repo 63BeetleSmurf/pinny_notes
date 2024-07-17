@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public partial class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class IndentTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -12,39 +13,12 @@ public partial class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), IT
         IndentTab
     }
 
-    public MenuItem GetMenuItem()
+    public IndentTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Indent",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "2 Spaces",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.Indent2Spaces
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "4 Spaces",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.Indent4Spaces
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Tab",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.IndentTab
-            }
-        );
-
-        return menuItem;
+        _name = "Indent";
+        _menuActions.Add(new("2 Spaces", MenuActionCommand, ToolActions.Indent2Spaces));
+        _menuActions.Add(new("4 Spaces", MenuActionCommand, ToolActions.Indent4Spaces));
+        _menuActions.Add(new("Tab", MenuActionCommand, ToolActions.IndentTab));
     }
 
     [RelayCommand]
@@ -53,7 +27,7 @@ public partial class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), IT
         ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private string? ModifyLineCallback(string line, int index, ToolActions action)
+    private string? ModifyLineCallback(string line, int index, Enum action)
     {
         switch (action)
         {

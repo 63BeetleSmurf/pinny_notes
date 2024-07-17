@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-
-public partial class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class TrimTool : BaseTool, ITool
 {
     public enum ToolActions
     {
@@ -14,47 +14,13 @@ public partial class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         TrimLines
     }
 
-    public MenuItem GetMenuItem()
+    public TrimTool(TextBox noteTextBox) : base(noteTextBox)
     {
-        MenuItem menuItem = new()
-        {
-            Header = "Trim",
-        };
-
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Start",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.TrimStart
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "End",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.TrimEnd
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Both",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.TrimBoth
-            }
-        );
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Empty Lines",
-                Command = MenuActionCommand,
-                CommandParameter = ToolActions.TrimLines
-            }
-        );
-
-        return menuItem;
+        _name = "Trim";
+        _menuActions.Add(new("Start", MenuActionCommand, ToolActions.TrimStart));
+        _menuActions.Add(new("End", MenuActionCommand, ToolActions.TrimEnd));
+        _menuActions.Add(new("Both", MenuActionCommand, ToolActions.TrimBoth));
+        _menuActions.Add(new("Empty Lines", MenuActionCommand, ToolActions.TrimLines));
     }
 
     [RelayCommand]
@@ -63,7 +29,7 @@ public partial class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), IToo
         ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private string? ModifyLineCallback(string line, int index, ToolActions action)
+    private string? ModifyLineCallback(string line, int index, Enum action)
     {
         switch (action)
         {
