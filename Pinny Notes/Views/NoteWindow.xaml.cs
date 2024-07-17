@@ -46,6 +46,7 @@ public partial class NoteWindow : Window
             new JsonTool(NoteTextBox),
             new ListTool(NoteTextBox),
             new QuoteTool(NoteTextBox),
+            new RemoveTool(NoteTextBox),
             new SlashTool(NoteTextBox),
             new SplitTool(NoteTextBox),
             new TrimTool(NoteTextBox)
