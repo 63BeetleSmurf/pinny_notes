@@ -1,0 +1,39 @@
+﻿<Window x:Class="Pinny_Notes.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Pinny_Notes.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+        Title="Pinny Notes Settings"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        Activated="Window_Activated"
+        >
+    <Grid Margin="5,5,5,5">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Startup Position"/>
+                <ComboBox Width="120">
+                    <ComboBoxItem Content="Top Left" />
+                    <ComboBoxItem Content="Top Right" />
+                    <ComboBoxItem Content="Bottom Left" />
+                    <ComboBoxItem Content="Bottom Right" />
+                </ComboBox>
+            </StackPanel>
+            <CheckBox Content="Cycle Colors" IsChecked="{Binding CycleColors}" />
+            <CheckBox Content="Trim Copied Text" IsChecked="{Binding TrimCopiedText}" />
+            <CheckBox Content="Trim Pasted Text" IsChecked="{Binding TrimPastedText}" />
+            <CheckBox Content="Middle Click Paste" IsChecked="{Binding MiddleClickPaste}" />
+            <CheckBox Content="Auto Copy" IsChecked="{Binding AutoCopy}" />
+            <CheckBox Content="Spell Checker" IsChecked="{Binding SpellChecker}" />
+            <CheckBox Content="New Line At End" IsChecked="{Binding NewLineAtEnd}" />
+            <CheckBox Content="Keep New Line At End Visible" IsChecked="{Binding KeepNewLineAtEndVisible}" />
+            <CheckBox Content="Auto Indent" IsChecked="{Binding AutoIndent}" />
+            <CheckBox Content="Allow Minimize When Pinned" IsChecked="{Binding AllowMinimizeWhenPinned}" />
+            <Button x:Name="CloseButton" Content="Close" Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -65,8 +65,6 @@ public partial class NoteWindow : Window
         ClearMenuItem.Command = _clearCommand;
         _saveCommand = new(SaveCommandExecute);
         SaveMenuItem.Command = _saveCommand;
-
-        LoadSettings();
     }
 
     private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -160,37 +158,6 @@ public partial class NoteWindow : Window
 
     #region MiscFunctions
 
-    private void LoadSettings()
-    {
-        AutoCopyMenuItem.IsChecked = Properties.Settings.Default.AutoCopy;
-        TrimCopiedTextMenuItem.IsChecked = Properties.Settings.Default.TrimCopiedText;
-        TrimPastedTextMenuItem.IsChecked = Properties.Settings.Default.TrimPastedText;
-        MiddleClickPasteMenuItem.IsChecked = Properties.Settings.Default.MiddleClickPaste;
-        SpellCheckMenuItem.IsChecked = Properties.Settings.Default.SpellCheck;
-        NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
-        NewLineEnabledMenuItem.IsChecked = Properties.Settings.Default.NewLine;
-        NewLineKeepVisibleMenuItem.IsChecked = Properties.Settings.Default.KeepNewLineAtEndVisible;
-        AutoIndentMenuItem.IsChecked = Properties.Settings.Default.AutoIndent;
-        AllowMinimizeWhenPinnedMenuItem.IsChecked = Properties.Settings.Default.AllowMinimizeWhenPinned;
-        ColorCycleMenuItem.IsChecked = Properties.Settings.Default.CycleColors;
-
-        if (Properties.Settings.Default.StartupPositionLeft)
-        {
-            if (Properties.Settings.Default.StartupPositionTop)
-                StartupPositionTopLeftMenuItem.IsChecked = true;
-            else
-                StartupPositionBottomLeftMenuItem.IsChecked = true;
-        }
-        else
-        {
-            if (Properties.Settings.Default.StartupPositionTop)
-                StartupPositionTopRightMenuItem.IsChecked = true;
-            else
-                StartupPositionBottomRightMenuItem.IsChecked = true;
-        }
-
-    }
-
     private MessageBoxResult SaveNote()
     {
         SaveFileDialog saveFileDialog = new()
@@ -248,114 +215,44 @@ public partial class NoteWindow : Window
         Close();
     }
 
-    #region ContextMenu
+    //private void StartupPositionMenuItem_Click(object sender, RoutedEventArgs e)
+    //{
+    //    // Don't allow uncheckign active item.
+    //    MenuItem menuItem = (MenuItem)sender;
+    //    if (!menuItem.IsChecked)
+    //    {
+    //        menuItem.IsChecked = true;
+    //        return;
+    //    }
 
-    #region Colors
+    //    // Uncheck all other items when this is checked.
+    //    foreach (object childObject in StartupPositionMenuItem.Items)
+    //    {
+    //        MenuItem childMenuItem = (MenuItem)childObject;
+    //        if (childMenuItem != menuItem)
+    //            childMenuItem.IsChecked = false;
+    //    }
 
-    private void ColorCycleMenuItem_Click(object sender, RoutedEventArgs e)
+    //    string menuItemText = menuItem.Header.ToString() ?? "";
+    //    string[] position = menuItemText.Split(" ");
+    //    if (position[0] == "Top")
+    //        Properties.Settings.Default.StartupPositionTop = true;
+    //    else
+    //        Properties.Settings.Default.StartupPositionTop = false;
+    //    if (position[1] == "Left")
+    //        Properties.Settings.Default.StartupPositionLeft = true;
+    //    else
+    //        Properties.Settings.Default.StartupPositionLeft = false;
+    //    Properties.Settings.Default.Save();
+    //}
+
+    // SpellCheck - Needs to set NoteTextBox.SpellCheck.IsEnabled
+    // NewLineEnabledMenuItem - Should trigger NoteTextBox_TextChanged when enabled.
+
+    private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        Properties.Settings.Default.CycleColors = ColorCycleMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
+        ((App)Application.Current).ShowSettingsWindow(this);
     }
-
-    #endregion
-
-    #region Settings
-
-    private void StartupPositionMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        // Don't allow uncheckign active item.
-        MenuItem menuItem = (MenuItem)sender;
-        if (!menuItem.IsChecked)
-        {
-            menuItem.IsChecked = true;
-            return;
-        }
-
-        // Uncheck all other items when this is checked.
-        foreach (object childObject in StartupPositionMenuItem.Items)
-        {
-            MenuItem childMenuItem = (MenuItem)childObject;
-            if (childMenuItem != menuItem)
-                childMenuItem.IsChecked = false;
-        }
-
-        string menuItemText = menuItem.Header.ToString() ?? "";
-        string[] position = menuItemText.Split(" ");
-        if (position[0] == "Top")
-            Properties.Settings.Default.StartupPositionTop = true;
-        else
-            Properties.Settings.Default.StartupPositionTop = false;
-        if (position[1] == "Left")
-            Properties.Settings.Default.StartupPositionLeft = true;
-        else
-            Properties.Settings.Default.StartupPositionLeft = false;
-        Properties.Settings.Default.Save();
-    }
-
-    private void AutoCopyMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.AutoCopy = AutoCopyMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void TrimCopiedTextMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.TrimCopiedText = TrimCopiedTextMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void TrimPastedTextMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.TrimPastedText = TrimPastedTextMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void MiddleClickPasteMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.MiddleClickPaste = MiddleClickPasteMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void SpellCheckMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        NoteTextBox.SpellCheck.IsEnabled = SpellCheckMenuItem.IsChecked;
-        Properties.Settings.Default.SpellCheck = SpellCheckMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void NewLineEnabledMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.NewLine = NewLineEnabledMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-
-        // Check for new line when this option is activated
-        if (Properties.Settings.Default.NewLine)
-            NoteTextBox_TextChanged(sender, e);
-    }
-
-    private void NewLineKeepVisibleMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.KeepNewLineAtEndVisible = NewLineKeepVisibleMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void AutoIndentMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.AutoIndent = AutoIndentMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    private void AllowMinimizeWhenPinnedMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Properties.Settings.Default.AllowMinimizeWhenPinned = AllowMinimizeWhenPinnedMenuItem.IsChecked;
-        Properties.Settings.Default.Save();
-    }
-
-    #endregion
-
-    #endregion
-
 
     #endregion
 
