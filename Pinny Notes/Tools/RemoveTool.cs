@@ -12,7 +12,10 @@ public partial class RemoveTool : BaseTool, ITool
     {
         RemoveSpaces,
         RemoveTabs,
-        RemoveNewLines
+        RemoveNewLines,
+        RemoveForwardSlashes,
+        RemoveBackSlashes,
+        RemoveAllSlashes
     }
 
     public RemoveTool(TextBox noteTextBox) : base(noteTextBox)
@@ -21,6 +24,10 @@ public partial class RemoveTool : BaseTool, ITool
         _menuActions.Add(new("Spaces", MenuActionCommand, ToolActions.RemoveSpaces));
         _menuActions.Add(new("Tabs", MenuActionCommand, ToolActions.RemoveTabs));
         _menuActions.Add(new("New Lines", MenuActionCommand, ToolActions.RemoveNewLines));
+        _menuActions.Add(new("-"));
+        _menuActions.Add(new("Forward Slashes (/)", MenuActionCommand, ToolActions.RemoveForwardSlashes));
+        _menuActions.Add(new("Back Slashes (\\)", MenuActionCommand, ToolActions.RemoveBackSlashes));
+        _menuActions.Add(new("All Slashes", MenuActionCommand, ToolActions.RemoveAllSlashes));
     }
 
     [RelayCommand]
@@ -39,6 +46,12 @@ public partial class RemoveTool : BaseTool, ITool
                 return RemoveCharacters(text, ['\t']);
             case ToolActions.RemoveNewLines:
                 return RemoveCharacters(text, ['\r', '\n']);
+            case ToolActions.RemoveForwardSlashes:
+                return RemoveCharacters(text, ['/']);
+            case ToolActions.RemoveBackSlashes:
+                return RemoveCharacters(text, ['\\']);
+            case ToolActions.RemoveAllSlashes:
+                return RemoveCharacters(text, ['\\', '/']);
         }
 
         return text;

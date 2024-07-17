@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Windows.Controls;
 
@@ -12,10 +11,7 @@ public partial class SlashTool : BaseTool, ITool
     {
         SlashAllForward,
         SlashAllBack,
-        SlashSwap,
-        SlashRemoveForward,
-        SlashRemoveBack,
-        SlashRemoveAll
+        SlashSwap
     }
 
     public SlashTool(TextBox noteTextBox) : base(noteTextBox)
@@ -24,10 +20,6 @@ public partial class SlashTool : BaseTool, ITool
         _menuActions.Add(new("All Forward (/)", MenuActionCommand, ToolActions.SlashAllForward));
         _menuActions.Add(new("All Back (\\)", MenuActionCommand, ToolActions.SlashAllBack));
         _menuActions.Add(new("Swap", MenuActionCommand, ToolActions.SlashSwap));
-        _menuActions.Add(new("-"));
-        _menuActions.Add(new("Remove Forward (/)", MenuActionCommand, ToolActions.SlashRemoveForward));
-        _menuActions.Add(new("Remove Back (\\)", MenuActionCommand, ToolActions.SlashRemoveBack));
-        _menuActions.Add(new("Remove All", MenuActionCommand, ToolActions.SlashRemoveAll));
     }
 
     [RelayCommand]
@@ -46,12 +38,6 @@ public partial class SlashTool : BaseTool, ITool
                 return text.Replace('/', '\\');
             case ToolActions.SlashSwap:
                 return SwapCharacters(text, '\\', '/');
-            case ToolActions.SlashRemoveForward:
-                return RemoveCharacters(text, ['/']);
-            case ToolActions.SlashRemoveBack:
-                return RemoveCharacters(text, ['\\']);
-            case ToolActions.SlashRemoveAll:
-                return RemoveCharacters(text, ['\\', '/']);
         }
 
         return text;
@@ -68,19 +54,6 @@ public partial class SlashTool : BaseTool, ITool
             else if (currentChar == character2)
                 stringBuilder.Append(character1);
             else
-                stringBuilder.Append(currentChar);
-        }
-
-        return stringBuilder.ToString();
-    }
-
-    private string RemoveCharacters(string text, HashSet<char> character)
-    {
-        StringBuilder stringBuilder = new(text.Length);
-
-        foreach (char currentChar in text)
-        {
-            if (!character.Contains(currentChar))
                 stringBuilder.Append(currentChar);
         }
 
