@@ -4,8 +4,17 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        ListEnumerate,
+        ListDash,
+        ListRemove,
+        ListSortAsc,
+        ListSortDec
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,21 +26,24 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Enumerate",
-                Command = new RelayCommand(ListEnumerateAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.ListEnumerate
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Dash",
-                Command = new RelayCommand(ListDashAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.ListDash
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove",
-                Command = new RelayCommand(ListRemoveAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.ListRemove
             }
         );
 
@@ -41,58 +53,57 @@ public class ListTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Sort Asc.",
-                Command = new RelayCommand(ListSortAscAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.ListSortAsc
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Sort Dec.",
-                Command = new RelayCommand(ListSortDecAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.ListSortDec
             }
         );
 
         return menuItem;
     }
 
-    private void ListEnumerateAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToEachLine<bool?>(EnumerateLine);
+        if (action == ToolActions.ListSortAsc || action == ToolActions.ListSortDec)
+            ApplyFunctionToNoteText(ModifyTextCallback, action);
+        else
+            ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private void ListDashAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToEachLine<bool?>(DashLine);
+        switch (action)
+        {
+            case ToolActions.ListSortAsc:
+                return SortNoteText(text);
+            case ToolActions.ListSortDec:
+                return SortNoteText(text, true);
+        }
+
+        return text;
     }
 
-    private void ListRemoveAction()
+    private string? ModifyLineCallback(string line, int index, ToolActions action)
     {
-        ApplyFunctionToEachLine<bool?>(RemoveFirstWordInLine);
-    }
+        switch (action)
+        {
+            case ToolActions.ListEnumerate:
+                return $"{index + 1}. {line}";
+            case ToolActions.ListDash:
+                return $"- {line}";
+            case ToolActions.ListRemove:
+                return line[(line.IndexOf(' ') + 1)..];
+        }
 
-    private void ListSortAscAction()
-    {
-        ApplyFunctionToNoteText<bool>(SortNoteText);
-    }
-
-    private void ListSortDecAction()
-    {
-        ApplyFunctionToNoteText<bool>(SortNoteText, true);
-    }
-
-    private string EnumerateLine(string line, int index, bool? additional = null)
-    {
-        return $"{index + 1}. {line}";
-    }
-
-    private string DashLine(string line, int index, bool? additional = null)
-    {
-        return $"- {line}";
-    }
-
-    private string RemoveFirstWordInLine(string line, int index, bool? additional = null)
-    {
-        return line[(line.IndexOf(' ') + 1)..];
+        return line;
     }
 
     private string SortNoteText(string text, bool reverse = false)

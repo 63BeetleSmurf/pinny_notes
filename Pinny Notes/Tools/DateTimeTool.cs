@@ -4,8 +4,13 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class DateTimeTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class DateTimeTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        DateTimeSortableDateTime
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,17 +22,29 @@ public class DateTimeTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Sortable Date Time",
-                Command = new RelayCommand(DateSortableDateTimeAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.DateTimeSortableDateTime
             }
         );
 
         return menuItem;
     }
 
-    private void DateSortableDateTimeAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
+    {
+        switch (action)
+        {
+            case ToolActions.DateTimeSortableDateTime:
+                InsertIntoNoteText(GetSortableDateTime());
+                break;
+        }
+    }
+
+    private string GetSortableDateTime()
     {
         string selectedText = _noteTextBox.SelectedText;
-        InsertIntoNoteText(GetDateTime("s", selectedText));
+        return GetDateTime("s", selectedText);
     }
 
     private string GetDateTime(string format, string? dateString = null)

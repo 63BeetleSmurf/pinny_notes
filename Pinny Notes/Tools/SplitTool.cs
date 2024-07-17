@@ -4,8 +4,18 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+// TO DO: Need to fix split by selected text. Possibly TextAction needs to get both text and selected text.
+
+public partial class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        SplitComma,
+        SplitSpace,
+        SplitTab,
+        SplitSelected
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,63 +27,61 @@ public class SplitTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Comma",
-                Command = new RelayCommand(SplitCommaAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SplitComma
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
-                Command = new RelayCommand(SplitSpaceAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SplitSpace
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new RelayCommand(SplitTabAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SplitTab
             }
         );
 
-        menuItem.Items.Add(new Separator());
+        //menuItem.Items.Add(new Separator());
 
-        menuItem.Items.Add(
-            new MenuItem()
-            {
-                Header = "Selected",
-                Command = new RelayCommand(SplitSelectedAction)
-            }
-        );
+        //menuItem.Items.Add(
+        //    new MenuItem()
+        //    {
+        //        Header = "Selected",
+        //        Command = MenuActionCommand,
+        //        CommandParameter = ToolActions.SplitSelected
+        //    }
+        //);
 
         return menuItem;
     }
 
-    private void SplitCommaAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<string>(SplitText, ",");
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void SplitSpaceAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToNoteText<string>(SplitText, " ");
-    }
+        switch (action)
+        {
+            case ToolActions.SplitComma:
+                return text.Replace(",", Environment.NewLine);
+            case ToolActions.SplitSpace:
+                return text.Replace(" ", Environment.NewLine);
+            case ToolActions.SplitTab:
+                return text.Replace("\t", Environment.NewLine);
+                //case ToolActions.SplitSelected:
+                //    return text.Replace(splitString, Environment.NewLine);
+        }
 
-    private void SplitTabAction()
-    {
-        ApplyFunctionToNoteText<string>(SplitText, "\t");
-    }
-
-    private void SplitSelectedAction()
-    {
-        string splitString = _noteTextBox.SelectedText;
-        _noteTextBox.SelectionLength = 0;
-        ApplyFunctionToNoteText(SplitText, splitString);
-    }
-
-    private string SplitText(string line, string? splitString)
-    {
-        if (splitString == null)
-            return line;
-        return line.Replace(splitString, Environment.NewLine);
+        return text;
     }
 }

@@ -3,8 +3,14 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        QuoteDouble,
+        QuoteSingle
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -16,32 +22,38 @@ public class QuoteTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Double",
-                Command = new RelayCommand(QuoteDoubleAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.QuoteDouble
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Single",
-                Command = new RelayCommand(QuoteSingleAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.QuoteSingle
             }
         );
 
         return menuItem;
     }
 
-    private void QuoteDoubleAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToEachLine<char>(QuoteText, '"');
+        ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private void QuoteSingleAction()
+    private string? ModifyLineCallback(string line, int index, ToolActions action)
     {
-        ApplyFunctionToEachLine<char>(QuoteText, '\'');
-    }
+        switch (action)
+        {
+            case ToolActions.QuoteDouble:
+                return $"\"{line}\"";
+            case ToolActions.QuoteSingle:
+                return $"'{line}'";
+        }
 
-    private string? QuoteText(string line, int index, char quoteChar)
-    {
-        return $"{quoteChar}{line}{quoteChar}";
+        return line;
     }
 }

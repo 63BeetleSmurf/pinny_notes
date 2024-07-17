@@ -4,12 +4,22 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        GibberishWord,
+        GibberishTitle,
+        GibberishSentence,
+        GibberishParagraph,
+        GibberishArticle,
+        GibberishName,
+    }
+
     private const string _characters = "zqxjkvbbppyyggffwwmmuuccllldddrrrhhhsssnnniiiiooooaaaaattttteeeeeeeeee";
     private const string _doubleNewLine = "\r\n\r\n";
 
-    private Random random = new Random();
+    private Random random = new();
 
     public MenuItem GetMenuItem()
     {
@@ -22,35 +32,40 @@ public class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Word",
-                Command = new RelayCommand(GibberishWordAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishWord
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Title",
-                Command = new RelayCommand(GibberishTitleAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishTitle
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Sentence",
-                Command = new RelayCommand(GibberishSentenceAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishSentence
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Paragraph",
-                Command = new RelayCommand(GibberishParagraphAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishParagraph
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Article",
-                Command = new RelayCommand(GibberishArticleAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishArticle
             }
         );
 
@@ -60,41 +75,38 @@ public class GibberishTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Name",
-                Command = new RelayCommand(GibberishNameAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.GibberishName
             }
         );
 
         return menuItem;
     }
 
-    private void GibberishWordAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        InsertIntoNoteText(GenerateGibberishWord());
-    }
-
-    private void GibberishTitleAction()
-    {
-        InsertIntoNoteText(GenerateGibberishTitle());
-    }
-
-    private void GibberishSentenceAction()
-    {
-        InsertIntoNoteText(GenerateGibberishSentence());
-    }
-
-    private void GibberishParagraphAction()
-    {
-        InsertIntoNoteText(GenerateGibberishParagraph());
-    }
-
-    private void GibberishArticleAction()
-    {
-        InsertIntoNoteText(GenerateGibberishArticle());
-    }
-
-    private void GibberishNameAction()
-    {
-        InsertIntoNoteText(GenerateGibberishTitle(2));
+        switch (action)
+        {
+            case ToolActions.GibberishWord:
+                InsertIntoNoteText(GenerateGibberishWord());
+                break;
+            case ToolActions.GibberishTitle:
+                InsertIntoNoteText(GenerateGibberishTitle());
+                break;
+            case ToolActions.GibberishSentence:
+                InsertIntoNoteText(GenerateGibberishSentence());
+                break;
+            case ToolActions.GibberishParagraph:
+                InsertIntoNoteText(GenerateGibberishParagraph());
+                break;
+            case ToolActions.GibberishArticle:
+                InsertIntoNoteText(GenerateGibberishArticle());
+                break;
+            case ToolActions.GibberishName:
+                InsertIntoNoteText(GenerateGibberishTitle(2));
+                break;
+        }
     }
 
     private string GenerateGibberishWord(bool titleCase = false)

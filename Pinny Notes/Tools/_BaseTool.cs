@@ -8,11 +8,11 @@ public abstract class BaseTool(TextBox noteTextBox)
 {
     protected TextBox _noteTextBox = noteTextBox;
 
-    protected void ApplyFunctionToNoteText<TAdditional>(Func<string, TAdditional?, string> function, TAdditional? additional = default)
+    protected void ApplyFunctionToNoteText<TAction>(Func<string, TAction, string> function, TAction action)
     {
         if (_noteTextBox.SelectionLength > 0)
         {
-            _noteTextBox.SelectedText = function(_noteTextBox.SelectedText, additional);
+            _noteTextBox.SelectedText = function(_noteTextBox.SelectedText, action);
         }
         else
         {
@@ -20,13 +20,13 @@ public abstract class BaseTool(TextBox noteTextBox)
             // Ignore trailing new line if it was automatically added
             if (Properties.Settings.Default.NewLine && _noteTextBox.Text.EndsWith(Environment.NewLine))
                 noteText = noteText.Remove(noteText.Length - Environment.NewLine.Length);
-            _noteTextBox.Text = function(noteText, additional);
+            _noteTextBox.Text = function(noteText, action);
             if (_noteTextBox.Text.Length > 0)
                 _noteTextBox.CaretIndex = _noteTextBox.Text.Length - 1;
         }
     }
 
-    protected void ApplyFunctionToEachLine<TAdditional>(Func<string, int, TAdditional?, string?> function, TAdditional? additional = default)
+    protected void ApplyFunctionToEachLine<TAction>(Func<string, int, TAction, string?> function, TAction action)
     {
         bool hasSelectedText = (_noteTextBox.SelectionLength > 0);
         string noteText = (hasSelectedText) ? _noteTextBox.SelectedText : _noteTextBox.Text;
@@ -39,7 +39,7 @@ public abstract class BaseTool(TextBox noteTextBox)
         List<string> newLines = [];
         for (int i = 0; i < lines.Length; i++)
         {
-            string? line = function(lines[i], i, additional);
+            string? line = function(lines[i], i, action);
             if (line != null)
                 newLines.Add(line);
         }

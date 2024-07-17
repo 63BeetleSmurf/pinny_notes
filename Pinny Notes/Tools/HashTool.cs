@@ -6,17 +6,17 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-enum HashAlgorithms
+public partial class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    SHA512 = 0,
-    SHA384 = 1,
-    SHA256 = 2,
-    SHA1 = 3,
-    MD5 = 4
-}
+    public enum ToolActions
+    {
+        HashSHA512,
+        HashSHA384,
+        HashSHA256,
+        HashSHA1,
+        HashMD5
+    }
 
-public class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
-{
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -28,89 +28,76 @@ public class HashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "SHA512",
-                Command = new RelayCommand(HashSHA512Action)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.HashSHA512
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA384",
-                Command = new RelayCommand(HashSHA384Action)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.HashSHA384
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA256",
-                Command = new RelayCommand(HashSHA256Action)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.HashSHA256
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "SHA1",
-                Command = new RelayCommand(HashSHA1Action)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.HashSHA1
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "MD5",
-                Command = new RelayCommand(HashMD5Action)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.HashMD5
             }
         );
 
         return menuItem;
     }
 
-    private void HashSHA512Action()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA512);
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void HashSHA384Action()
-    {
-        ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA384);
-    }
-
-    private void HashSHA256Action()
-    {
-        ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA256);
-    }
-
-    private void HashSHA1Action()
-    {
-        ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.SHA1);
-    }
-
-    private void HashMD5Action()
-    {
-        ApplyFunctionToNoteText<HashAlgorithms>(HashText, HashAlgorithms.MD5);
-    }
-
-    private string HashText(string text, HashAlgorithms algorithm)
+    private string ModifyTextCallback(string text, ToolActions action)
     {
         HashAlgorithm hasher;
-        switch (algorithm)
+        switch (action)
         {
-            case HashAlgorithms.SHA512:
+            case ToolActions.HashSHA512:
                 hasher = SHA512.Create();
                 break;
-            case HashAlgorithms.SHA384:
+            case ToolActions.HashSHA384:
                 hasher = SHA384.Create();
                 break;
-            case HashAlgorithms.SHA256:
+            case ToolActions.HashSHA256:
                 hasher = SHA256.Create();
                 break;
-            case HashAlgorithms.SHA1:
+            case ToolActions.HashSHA1:
                 hasher = SHA1.Create();
                 break;
-            case HashAlgorithms.MD5:
+            case ToolActions.HashMD5:
                 hasher = MD5.Create();
                 break;
             default:
                 return text;
         }
+
         return BitConverter.ToString(
             hasher.ComputeHash(Encoding.UTF8.GetBytes(_noteTextBox.Text))
         ).Replace("-", "");

@@ -1,11 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        SlashAllForward,
+        SlashAllBack,
+        SlashSwap,
+        SlashRemoveForward,
+        SlashRemoveBack,
+        SlashRemoveAll
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,21 +28,24 @@ public class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "All Forward (/)",
-                Command = new RelayCommand(SlashAllForwardAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashAllForward
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "All Back (\\)",
-                Command = new RelayCommand(SlashAllBackAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashAllBack
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Swap",
-                Command = new RelayCommand(SlashSwapAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashSwap
             }
         );
 
@@ -41,86 +55,84 @@ public class SlashTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Remove Forward (/)",
-                Command = new RelayCommand(SlashRemoveForwardAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashRemoveForward
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove Back (\\)",
-                Command = new RelayCommand(SlashRemoveBackAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashRemoveBack
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Remove All",
-                Command = new RelayCommand(SlashRemoveAllAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.SlashRemoveAll
             }
         );
 
         return menuItem;
     }
 
-    private void SlashAllForwardAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<Tuple<string, string>>(ReplaceCharacters, new("\\", "/"));
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void SlashAllBackAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToNoteText<Tuple<string, string>>(ReplaceCharacters, new("/", "\\"));
+        switch (action)
+        {
+            case ToolActions.SlashAllForward:
+                return text.Replace('\\', '/');
+            case ToolActions.SlashAllBack:
+                return text.Replace('/', '\\');
+            case ToolActions.SlashSwap:
+                return SwapCharacters(text, '\\', '/');
+            case ToolActions.SlashRemoveForward:
+                return RemoveCharacters(text, ['/']);
+            case ToolActions.SlashRemoveBack:
+                return RemoveCharacters(text, ['\\']);
+            case ToolActions.SlashRemoveAll:
+                return RemoveCharacters(text, ['\\', '/']);
+        }
+
+        return text;
     }
 
-    private void SlashSwapAction()
+    private string SwapCharacters(string text, char character1, char? character2 = null)
     {
-        ApplyFunctionToNoteText<Tuple<string, string>>(SwapCharacters, new("\\", "/"));
+        StringBuilder stringBuilder = new(text.Length);
+
+        foreach (char currentChar in text)
+        {
+            if (currentChar == character1)
+                stringBuilder.Append(character2);
+            else if (currentChar == character2)
+                stringBuilder.Append(character1);
+            else
+                stringBuilder.Append(currentChar);
+        }
+
+        return stringBuilder.ToString();
     }
 
-    private void SlashRemoveForwardAction()
+    private string RemoveCharacters(string text, HashSet<char> character)
     {
-        ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["/"]);
-    }
+        StringBuilder stringBuilder = new(text.Length);
 
-    private void SlashRemoveBackAction()
-    {
-        ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["\\"]);
-    }
+        foreach (char currentChar in text)
+        {
+            if (!character.Contains(currentChar))
+                stringBuilder.Append(currentChar);
+        }
 
-    private void SlashRemoveAllAction()
-    {
-        ApplyFunctionToNoteText<string[]>(RemoveCharacters, ["\\", "/"]);
-    }
-
-    private string ReplaceCharacters(string text, Tuple<string, string>? characters)
-    {
-        if (characters == null)
-            return text;
-
-        return text.Replace(characters.Item1, characters.Item2);
-    }
-
-    private string SwapCharacters(string text, Tuple<string, string>? characters)
-    {
-        string placeholder = "#|_PHOLD_#|";
-
-        if (characters == null)
-            return text;
-
-        string newText = text.Replace(characters.Item1, placeholder);
-        newText = newText.Replace(characters.Item2, characters.Item1);
-        return newText.Replace(placeholder, characters.Item2);
-    }
-
-    private string RemoveCharacters(string text, string[]? characters)
-    {
-        if (characters == null)
-            return text;
-
-        string newText = text;
-        foreach (string character in characters)
-            newText = newText.Replace(character, "");
-
-        return newText;
+        return stringBuilder.ToString();
     }
 }

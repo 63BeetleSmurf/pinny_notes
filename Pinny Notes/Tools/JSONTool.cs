@@ -4,8 +4,13 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        JsonPrettify
+    }
+
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = true
@@ -22,29 +27,37 @@ public class JsonTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Prettify",
-                Command = new RelayCommand(JsonPrettifyAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.JsonPrettify
             }
         );
 
         return menuItem;
     }
 
-    private void JsonPrettifyAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<bool?>(JsonPrettifyText);
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private string JsonPrettifyText(string text, bool? additional = null)
+    private string ModifyTextCallback(string text, ToolActions action)
     {
         try
         {
-            object? jsonObject = JsonSerializer.Deserialize<object>(text);
-            if (jsonObject != null)
-                return JsonSerializer.Serialize<object>(jsonObject, _jsonSerializerOptions);
+            switch (action)
+            {
+                case ToolActions.JsonPrettify:
+                    object? jsonObject = JsonSerializer.Deserialize<object>(text);
+                    if (jsonObject != null)
+                        return JsonSerializer.Serialize<object>(jsonObject, _jsonSerializerOptions);
+                    break;
+            }
         }
         catch
         {
         }
+
         return text;
     }
 }

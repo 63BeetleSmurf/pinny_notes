@@ -3,8 +3,14 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        Base64Encode,
+        Base64Decode
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -16,39 +22,40 @@ public class Base64Tool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Encode",
-                Command = new RelayCommand(Base64EncodeAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.Base64Encode
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
-                Command = new RelayCommand(Base64DecodeAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.Base64Decode
             }
         );
 
         return menuItem;
     }
 
-    private void Base64EncodeAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<bool?>(Base64EncodeText);
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void Base64DecodeAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToNoteText<bool?>(Base64DecodeText);
-    }
+        switch (action)
+        {
+            case ToolActions.Base64Encode:
+                byte[] textBytes = System.Text.Encoding.UTF8.GetBytes(text);
+                return System.Convert.ToBase64String(textBytes);
+            case ToolActions.Base64Decode:
+                byte[] base64Bytes = System.Convert.FromBase64String(text);
+                return System.Text.Encoding.UTF8.GetString(base64Bytes);
+        }
 
-    private string Base64EncodeText(string text, bool? additional = null)
-    {
-        byte[] textBytes = System.Text.Encoding.UTF8.GetBytes(text);
-        return System.Convert.ToBase64String(textBytes);
-    }
-
-    private string Base64DecodeText(string text, bool? additional = null)
-    {
-        byte[] base64Bytes = System.Convert.FromBase64String(text);
-        return System.Text.Encoding.UTF8.GetString(base64Bytes);
+        return text;
     }
 }

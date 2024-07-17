@@ -4,8 +4,14 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        EntityEncode,
+        EntityDecode
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,36 +23,38 @@ public class HtmlEntityTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Encode",
-                Command = new RelayCommand(HtmlEntityEncodeAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.EntityEncode
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Decode",
-                Command = new RelayCommand(HtmlEntityDecodeAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.EntityDecode
             }
         );
 
         return menuItem;
     }
 
-    private void HtmlEntityEncodeAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<bool?>(HtmlEntityEncodeText);
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void HtmlEntityDecodeAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToNoteText<bool?>(HtmlEntityDecodeText);
-    }
+        switch (action)
+        {
+            case ToolActions.EntityEncode:
+                return WebUtility.HtmlEncode(text);
+            case ToolActions.EntityDecode:
+                return WebUtility.HtmlDecode(text);
+        }
 
-    private string HtmlEntityEncodeText(string text, bool? additional = null)
-    {
-        return WebUtility.HtmlEncode(text);
-    }
-    private string HtmlEntityDecodeText(string text, bool? additional = null)
-    {
-        return WebUtility.HtmlDecode(text);
+        return text;
     }
 }

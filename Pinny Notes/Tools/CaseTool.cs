@@ -4,15 +4,15 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-enum Cases
+public partial class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
-    Lower = 0,
-    Upper = 1,
-    Proper = 2
-}
+    public enum ToolActions
+    {
+        CaseLower,
+        CaseUpper,
+        CaseTitle
+    }
 
-public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
-{
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -24,50 +24,50 @@ public class CaseTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Lower",
-                Command = new RelayCommand(CaseLowerAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.CaseLower
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Upper",
-                Command = new RelayCommand(CaseUpperAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.CaseUpper
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
-                Header = "Proper",
-                Command = new RelayCommand(CaseProperAction)
+                Header = "Title",
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.CaseTitle
             }
         );
 
         return menuItem;
     }
 
-    private void CaseLowerAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Lower);
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void CaseUpperAction()
-    {
-        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Upper);
-    }
-
-    private void CaseProperAction()
-    {
-        ApplyFunctionToNoteText<Cases>(SetTextCase, Cases.Proper);
-    }
-
-    private string SetTextCase(string text, Cases textCase)
+    private string ModifyTextCallback(string text, ToolActions action)
     {
         TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-        return textCase switch
+
+        switch (action)
         {
-            Cases.Upper => textInfo.ToUpper(text),
-            Cases.Proper => textInfo.ToTitleCase(textInfo.ToLower(text)),
-            _ => textInfo.ToLower(text),
-        };
+            case ToolActions.CaseLower:
+                return textInfo.ToLower(text);
+            case ToolActions.CaseUpper:
+                return textInfo.ToUpper(text);
+            case ToolActions.CaseTitle:
+                return textInfo.ToTitleCase(text);
+        }
+
+        return text;
     }
 }

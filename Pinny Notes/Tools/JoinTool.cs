@@ -4,8 +4,15 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        JoinComma,
+        JoinSpace,
+        JoinTab
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -17,44 +24,48 @@ public class JoinTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Comma",
-                Command = new RelayCommand(JoinCommaAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.JoinComma
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Space",
-                Command = new RelayCommand(JoinSpaceAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.JoinComma
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new RelayCommand(JoinTabAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.JoinComma
             }
         );
 
         return menuItem;
     }
 
-    private void JoinCommaAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToNoteText<string>(JoinText, ",");
+        ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
-    private void JoinSpaceAction()
+    private string ModifyTextCallback(string text, ToolActions action)
     {
-        ApplyFunctionToNoteText<string>(JoinText, " ");
-    }
+        switch (action)
+        {
+            case ToolActions.JoinComma:
+                return text.Replace(Environment.NewLine, ",");
+            case ToolActions.JoinSpace:
+                return text.Replace(Environment.NewLine, " ");
+            case ToolActions.JoinTab:
+                return text.Replace(Environment.NewLine, "\t");
+        }
 
-    private void JoinTabAction()
-    {
-        ApplyFunctionToNoteText<string>(JoinText, "\t");
-    }
-
-    private string JoinText(string text, string? joinString)
-    {
-        return text.Replace(Environment.NewLine, joinString);
+        return text;
     }
 }

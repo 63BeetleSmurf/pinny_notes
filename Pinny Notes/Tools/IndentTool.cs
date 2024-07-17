@@ -3,8 +3,15 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-public class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        Indent2Spaces,
+        Indent4Spaces,
+        IndentTab
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -16,43 +23,48 @@ public class IndentTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "2 Spaces",
-                Command = new RelayCommand(Indent2SpacesAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.Indent2Spaces
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "4 Spaces",
-                Command = new RelayCommand(Indent4SpacesAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.Indent4Spaces
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Tab",
-                Command = new RelayCommand(IndentTabAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.IndentTab
             }
         );
 
         return menuItem;
     }
-    private void Indent2SpacesAction()
+
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToEachLine<string>(IndentText, "  ");
+        ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private void Indent4SpacesAction()
+    private string? ModifyLineCallback(string line, int index, ToolActions action)
     {
-        ApplyFunctionToEachLine<string>(IndentText, "    ");
-    }
+        switch (action)
+        {
+            case ToolActions.Indent2Spaces:
+                return $"  {line}";
+            case ToolActions.Indent4Spaces:
+                return $"    {line}";
+            case ToolActions.IndentTab:
+                return $"\t{line}";
+        }
 
-    private void IndentTabAction()
-    {
-        ApplyFunctionToEachLine<string>(IndentText, "\t");
-    }
-
-    private string? IndentText(string line, int index, string? indentString)
-    {
-        return indentString + line;
+        return line;
     }
 }

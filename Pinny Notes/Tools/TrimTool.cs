@@ -3,16 +3,17 @@ using System.Windows.Controls;
 
 namespace Pinny_Notes.Tools;
 
-enum Trims
-{
-    Start = 0,
-    End = 1,
-    Both = 2,
-    Lines = 3
-}
 
-public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
+public partial class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
 {
+    public enum ToolActions
+    {
+        TrimStart,
+        TrimEnd,
+        TrimBoth,
+        TrimLines
+    }
+
     public MenuItem GetMenuItem()
     {
         MenuItem menuItem = new()
@@ -24,72 +25,61 @@ public class TrimTool(TextBox noteTextBox) : BaseTool(noteTextBox), ITool
             new MenuItem()
             {
                 Header = "Start",
-                Command = new RelayCommand(TrimStartAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.TrimStart
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "End",
-                Command = new RelayCommand(TrimEndAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.TrimEnd
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Both",
-                Command = new RelayCommand(TrimBothAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.TrimBoth
             }
         );
         menuItem.Items.Add(
             new MenuItem()
             {
                 Header = "Empty Lines",
-                Command = new RelayCommand(TrimEmptyLinesAction)
+                Command = MenuActionCommand,
+                CommandParameter = ToolActions.TrimLines
             }
         );
 
         return menuItem;
     }
 
-    private void TrimStartAction()
+    [RelayCommand]
+    private void MenuAction(ToolActions action)
     {
-        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Start);
+        ApplyFunctionToEachLine(ModifyLineCallback, action);
     }
 
-    private void TrimEndAction()
+    private string? ModifyLineCallback(string line, int index, ToolActions action)
     {
-        ApplyFunctionToEachLine<Trims>(TrimText, Trims.End);
-    }
-
-    private void TrimBothAction()
-    {
-        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Both);
-    }
-
-    private void TrimEmptyLinesAction()
-    {
-        ApplyFunctionToEachLine<Trims>(TrimText, Trims.Lines);
-    }
-
-    private string? TrimText(string line, int index, Trims trimType)
-    {
-        switch (trimType)
+        switch (action)
         {
-            case Trims.Start:
+            case ToolActions.TrimStart:
                 return line.TrimStart();
-            case Trims.End:
+            case ToolActions.TrimEnd:
                 return line.TrimEnd();
-            case Trims.Both:
+            case ToolActions.TrimBoth:
                 return line.Trim();
-            case Trims.Lines:
+            case ToolActions.TrimLines:
                 if (string.IsNullOrEmpty(line))
                     return null;
                 else
                     return line;
-            default:
-                return line;
-
         }
+
+        return line;
     }
 }
