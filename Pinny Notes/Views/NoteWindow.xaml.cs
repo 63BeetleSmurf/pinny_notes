@@ -388,8 +388,11 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_DragOver(object sender, DragEventArgs e)
     {
-        e.Effects = DragDropEffects.Copy;
-        e.Handled = true;
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            e.Effects = DragDropEffects.Copy;
+            e.Handled = true;
+        }
     }
 
     private void NoteTextBox_Drop(object sender, DragEventArgs e)
@@ -399,10 +402,6 @@ public partial class NoteWindow : Window
             NoteTextBox.Text = File.ReadAllText(
                 ((string[])e.Data.GetData(DataFormats.FileDrop))[0]
             );
-        }
-        else if (e.Data.GetDataPresent(DataFormats.StringFormat))
-        {
-            NoteTextBox.Text = (string)e.Data.GetData(DataFormats.StringFormat);
         }
     }
 
