@@ -32,8 +32,8 @@
     <Setting Name="MiddleClickPaste" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AllowMinimizeWhenPinned" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="MinimizeMode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="StartupPosition" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

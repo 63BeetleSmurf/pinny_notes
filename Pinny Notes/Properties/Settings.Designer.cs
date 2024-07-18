@@ -145,13 +145,13 @@ namespace Pinny_Notes.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AllowMinimizeWhenPinned {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int MinimizeMode {
             get {
-                return ((bool)(this["AllowMinimizeWhenPinned"]));
+                return ((int)(this["MinimizeMode"]));
             }
             set {
-                this["AllowMinimizeWhenPinned"] = value;
+                this["MinimizeMode"] = value;
             }
         }
         

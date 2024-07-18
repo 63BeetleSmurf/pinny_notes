@@ -18,6 +18,12 @@ public partial class SettingsViewModel : ObservableObject
         new(StartupPositions.BottomRight, "Bottom Right")
     ];
 
+    private static readonly KeyValuePair<MinimizeModes, string>[] _minimizeModeList = [
+        new(MinimizeModes.Allow, "Yes"),
+        new(MinimizeModes.Prevent, "No"),
+        new(MinimizeModes.PreventIfPinned, "When not pinned")
+    ];
+
     public SettingsViewModel()
     {
         _startupPosition = (StartupPositions)Properties.Settings.Default.StartupPosition;
@@ -30,13 +36,14 @@ public partial class SettingsViewModel : ObservableObject
         _newLineAtEnd = Properties.Settings.Default.NewLine;
         _keepNewLineAtEndVisible = Properties.Settings.Default.KeepNewLineAtEndVisible;
         _autoIndent = Properties.Settings.Default.AutoIndent;
-        _allowMinimizeWhenPinned = Properties.Settings.Default.AllowMinimizeWhenPinned;
+        _minimizeMode = (MinimizeModes)Properties.Settings.Default.MinimizeMode;
         _transparentNotes = Properties.Settings.Default.TransparentNotes;
         _opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
         _onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
     }
 
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
+    public KeyValuePair<MinimizeModes, string>[] MinimizeModeList => _minimizeModeList;
 
     [ObservableProperty]
     private StartupPositions _startupPosition;
@@ -119,10 +126,10 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private bool _allowMinimizeWhenPinned;
-    partial void OnAllowMinimizeWhenPinnedChanged(bool value)
+    private MinimizeModes _minimizeMode;
+    partial void OnMinimizeModeChanged(MinimizeModes value)
     {
-        Properties.Settings.Default.AllowMinimizeWhenPinned = value;
+        Properties.Settings.Default.MinimizeMode = (int)value;
         Properties.Settings.Default.Save();
     }
 

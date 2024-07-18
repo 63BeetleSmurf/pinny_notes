@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Pinny_Notes.Tools;
 using Pinny_Notes.ViewModels;
+using Pinny_Notes.Enums;
 
 namespace Pinny_Notes.Views;
 
@@ -87,7 +88,14 @@ public partial class NoteWindow : Window
 
     private void NoteWindow_StateChanged(object sender, EventArgs e)
     {
-        if (WindowState == WindowState.Minimized && Topmost && !Properties.Settings.Default.AllowMinimizeWhenPinned)
+        MinimizeModes minimizeMode = (MinimizeModes)Properties.Settings.Default.MinimizeMode;
+
+        if (WindowState == WindowState.Minimized
+            && (
+                minimizeMode == MinimizeModes.Prevent 
+                || (minimizeMode == MinimizeModes.PreventIfPinned && Topmost)
+            )
+        )
             WindowState = WindowState.Normal;
     }
 

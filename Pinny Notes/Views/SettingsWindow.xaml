@@ -33,7 +33,16 @@
             <CheckBox Content="New Line At End" IsChecked="{Binding NewLineAtEnd}" />
             <CheckBox Content="Keep New Line At End Visible" IsChecked="{Binding KeepNewLineAtEndVisible}" />
             <CheckBox Content="Auto Indent" IsChecked="{Binding AutoIndent}" />
-            <CheckBox Content="Allow Minimize When Pinned" IsChecked="{Binding AllowMinimizeWhenPinned}" />
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Allow notes to be minimized"/>
+                <ComboBox
+                    Width="120"
+                    ItemsSource="{Binding MinimizeModeList, Mode=OneTime}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    SelectedValue="{Binding MinimizeMode, Mode=TwoWay}"
+                    />
+            </StackPanel>
             <CheckBox Content="Transparent Notes" IsChecked="{Binding TransparentNotes}" />
             <CheckBox Content="Opaque When Focused" IsChecked="{Binding OpaqueWhenFocused}" />
             <CheckBox Content="Only Transparent When Pinned" IsChecked="{Binding OnlyTransparentWhenPinned}" />
