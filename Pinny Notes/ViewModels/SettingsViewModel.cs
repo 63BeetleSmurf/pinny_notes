@@ -60,7 +60,7 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private StartupPositions _startupPosition;
     partial void OnStartupPositionChanged(StartupPositions oldValue, StartupPositions newValue) =>
-        UpdateSetting(nameof(StartupPosition), oldValue, newValue);
+        UpdateSetting(nameof(StartupPosition), (int)oldValue, (int)newValue);
 
     [ObservableProperty]
     private bool _cycleColors;
@@ -110,7 +110,7 @@ public partial class SettingsViewModel : ObservableRecipient
     [ObservableProperty]
     private MinimizeModes _minimizeMode;
     partial void OnMinimizeModeChanged(MinimizeModes oldValue, MinimizeModes newValue) =>
-        UpdateSetting(nameof(MinimizeMode), oldValue, newValue);
+        UpdateSetting(nameof(MinimizeMode), (int)oldValue, (int)newValue);
 
     [ObservableProperty]
     private bool _transparentNotes;
