@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
-using Pinny_Notes.Enums;
-using Pinny_Notes.Properties;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using Pinny_Notes.Enums;
+using Pinny_Notes.Properties;
 
 namespace Pinny_Notes.ViewModels;
 
@@ -36,21 +36,21 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public SettingsViewModel()
     {
-        _startupPosition = (StartupPositions)Properties.Settings.Default.StartupPosition;
-        _cycleColors = Properties.Settings.Default.CycleColors;
-        _trimCopiedText = Properties.Settings.Default.TrimCopiedText;
-        _trimPastedText = Properties.Settings.Default.TrimPastedText;
-        _middleClickPaste = Properties.Settings.Default.MiddleClickPaste;
-        _autoCopy = Properties.Settings.Default.AutoCopy;
-        _spellChecker = Properties.Settings.Default.SpellCheck;
-        _newLineAtEnd = Properties.Settings.Default.NewLineAtEnd;
-        _keepNewLineAtEndVisible = Properties.Settings.Default.KeepNewLineAtEndVisible;
-        _autoIndent = Properties.Settings.Default.AutoIndent;
-        _minimizeMode = (MinimizeModes)Properties.Settings.Default.MinimizeMode;
-        _transparentNotes = Properties.Settings.Default.TransparentNotes;
-        _opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
-        _onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
-        _colorMode = (ColorModes)Properties.Settings.Default.ColorMode;
+        _startupPosition = (StartupPositions)Settings.Default.StartupPosition;
+        _cycleColors = Settings.Default.CycleColors;
+        _trimCopiedText = Settings.Default.TrimCopiedText;
+        _trimPastedText = Settings.Default.TrimPastedText;
+        _middleClickPaste = Settings.Default.MiddleClickPaste;
+        _autoCopy = Settings.Default.AutoCopy;
+        _spellChecker = Settings.Default.SpellCheck;
+        _newLineAtEnd = Settings.Default.NewLineAtEnd;
+        _keepNewLineAtEndVisible = Settings.Default.KeepNewLineAtEndVisible;
+        _autoIndent = Settings.Default.AutoIndent;
+        _minimizeMode = (MinimizeModes)Settings.Default.MinimizeMode;
+        _transparentNotes = Settings.Default.TransparentNotes;
+        _opaqueWhenFocused = Settings.Default.OpaqueWhenFocused;
+        _onlyTransparentWhenPinned = Settings.Default.OnlyTransparentWhenPinned;
+        _colorMode = (ColorModes)Settings.Default.ColorMode;
     }
 
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;

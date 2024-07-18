@@ -8,9 +8,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using Pinny_Notes.Enums;
 using Pinny_Notes.Tools;
 using Pinny_Notes.ViewModels;
-using Pinny_Notes.Enums;
+using Pinny_Notes.Properties;
 
 namespace Pinny_Notes.Views;
 
@@ -88,7 +89,7 @@ public partial class NoteWindow : Window
 
     private void NoteWindow_StateChanged(object sender, EventArgs e)
     {
-        MinimizeModes minimizeMode = (MinimizeModes)Properties.Settings.Default.MinimizeMode;
+        MinimizeModes minimizeMode = (MinimizeModes)Settings.Default.MinimizeMode;
 
         if (WindowState == WindowState.Minimized
             && (
@@ -122,7 +123,7 @@ public partial class NoteWindow : Window
             return;
 
         string copiedText = NoteTextBox.SelectedText;
-        if (Properties.Settings.Default.TrimCopiedText)
+        if (Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
         Clipboard.SetText(copiedText);
     }
@@ -133,7 +134,7 @@ public partial class NoteWindow : Window
             return;
 
         string copiedText = NoteTextBox.SelectedText;
-        if (Properties.Settings.Default.TrimCopiedText)
+        if (Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
         Clipboard.SetText(copiedText);
         NoteTextBox.SelectedText = "";
@@ -147,7 +148,7 @@ public partial class NoteWindow : Window
 
         // Get text from clipboard and trim if specified
         string clipboardString = Clipboard.GetText();
-        if (Properties.Settings.Default.TrimPastedText)
+        if (Settings.Default.TrimPastedText)
             clipboardString = clipboardString.Trim();
 
         bool hasSelectedText = (NoteTextBox.SelectionLength > 0);
@@ -157,7 +158,7 @@ public partial class NoteWindow : Window
         NoteTextBox.SelectedText = clipboardString;
 
         NoteTextBox.CaretIndex = caretIndex + clipboardString.Length;
-        if (!hasSelectedText && Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+        if (!hasSelectedText && Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
             NoteTextBox.ScrollToEnd();
 
     }
@@ -242,7 +243,7 @@ public partial class NoteWindow : Window
     private void NoteTextBox_TextChanged(object sender, RoutedEventArgs e)
     {
         _viewModel.IsSaved = false;
-        if (!Properties.Settings.Default.NewLineAtEnd || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
+        if (!Settings.Default.NewLineAtEnd || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
             return;
 
         bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
@@ -255,13 +256,13 @@ public partial class NoteWindow : Window
         NoteTextBox.SelectionStart = selectionStart;
         NoteTextBox.SelectionLength = selectionLength;
 
-        if (Properties.Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
+        if (Settings.Default.KeepNewLineAtEndVisible && caretAtEnd)
             NoteTextBox.ScrollToEnd();
     }
 
     private void NoteTextBox_SelectionChanged(object sender, RoutedEventArgs e)
     {
-        if (Properties.Settings.Default.AutoCopy && NoteTextBox.SelectionLength > 0)
+        if (Settings.Default.AutoCopy && NoteTextBox.SelectionLength > 0)
             _copyCommand.Execute(null);
     }
 
@@ -327,7 +328,7 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Middle && Properties.Settings.Default.MiddleClickPaste)
+        if (e.ChangedButton == MouseButton.Middle && Settings.Default.MiddleClickPaste)
             _pasteCommand.Execute(null);
     }
 
@@ -374,7 +375,7 @@ public partial class NoteWindow : Window
 
             e.Handled = true;
         }
-        else if (e.Key == Key.Return && Properties.Settings.Default.AutoIndent)
+        else if (e.Key == Key.Return && Settings.Default.AutoIndent)
         {
             // If there is selected text remove it and set caret to correct position
             if (NoteTextBox.SelectionLength > 0)

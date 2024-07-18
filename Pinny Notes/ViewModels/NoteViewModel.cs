@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using Pinny_Notes.Enums;
-using CommunityToolkit.Mvvm.Messaging.Messages;
-using CommunityToolkit.Mvvm.Messaging;
-using System.Collections.Generic;
 using Pinny_Notes.Helpers;
+using Pinny_Notes.Properties;
 
 namespace Pinny_Notes.ViewModels;
 
@@ -112,8 +113,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private void InitNoteColor(NoteViewModel? parent = null)
     {
         // Set this first as cycle colors wont trigger a change if the next color if the default for ThemeColors
-        CurrentThemeColor = (ThemeColors)Properties.Settings.Default.Color;
-        if (Properties.Settings.Default.CycleColors)
+        CurrentThemeColor = (ThemeColors)Settings.Default.Color;
+        if (Settings.Default.CycleColors)
         {
             int themeColorIndex = GetNextThemeColorIndex((int)CurrentThemeColor);
             if (parent != null && themeColorIndex == (int)parent.CurrentThemeColor)
@@ -156,7 +157,7 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
         else
         {
             int screenMargin = 78;
-            switch ((StartupPositions)Properties.Settings.Default.StartupPosition)
+            switch ((StartupPositions)Settings.Default.StartupPosition)
             {
                 case StartupPositions.TopLeft:
                 case StartupPositions.MiddleLeft:
@@ -178,7 +179,7 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
                     break;
             }
 
-            switch ((StartupPositions)Properties.Settings.Default.StartupPosition)
+            switch ((StartupPositions)Settings.Default.StartupPosition)
             {
                 case StartupPositions.TopLeft:
                 case StartupPositions.TopCenter:
@@ -204,7 +205,7 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     private void UpdateBrushes(ThemeColors themeColor)
     {
-        ColorModes colorMode = (ColorModes)Properties.Settings.Default.ColorMode;
+        ColorModes colorMode = (ColorModes)Settings.Default.ColorMode;
 
         // 0 = Title, 1 = Background, 2 = Border
         BorderColorBrush = new(_colors[themeColor][2]);         // #feea00
@@ -225,9 +226,9 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     public void UpdateOpacity()
     {
-        bool transparentNotes = Properties.Settings.Default.TransparentNotes;
-        bool opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
-        bool onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
+        bool transparentNotes = Settings.Default.TransparentNotes;
+        bool opaqueWhenFocused = Settings.Default.OpaqueWhenFocused;
+        bool onlyTransparentWhenPinned = Settings.Default.OnlyTransparentWhenPinned;
 
         if (IsFocused)
             Opacity = (transparentNotes && !opaqueWhenFocused) ? _transparentOpacity : _opaqueOpacity;
@@ -241,8 +242,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private ThemeColors _currentThemeColor;
     partial void OnCurrentThemeColorChanged(ThemeColors value)
     {
-        Properties.Settings.Default.Color = (int)value;
-        Properties.Settings.Default.Save();
+        Settings.Default.Color = (int)value;
+        Settings.Default.Save();
         UpdateBrushes(value);
     }
 
@@ -269,10 +270,10 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private double _height = 300;
 
     [ObservableProperty]
-    private double _opacity = (Properties.Settings.Default.TransparentNotes && !Properties.Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
+    private double _opacity = (Settings.Default.TransparentNotes && !Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
 
     [ObservableProperty]
-    private bool _spellCheck = Properties.Settings.Default.SpellCheck;
+    private bool _spellCheck = Settings.Default.SpellCheck;
 
     [ObservableProperty]
     private bool _isPinned = false;
