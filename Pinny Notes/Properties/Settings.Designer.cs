@@ -74,12 +74,12 @@ namespace Pinny_Notes.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool NewLine {
+        public bool NewLineAtEnd {
             get {
-                return ((bool)(this["NewLine"]));
+                return ((bool)(this["NewLineAtEnd"]));
             }
             set {
-                this["NewLine"] = value;
+                this["NewLineAtEnd"] = value;
             }
         }
         

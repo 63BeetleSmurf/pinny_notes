@@ -50,7 +50,7 @@ public abstract class BaseTool(TextBox noteTextBox)
         {
             string noteText = _noteTextBox.Text;
             // Ignore trailing new line if it was automatically added
-            if (Properties.Settings.Default.NewLine && _noteTextBox.Text.EndsWith(Environment.NewLine))
+            if (Properties.Settings.Default.NewLineAtEnd && _noteTextBox.Text.EndsWith(Environment.NewLine))
                 noteText = noteText.Remove(noteText.Length - Environment.NewLine.Length);
             _noteTextBox.Text = function(noteText, action);
             if (_noteTextBox.Text.Length > 0)
@@ -65,7 +65,7 @@ public abstract class BaseTool(TextBox noteTextBox)
 
         string[] lines = noteText.Split(Environment.NewLine);
         // Ignore trailing new line if it was automatically added
-        if (Properties.Settings.Default.NewLine && lines[^1] == "")
+        if (Properties.Settings.Default.NewLineAtEnd && lines[^1] == "")
             lines = lines[..^1];
 
         List<string> newLines = [];

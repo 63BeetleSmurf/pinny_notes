@@ -249,7 +249,7 @@ public partial class NoteWindow : Window
     private void NoteTextBox_TextChanged(object sender, RoutedEventArgs e)
     {
         _viewModel.IsSaved = false;
-        if (!Properties.Settings.Default.NewLine || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
+        if (!Properties.Settings.Default.NewLineAtEnd || NoteTextBox.Text == "" || NoteTextBox.Text.EndsWith(Environment.NewLine))
             return;
 
         bool caretAtEnd = (NoteTextBox.CaretIndex == NoteTextBox.Text.Length);
