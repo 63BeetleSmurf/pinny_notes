@@ -4,13 +4,27 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using Pinny_Notes.Enums;
+using CommunityToolkit.Mvvm.Messaging.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Pinny_Notes.ViewModels;
 
-public partial class NoteViewModel : ObservableObject
+public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyChangedMessage<object>>
 {
+    public void Receive(PropertyChangedMessage<object> message)
+    {
+        switch (message.PropertyName)
+        {
+            case "SpellCheck":
+                SpellCheck = (bool)message.NewValue;
+                break;
+        }
+    }
+
     public NoteViewModel(NoteViewModel? parent = null)
     {
+        Messenger.Register(this);
+
         InitNoteColor(parent);
         InitNotePosition(parent);
     }
@@ -186,7 +200,10 @@ public partial class NoteViewModel : ObservableObject
     private double _height = 300;
 
     [ObservableProperty]
-    private double _opacity = 1;
+    private double _opacity = (Properties.Settings.Default.TransparentNotes && !Properties.Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
+
+    [ObservableProperty]
+    private bool _spellCheck = Properties.Settings.Default.SpellCheck;
 
     [ObservableProperty]
     private bool _isPinned = false;

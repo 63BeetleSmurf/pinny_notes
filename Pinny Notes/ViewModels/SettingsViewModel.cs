@@ -1,10 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using Pinny_Notes.Enums;
+using Pinny_Notes.Properties;
 using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace Pinny_Notes.ViewModels;
 
-public partial class SettingsViewModel : ObservableObject
+public partial class SettingsViewModel : ObservableRecipient
 {
     private static readonly KeyValuePair<StartupPositions, string>[] _startupPositionsList = [
         new(StartupPositions.TopLeft, "Top Left"),
@@ -33,7 +37,7 @@ public partial class SettingsViewModel : ObservableObject
         _middleClickPaste = Properties.Settings.Default.MiddleClickPaste;
         _autoCopy = Properties.Settings.Default.AutoCopy;
         _spellChecker = Properties.Settings.Default.SpellCheck;
-        _newLineAtEnd = Properties.Settings.Default.NewLine;
+        _newLineAtEnd = Properties.Settings.Default.NewLineAtEnd;
         _keepNewLineAtEndVisible = Properties.Settings.Default.KeepNewLineAtEndVisible;
         _autoIndent = Properties.Settings.Default.AutoIndent;
         _minimizeMode = (MinimizeModes)Properties.Settings.Default.MinimizeMode;
@@ -45,115 +49,81 @@ public partial class SettingsViewModel : ObservableObject
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
     public KeyValuePair<MinimizeModes, string>[] MinimizeModeList => _minimizeModeList;
 
+    private void UpdateSetting(string settingName, object oldValue, object newValue)
+    {
+        Settings.Default[settingName] = newValue;
+        Settings.Default.Save();
+
+        Messenger.Send(new PropertyChangedMessage<object>(this, settingName, oldValue, newValue));
+    }
+
     [ObservableProperty]
     private StartupPositions _startupPosition;
-    partial void OnStartupPositionChanged(StartupPositions value)
-    {
-        Properties.Settings.Default.StartupPosition = (int)value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnStartupPositionChanged(StartupPositions oldValue, StartupPositions newValue) =>
+        UpdateSetting(nameof(StartupPosition), oldValue, newValue);
 
     [ObservableProperty]
     private bool _cycleColors;
-    partial void OnCycleColorsChanged(bool value)
-    {
-        Properties.Settings.Default.CycleColors = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnCycleColorsChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(CycleColors), oldValue, newValue);
 
     [ObservableProperty]
     private bool _trimCopiedText;
-    partial void OnTrimCopiedTextChanged(bool value)
-    {
-        Properties.Settings.Default.TrimCopiedText = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnTrimCopiedTextChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(TrimCopiedText), oldValue, newValue);
 
     [ObservableProperty]
     private bool _trimPastedText;
-    partial void OnTrimPastedTextChanged(bool value)
-    {
-        Properties.Settings.Default.TrimPastedText = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnTrimPastedTextChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(TrimPastedText), oldValue, newValue);
 
     [ObservableProperty]
     private bool _middleClickPaste;
-    partial void OnMiddleClickPasteChanged(bool value)
-    {
-        Properties.Settings.Default.MiddleClickPaste = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnMiddleClickPasteChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(MiddleClickPaste), oldValue, newValue);
 
     [ObservableProperty]
     private bool _autoCopy;
-    partial void OnAutoCopyChanged(bool value)
-    {
-        Properties.Settings.Default.AutoCopy = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnAutoCopyChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(AutoCopy), oldValue, newValue);
 
     [ObservableProperty]
     private bool _spellChecker;
-    partial void OnSpellCheckerChanged(bool value)
-    {
-        Properties.Settings.Default.SpellCheck = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnSpellCheckerChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(SpellCheck), oldValue, newValue);
 
     [ObservableProperty]
     private bool _newLineAtEnd;
-    partial void OnNewLineAtEndChanged(bool value)
-    {
-        Properties.Settings.Default.NewLine = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnNewLineAtEndChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(NewLineAtEnd), oldValue, newValue);
 
     [ObservableProperty]
     private bool _keepNewLineAtEndVisible;
-    partial void OnKeepNewLineAtEndVisibleChanged(bool value)
-    {
-        Properties.Settings.Default.KeepNewLineAtEndVisible = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnKeepNewLineAtEndVisibleChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(KeepNewLineAtEndVisible), oldValue, newValue);
 
     [ObservableProperty]
     private bool _autoIndent;
-    partial void OnAutoIndentChanged(bool value)
-    {
-        Properties.Settings.Default.AutoIndent = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnAutoIndentChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(AutoIndent), oldValue, newValue);
 
     [ObservableProperty]
     private MinimizeModes _minimizeMode;
-    partial void OnMinimizeModeChanged(MinimizeModes value)
-    {
-        Properties.Settings.Default.MinimizeMode = (int)value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnMinimizeModeChanged(MinimizeModes oldValue, MinimizeModes newValue) =>
+        UpdateSetting(nameof(MinimizeMode), oldValue, newValue);
 
     [ObservableProperty]
     private bool _transparentNotes;
-    partial void OnTransparentNotesChanged(bool value)
-    {
-        Properties.Settings.Default.TransparentNotes = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnTransparentNotesChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(TransparentNotes), oldValue, newValue);
 
     [ObservableProperty]
     private bool _opaqueWhenFocused;
-    partial void OnOpaqueWhenFocusedChanged(bool value)
-    {
-        Properties.Settings.Default.OpaqueWhenFocused = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnOpaqueWhenFocusedChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(OpaqueWhenFocused), oldValue, newValue);
 
     [ObservableProperty]
     private bool _onlyTransparentWhenPinned;
-    partial void OnOnlyTransparentWhenPinnedChanged(bool value)
-    {
-        Properties.Settings.Default.OnlyTransparentWhenPinned = value;
-        Properties.Settings.Default.Save();
-    }
+    partial void OnOnlyTransparentWhenPinnedChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(OnlyTransparentWhenPinned), oldValue, newValue);
 }

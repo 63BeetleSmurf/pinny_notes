@@ -238,6 +238,7 @@
                 TextChanged="NoteTextBox_TextChanged"
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto"
+                SpellCheck.IsEnabled="{Binding SpellCheck}"
                 Text="{Binding Content}"
                 />
         </Grid>

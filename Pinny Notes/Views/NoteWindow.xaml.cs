@@ -234,7 +234,6 @@ public partial class NoteWindow : Window
         Close();
     }
 
-    // SpellCheck - Needs to set NoteTextBox.SpellCheck.IsEnabled
     // NewLineEnabledMenuItem - Should trigger NoteTextBox_TextChanged when enabled.
 
     private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
