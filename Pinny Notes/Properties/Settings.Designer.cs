@@ -202,5 +202,17 @@ namespace Pinny_Notes.Properties {
                 this["OnlyTransparentWhenPinned"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ColorMode {
+            get {
+                return ((int)(this["ColorMode"]));
+            }
+            set {
+                this["ColorMode"] = value;
+            }
+        }
     }
 }

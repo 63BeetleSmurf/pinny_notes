@@ -6,17 +6,89 @@ using System.Windows.Media;
 using Pinny_Notes.Enums;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.Generic;
+using Pinny_Notes.Helpers;
 
 namespace Pinny_Notes.ViewModels;
 
 public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyChangedMessage<object>>
 {
+    private static readonly Dictionary<ThemeColors, Color[]> _colors = new() {
+        {
+            ThemeColors.Yellow,
+            new[] {
+                Color.FromRgb(254, 247, 177),   // #fef7b1
+                Color.FromRgb(255, 252, 221),   // #fffcdd
+                Color.FromRgb(254, 234, 0),     // #feea00
+            }
+        },
+        {
+            ThemeColors.Orange,
+            new[] {
+                Color.FromRgb(255, 209, 121),   // #ffd179
+                Color.FromRgb(254, 232, 185),   // #fee8b9
+                Color.FromRgb(255, 171, 0),     // #ffab00
+            }
+        },
+        {
+            ThemeColors.Red,
+            new[] {
+                Color.FromRgb(255, 124, 129),   // #ff7c81
+                Color.FromRgb(255, 196, 198),   // #ffc4c6
+                Color.FromRgb(227, 48, 54),     // #e33036
+            }
+        },
+        {
+            ThemeColors.Pink,
+            new[] {
+                Color.FromRgb(217, 134, 204),   // #d986cc
+                Color.FromRgb(235, 191, 227),   // #ebbfe3
+                Color.FromRgb(167, 41, 149),    // #a72995
+            }
+        },
+        {
+            ThemeColors.Purple,
+            new[] {
+                Color.FromRgb(157, 154, 221),   // #9d9add
+                Color.FromRgb(208, 206, 243),   // #d0cef3
+                Color.FromRgb(98, 91, 184),     // #625bb8
+            }
+        },
+        {
+            ThemeColors.Blue,
+            new[] {
+                Color.FromRgb(122, 195, 230),   // #7ac3e6
+                Color.FromRgb(179, 217, 236),   // #b3d9ec
+                Color.FromRgb(17, 149, 221),    // #1195dd
+            }
+        },
+        {
+            ThemeColors.Aqua,
+            new[] {
+                Color.FromRgb(151, 207, 198),   // #97cfc6
+                Color.FromRgb(192, 226, 225),   // #c0e2e1
+                Color.FromRgb(22, 176, 152),    // #16b098
+           }
+        },
+        {
+            ThemeColors.Green,
+            new[] {
+                Color.FromRgb(198, 214, 125),   // #c6d67d
+                Color.FromRgb(227, 235, 198),   // #e3ebc6
+                Color.FromRgb(170, 204, 4),     // #aacc04
+            }
+        }
+    };
+
     public void Receive(PropertyChangedMessage<object> message)
     {
         switch (message.PropertyName)
         {
             case "SpellCheck":
                 SpellCheck = (bool)message.NewValue;
+                break;
+            case "ColorMode":
+                UpdateBrushes(CurrentThemeColor);
                 break;
         }
     }
@@ -124,49 +196,22 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     private void UpdateBrushes(ThemeColors themeColor)
     {
-        switch (themeColor)
+        ColorModes colorMode = (ColorModes)Properties.Settings.Default.ColorMode;
+
+        // 0 = Title, 1 = Background, 2 = Border
+        BorderColorBrush = new(_colors[themeColor][2]);         // #feea00
+
+        if (colorMode == ColorModes.Dark || (colorMode == ColorModes.System && SystemThemeHelper.IsDarkMode()))
         {
-            default:
-            case ThemeColors.Yellow:
-                TitleBarColorBrush = new(Color.FromRgb(254, 247, 177));     // #fef7b1
-                BackgroundColorBrush = new(Color.FromRgb(255, 252, 221));   // #fffcdd
-                BorderColorBrush = new(Color.FromRgb(254, 234, 0));         // #feea00
-                break;
-            case ThemeColors.Orange:
-                TitleBarColorBrush = new(Color.FromRgb(255, 209, 121));     // #ffd179
-                BackgroundColorBrush = new(Color.FromRgb(254, 232, 185));   // #fee8b9
-                BorderColorBrush = new(Color.FromRgb(255, 171, 0));         // #ffab00
-                break;
-            case ThemeColors.Red:
-                TitleBarColorBrush = new(Color.FromRgb(255, 124, 129));     // #ff7c81
-                BackgroundColorBrush = new(Color.FromRgb(255, 196, 198));   // #ffc4c6
-                BorderColorBrush = new(Color.FromRgb(227, 48, 54));         // #e33036
-                break;
-            case ThemeColors.Pink:
-                TitleBarColorBrush = new(Color.FromRgb(217, 134, 204));     // #d986cc
-                BackgroundColorBrush = new(Color.FromRgb(235, 191, 227));   // #ebbfe3
-                BorderColorBrush = new(Color.FromRgb(167, 41, 149));        // #a72995
-                break;
-            case ThemeColors.Purple:
-                TitleBarColorBrush = new(Color.FromRgb(157, 154, 221));     // #9d9add
-                BackgroundColorBrush = new(Color.FromRgb(208, 206, 243));   // #d0cef3
-                BorderColorBrush = new(Color.FromRgb(98, 91, 184));         // #625bb8
-                break;
-            case ThemeColors.Blue:
-                TitleBarColorBrush = new(Color.FromRgb(122, 195, 230));     // #7ac3e6
-                BackgroundColorBrush = new(Color.FromRgb(179, 217, 236));   // #b3d9ec
-                BorderColorBrush = new(Color.FromRgb(17, 149, 221));        // #1195dd
-                break;
-            case ThemeColors.Aqua:
-                TitleBarColorBrush = new(Color.FromRgb(151, 207, 198));     // #97cfc6
-                BackgroundColorBrush = new(Color.FromRgb(192, 226, 225));   // #c0e2e1
-                BorderColorBrush = new(Color.FromRgb(22, 176, 152));        // #16b098
-                break;
-            case ThemeColors.Green:
-                TitleBarColorBrush = new(Color.FromRgb(198, 214, 125));     // #c6d67d
-                BackgroundColorBrush = new(Color.FromRgb(227, 235, 198));   // #e3ebc6
-                BorderColorBrush = new(Color.FromRgb(170, 204, 4));         // #aacc04
-                break;
+            TitleBarColorBrush = new(Color.FromRgb(70, 70, 70));    // #464646
+            TitleButtonColorBrush = new(_colors[themeColor][2]);
+            BackgroundColorBrush = new(Color.FromRgb(50, 50, 50));  // #323232
+        }
+        else
+        {
+            TitleBarColorBrush = new(_colors[themeColor][0]);        // #464646
+            TitleButtonColorBrush = new(Color.FromRgb(70, 70, 70));
+            BackgroundColorBrush = new(_colors[themeColor][1]);      // #323232
         }
     }
 
@@ -181,6 +226,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     [ObservableProperty]
     private SolidColorBrush _titleBarColorBrush = null!;
+    [ObservableProperty]
+    private SolidColorBrush _titleButtonColorBrush = null!;
     [ObservableProperty]
     private SolidColorBrush _backgroundColorBrush = null!;
     [ObservableProperty]

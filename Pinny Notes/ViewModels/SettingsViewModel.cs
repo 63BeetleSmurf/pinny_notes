@@ -28,6 +28,12 @@ public partial class SettingsViewModel : ObservableRecipient
         new(MinimizeModes.PreventIfPinned, "When not pinned")
     ];
 
+    private static readonly KeyValuePair<ColorModes, string>[] _colorModeList = [
+        new(ColorModes.Light, "Light"),
+        new(ColorModes.Dark, "Dark"),
+        new(ColorModes.System, "System Default")
+    ];
+
     public SettingsViewModel()
     {
         _startupPosition = (StartupPositions)Properties.Settings.Default.StartupPosition;
@@ -44,10 +50,12 @@ public partial class SettingsViewModel : ObservableRecipient
         _transparentNotes = Properties.Settings.Default.TransparentNotes;
         _opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
         _onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
+        _colorMode = (ColorModes)Properties.Settings.Default.ColorMode;
     }
 
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
     public KeyValuePair<MinimizeModes, string>[] MinimizeModeList => _minimizeModeList;
+    public KeyValuePair<ColorModes, string>[] ColorModeList => _colorModeList;
 
     private void UpdateSetting(string settingName, object oldValue, object newValue)
     {
@@ -126,4 +134,9 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _onlyTransparentWhenPinned;
     partial void OnOnlyTransparentWhenPinnedChanged(bool oldValue, bool newValue) =>
         UpdateSetting(nameof(OnlyTransparentWhenPinned), oldValue, newValue);
+
+    [ObservableProperty]
+    private ColorModes _colorMode;
+    partial void OnColorModeChanged(ColorModes oldValue, ColorModes newValue) =>
+        UpdateSetting(nameof(ColorMode), (int)oldValue, (int)newValue);
 }

@@ -27,18 +27,18 @@
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
-            <Setter Property="Opacity" Value="0.2"/>
+            <Setter Property="Opacity" Value="0.6"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="0.6"/>
+                    <Setter Property="Opacity" Value="1.0"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="FadeOutToggleButton" TargetType="{x:Type ToggleButton}">
-            <Setter Property="Opacity" Value="0.2"/>
+            <Setter Property="Opacity" Value="0.6"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="0.6"/>
+                    <Setter Property="Opacity" Value="1.0"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -57,7 +57,7 @@
                     <ControlTemplate>
                         <Grid>
                             <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 10,2 v 16 M 2,10 h 16" Stroke="Black" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
+                            <Path Data="M 10,2 v 16 M 2,10 h 16" Stroke="{Binding TitleButtonColorBrush}" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>
@@ -67,7 +67,7 @@
                     <ControlTemplate TargetType="ToggleButton">
                         <Grid>
                             <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 5,0 h 10 c 1,0 1,2 0,2 h -2 l 1,6 c 0,0 4,1 4,5 0,1 -7,1 -7,1 0,0 0,6 -1,6 C 9,20 9,14 9,14 9,14 2,14 2,13 2,9 6,8 6,8 L 7,2 H 5 C 4,2 4,0 5,0 Z" Fill="Black" RenderTransformOrigin="0.5,0.5">
+                            <Path Data="M 5,0 h 10 c 1,0 1,2 0,2 h -2 l 1,6 c 0,0 4,1 4,5 0,1 -7,1 -7,1 0,0 0,6 -1,6 C 9,20 9,14 9,14 9,14 2,14 2,13 2,9 6,8 6,8 L 7,2 H 5 C 4,2 4,0 5,0 Z" Fill="{Binding TitleButtonColorBrush}" RenderTransformOrigin="0.5,0.5">
                                 <Path.Style>
                                     <Style TargetType="Path">
                                         <Style.Triggers>
@@ -91,7 +91,7 @@
                     <ControlTemplate>
                         <Grid>
                             <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 3,3 L 17,17 M 3,17 L 17,3" Stroke="Black" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
+                            <Path Data="M 3,3 L 17,17 M 3,17 L 17,3" Stroke="{Binding TitleButtonColorBrush}" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"></Path>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>
@@ -224,6 +224,7 @@
                 AllowDrop="True"
                 BorderThickness="0"
                 Background="Transparent"
+                Foreground="LightGray"
                 ContextMenuOpening="NoteTextBox_ContextMenuOpening"
                 FontSize="16"
                 MouseDoubleClick="NoteTextBox_MouseDoubleClick"

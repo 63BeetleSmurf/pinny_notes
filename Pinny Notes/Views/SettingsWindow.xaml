@@ -46,6 +46,16 @@
             <CheckBox Content="Transparent Notes" IsChecked="{Binding TransparentNotes}" />
             <CheckBox Margin="20,0,0,0" Content="Opaque When Focused" IsEnabled="{Binding TransparentNotes}" IsChecked="{Binding OpaqueWhenFocused}" />
             <CheckBox Margin="20,0,0,0" Content="Only Transparent When Pinned" IsEnabled="{Binding TransparentNotes}" IsChecked="{Binding OnlyTransparentWhenPinned}" />
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Color mode"/>
+                <ComboBox
+                    Width="120"
+                    ItemsSource="{Binding ColorModeList, Mode=OneTime}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    SelectedValue="{Binding ColorMode, Mode=TwoWay}"
+                    />
+            </StackPanel>
             <Button x:Name="CloseButton" Content="Close" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
