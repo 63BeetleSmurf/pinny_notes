@@ -186,6 +186,9 @@ public partial class NoteViewModel : ObservableObject
     private double _height = 300;
 
     [ObservableProperty]
+    private double _opacity = 1;
+
+    [ObservableProperty]
     private bool _isPinned = false;
     [ObservableProperty]
     private bool _isSaved = false;

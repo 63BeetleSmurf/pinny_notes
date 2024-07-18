@@ -34,6 +34,9 @@
             <CheckBox Content="Keep New Line At End Visible" IsChecked="{Binding KeepNewLineAtEndVisible}" />
             <CheckBox Content="Auto Indent" IsChecked="{Binding AutoIndent}" />
             <CheckBox Content="Allow Minimize When Pinned" IsChecked="{Binding AllowMinimizeWhenPinned}" />
+            <CheckBox Content="Transparent Notes" IsChecked="{Binding TransparentNotes}" />
+            <CheckBox Content="Opaque When Focused" IsChecked="{Binding OpaqueWhenFocused}" />
+            <CheckBox Content="Only Transparent When Pinned" IsChecked="{Binding OnlyTransparentWhenPinned}" />
             <Button x:Name="CloseButton" Content="Close" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>

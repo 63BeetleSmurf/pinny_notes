@@ -94,9 +94,20 @@ public partial class NoteWindow : Window
     private void NoteWindow_ActivatedChanged(object sender, EventArgs e)
     {
         if (IsActive)
+        {
             Topmost = true;
-        else if (!_viewModel.IsPinned)
+            if (Opacity != 1 && Properties.Settings.Default.OpaqueWhenFocused)
+                Opacity = 1;
+        }
+        else if (_viewModel.IsPinned)
+        {
+            Opacity = Properties.Settings.Default.TransparentNotes ? 0.8 : 1.0;
+        }
+        else
+        {
             Topmost = false;
+            Opacity = (Properties.Settings.Default.TransparentNotes && !Properties.Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
+        }
     }
 
     #endregion

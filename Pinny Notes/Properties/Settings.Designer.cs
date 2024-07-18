@@ -166,5 +166,41 @@ namespace Pinny_Notes.Properties {
                 this["StartupPosition"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TransparentNotes {
+            get {
+                return ((bool)(this["TransparentNotes"]));
+            }
+            set {
+                this["TransparentNotes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OpaqueWhenFocused {
+            get {
+                return ((bool)(this["OpaqueWhenFocused"]));
+            }
+            set {
+                this["OpaqueWhenFocused"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OnlyTransparentWhenPinned {
+            get {
+                return ((bool)(this["OnlyTransparentWhenPinned"]));
+            }
+            set {
+                this["OnlyTransparentWhenPinned"] = value;
+            }
+        }
     }
 }

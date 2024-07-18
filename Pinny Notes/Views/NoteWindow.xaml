@@ -23,6 +23,7 @@
         StateChanged="NoteWindow_StateChanged"
         Activated="NoteWindow_ActivatedChanged"
         Deactivated="NoteWindow_ActivatedChanged"
+        Opacity="{Binding Opacity}"
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">

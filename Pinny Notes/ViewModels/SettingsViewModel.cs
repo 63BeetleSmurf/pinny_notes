@@ -31,6 +31,9 @@ public partial class SettingsViewModel : ObservableObject
         _keepNewLineAtEndVisible = Properties.Settings.Default.KeepNewLineAtEndVisible;
         _autoIndent = Properties.Settings.Default.AutoIndent;
         _allowMinimizeWhenPinned = Properties.Settings.Default.AllowMinimizeWhenPinned;
+        _transparentNotes = Properties.Settings.Default.TransparentNotes;
+        _opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
+        _onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
     }
 
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
@@ -120,6 +123,30 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnAllowMinimizeWhenPinnedChanged(bool value)
     {
         Properties.Settings.Default.AllowMinimizeWhenPinned = value;
+        Properties.Settings.Default.Save();
+    }
+
+    [ObservableProperty]
+    private bool _transparentNotes;
+    partial void OnTransparentNotesChanged(bool value)
+    {
+        Properties.Settings.Default.TransparentNotes = value;
+        Properties.Settings.Default.Save();
+    }
+
+    [ObservableProperty]
+    private bool _opaqueWhenFocused;
+    partial void OnOpaqueWhenFocusedChanged(bool value)
+    {
+        Properties.Settings.Default.OpaqueWhenFocused = value;
+        Properties.Settings.Default.Save();
+    }
+
+    [ObservableProperty]
+    private bool _onlyTransparentWhenPinned;
+    partial void OnOnlyTransparentWhenPinnedChanged(bool value)
+    {
+        Properties.Settings.Default.OnlyTransparentWhenPinned = value;
         Properties.Settings.Default.Save();
     }
 }
