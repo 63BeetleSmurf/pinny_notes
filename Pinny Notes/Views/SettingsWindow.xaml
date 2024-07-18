@@ -31,7 +31,7 @@
             <CheckBox Content="Auto Copy" IsChecked="{Binding AutoCopy}" />
             <CheckBox Content="Spell Checker" IsChecked="{Binding SpellChecker}" />
             <CheckBox Content="New Line At End" IsChecked="{Binding NewLineAtEnd}" />
-            <CheckBox Content="Keep New Line At End Visible" IsChecked="{Binding KeepNewLineAtEndVisible}" />
+            <CheckBox Margin="20,0,0,0" Content="Keep New Line At End Visible" IsEnabled="{Binding NewLineAtEnd}" IsChecked="{Binding KeepNewLineAtEndVisible}" />
             <CheckBox Content="Auto Indent" IsChecked="{Binding AutoIndent}" />
             <StackPanel Orientation="Horizontal">
                 <Label Content="Allow notes to be minimized"/>
@@ -44,8 +44,8 @@
                     />
             </StackPanel>
             <CheckBox Content="Transparent Notes" IsChecked="{Binding TransparentNotes}" />
-            <CheckBox Content="Opaque When Focused" IsChecked="{Binding OpaqueWhenFocused}" />
-            <CheckBox Content="Only Transparent When Pinned" IsChecked="{Binding OnlyTransparentWhenPinned}" />
+            <CheckBox Margin="20,0,0,0" Content="Opaque When Focused" IsEnabled="{Binding TransparentNotes}" IsChecked="{Binding OpaqueWhenFocused}" />
+            <CheckBox Margin="20,0,0,0" Content="Only Transparent When Pinned" IsEnabled="{Binding TransparentNotes}" IsChecked="{Binding OnlyTransparentWhenPinned}" />
             <Button x:Name="CloseButton" Content="Close" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>
