@@ -1,11 +1,21 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Pinny_Notes.Enums;
+using System.Collections.Generic;
 
 namespace Pinny_Notes.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private static readonly KeyValuePair<StartupPositions, string>[] _startupPositionsList = [
+        new(StartupPositions.TopLeft, "Top Left"),
+        new(StartupPositions.TopRight, "Top Right"),
+        new(StartupPositions.BottomLeft, "Bottom Left"),
+        new(StartupPositions.BottomRight, "Bottom Right")
+    ];
+
     public SettingsViewModel()
     {
+        _startupPosition = (StartupPositions)Properties.Settings.Default.StartupPosition;
         _cycleColors = Properties.Settings.Default.CycleColors;
         _trimCopiedText = Properties.Settings.Default.TrimCopiedText;
         _trimPastedText = Properties.Settings.Default.TrimPastedText;
@@ -16,6 +26,16 @@ public partial class SettingsViewModel : ObservableObject
         _keepNewLineAtEndVisible = Properties.Settings.Default.KeepNewLineAtEndVisible;
         _autoIndent = Properties.Settings.Default.AutoIndent;
         _allowMinimizeWhenPinned = Properties.Settings.Default.AllowMinimizeWhenPinned;
+    }
+
+    public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
+
+    [ObservableProperty]
+    private StartupPositions _startupPosition;
+    partial void OnStartupPositionChanged(StartupPositions value)
+    {
+        Properties.Settings.Default.StartupPosition = (int)value;
+        Properties.Settings.Default.Save();
     }
 
     [ObservableProperty]

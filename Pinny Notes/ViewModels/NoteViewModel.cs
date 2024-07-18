@@ -38,11 +38,11 @@ public partial class NoteViewModel : ObservableObject
 
     private void InitNotePosition(NoteViewModel? parent = null)
     {
-        GravityX = parent?.GravityX ?? (Properties.Settings.Default.StartupPositionLeft ? 1 : -1);
-        GravityY = parent?.GravityY ?? (Properties.Settings.Default.StartupPositionTop ? 1 : -1);
-
         if (parent != null)
         {
+            GravityX = parent.GravityX;
+            GravityY = parent.GravityY;
+
             double newX = parent.X + (45 * GravityX);
             if (newX < 0)
                 X = 0;
@@ -62,15 +62,33 @@ public partial class NoteViewModel : ObservableObject
         else
         {
             int screenMargin = 78;
-            if (Properties.Settings.Default.StartupPositionLeft)
-                X = screenMargin;
-            else // Right
-                X = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
-
-            if (Properties.Settings.Default.StartupPositionTop)
-                Y = screenMargin;
-            else // Bottom
-                Y = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
+            switch ((StartupPositions)Properties.Settings.Default.StartupPosition)
+            {
+                case StartupPositions.TopLeft:
+                    X = screenMargin;
+                    Y = screenMargin;
+                    GravityX = 1;
+                    GravityY = 1;
+                    break;
+                case StartupPositions.TopRight:
+                    X = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
+                    Y = screenMargin;
+                    GravityX = -1;
+                    GravityY = 1;
+                    break;
+                case StartupPositions.BottomLeft:
+                    X = screenMargin;
+                    Y = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
+                    GravityX = 1;
+                    GravityY = -1;
+                    break;
+                case StartupPositions.BottomRight:
+                    X = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
+                    Y = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
+                    GravityX = -1;
+                    GravityX = -1;
+                    break;
+            }
         }
     }
 

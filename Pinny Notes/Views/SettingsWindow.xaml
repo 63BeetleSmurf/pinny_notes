@@ -16,12 +16,13 @@
         <StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Startup Position"/>
-                <ComboBox Width="120">
-                    <ComboBoxItem Content="Top Left" />
-                    <ComboBoxItem Content="Top Right" />
-                    <ComboBoxItem Content="Bottom Left" />
-                    <ComboBoxItem Content="Bottom Right" />
-                </ComboBox>
+                <ComboBox
+                    Width="120"
+                    ItemsSource="{Binding StartupPositionsList, Mode=OneTime}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"
+                    SelectedValue="{Binding StartupPosition, Mode=TwoWay}"
+                    />
             </StackPanel>
             <CheckBox Content="Cycle Colors" IsChecked="{Binding CycleColors}" />
             <CheckBox Content="Trim Copied Text" IsChecked="{Binding TrimCopiedText}" />

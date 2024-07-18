@@ -86,30 +86,6 @@ namespace Pinny_Notes.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool StartupPositionTop {
-            get {
-                return ((bool)(this["StartupPositionTop"]));
-            }
-            set {
-                this["StartupPositionTop"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool StartupPositionLeft {
-            get {
-                return ((bool)(this["StartupPositionLeft"]));
-            }
-            set {
-                this["StartupPositionLeft"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool TrimCopiedText {
             get {
                 return ((bool)(this["TrimCopiedText"]));
@@ -176,6 +152,18 @@ namespace Pinny_Notes.Properties {
             }
             set {
                 this["AllowMinimizeWhenPinned"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int StartupPosition {
+            get {
+                return ((int)(this["StartupPosition"]));
+            }
+            set {
+                this["StartupPosition"] = value;
             }
         }
     }
