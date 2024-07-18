@@ -8,8 +8,13 @@ public partial class SettingsViewModel : ObservableObject
 {
     private static readonly KeyValuePair<StartupPositions, string>[] _startupPositionsList = [
         new(StartupPositions.TopLeft, "Top Left"),
+        new(StartupPositions.TopCenter, "Top Center"),
         new(StartupPositions.TopRight, "Top Right"),
+        new(StartupPositions.MiddleLeft, "Middle Left"),
+        new(StartupPositions.MiddleCenter, "Middle Center"),
+        new(StartupPositions.MiddleRight, "Middle Right"),
         new(StartupPositions.BottomLeft, "Bottom Left"),
+        new(StartupPositions.BottomCenter, "Bottom Center"),
         new(StartupPositions.BottomRight, "Bottom Right")
     ];
 

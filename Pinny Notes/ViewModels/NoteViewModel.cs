@@ -65,28 +65,44 @@ public partial class NoteViewModel : ObservableObject
             switch ((StartupPositions)Properties.Settings.Default.StartupPosition)
             {
                 case StartupPositions.TopLeft:
-                    X = screenMargin;
-                    Y = screenMargin;
-                    GravityX = 1;
-                    GravityY = 1;
-                    break;
-                case StartupPositions.TopRight:
-                    X = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
-                    Y = screenMargin;
-                    GravityX = -1;
-                    GravityY = 1;
-                    break;
+                case StartupPositions.MiddleLeft:
                 case StartupPositions.BottomLeft:
                     X = screenMargin;
-                    Y = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
                     GravityX = 1;
-                    GravityY = -1;
                     break;
+                case StartupPositions.TopCenter:
+                case StartupPositions.MiddleCenter:
+                case StartupPositions.BottomCenter:
+                    X = SystemParameters.PrimaryScreenWidth / 2 - Width / 2;
+                    GravityX = 1;
+                    break;
+                case StartupPositions.TopRight:
+                case StartupPositions.MiddleRight:
                 case StartupPositions.BottomRight:
                     X = (SystemParameters.PrimaryScreenWidth - screenMargin) - Width;
+                    GravityX = -1;
+                    break;
+            }
+
+            switch ((StartupPositions)Properties.Settings.Default.StartupPosition)
+            {
+                case StartupPositions.TopLeft:
+                case StartupPositions.TopCenter:
+                case StartupPositions.TopRight:
+                    Y = screenMargin;
+                    GravityY = 1;
+                    break;
+                case StartupPositions.MiddleLeft:
+                case StartupPositions.MiddleCenter:
+                case StartupPositions.MiddleRight:
+                    Y = SystemParameters.PrimaryScreenHeight / 2 - Height / 2;
+                    GravityY = -1;
+                    break;
+                case StartupPositions.BottomLeft:
+                case StartupPositions.BottomCenter:
+                case StartupPositions.BottomRight:
                     Y = (SystemParameters.PrimaryScreenHeight - screenMargin) - Height;
-                    GravityX = -1;
-                    GravityX = -1;
+                    GravityY = -1;
                     break;
             }
         }
