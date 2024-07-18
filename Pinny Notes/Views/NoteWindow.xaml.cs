@@ -215,37 +215,6 @@ public partial class NoteWindow : Window
         Close();
     }
 
-    //private void StartupPositionMenuItem_Click(object sender, RoutedEventArgs e)
-    //{
-    //    // Don't allow uncheckign active item.
-    //    MenuItem menuItem = (MenuItem)sender;
-    //    if (!menuItem.IsChecked)
-    //    {
-    //        menuItem.IsChecked = true;
-    //        return;
-    //    }
-
-    //    // Uncheck all other items when this is checked.
-    //    foreach (object childObject in StartupPositionMenuItem.Items)
-    //    {
-    //        MenuItem childMenuItem = (MenuItem)childObject;
-    //        if (childMenuItem != menuItem)
-    //            childMenuItem.IsChecked = false;
-    //    }
-
-    //    string menuItemText = menuItem.Header.ToString() ?? "";
-    //    string[] position = menuItemText.Split(" ");
-    //    if (position[0] == "Top")
-    //        Properties.Settings.Default.StartupPositionTop = true;
-    //    else
-    //        Properties.Settings.Default.StartupPositionTop = false;
-    //    if (position[1] == "Left")
-    //        Properties.Settings.Default.StartupPositionLeft = true;
-    //    else
-    //        Properties.Settings.Default.StartupPositionLeft = false;
-    //    Properties.Settings.Default.Save();
-    //}
-
     // SpellCheck - Needs to set NoteTextBox.SpellCheck.IsEnabled
     // NewLineEnabledMenuItem - Should trigger NoteTextBox_TextChanged when enabled.
 
