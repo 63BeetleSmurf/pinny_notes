@@ -215,12 +215,14 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
             TitleBarColorBrush = new(Color.FromRgb(70, 70, 70));    // #464646
             TitleButtonColorBrush = new(_colors[themeColor][2]);
             BackgroundColorBrush = new(Color.FromRgb(50, 50, 50));  // #323232
+            TextColorBrush = new(Colors.White);
         }
         else
         {
             TitleBarColorBrush = new(_colors[themeColor][0]);        // #464646
             TitleButtonColorBrush = new(Color.FromRgb(70, 70, 70));
             BackgroundColorBrush = new(_colors[themeColor][1]);      // #323232
+            TextColorBrush = new(Colors.Black);
         }
     }
 
@@ -255,6 +257,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private SolidColorBrush _backgroundColorBrush = null!;
     [ObservableProperty]
     private SolidColorBrush _borderColorBrush = null!;
+    [ObservableProperty]
+    private SolidColorBrush _textColorBrush = null!;
 
     public int GravityX;
     public int GravityY;
