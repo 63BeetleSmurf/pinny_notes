@@ -13,6 +13,9 @@ namespace Pinny_Notes.ViewModels;
 
 public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyChangedMessage<object>>
 {
+    private const double _opaqueOpacity = 1.0;
+    private const double _transparentOpacity = 0.8;
+
     private static readonly Dictionary<ThemeColors, Color[]> _colors = new() {
         {
             ThemeColors.Yellow,
@@ -86,6 +89,11 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
         {
             case "SpellCheck":
                 SpellCheck = (bool)message.NewValue;
+                break;
+            case "TransparentNotes":
+            case "OpaqueWhenFocused":
+            case "OnlyTransparentWhenPinned":
+                UpdateOpacity();
                 break;
             case "ColorMode":
                 UpdateBrushes(CurrentThemeColor);
@@ -215,6 +223,20 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
         }
     }
 
+    public void UpdateOpacity()
+    {
+        bool transparentNotes = Properties.Settings.Default.TransparentNotes;
+        bool opaqueWhenFocused = Properties.Settings.Default.OpaqueWhenFocused;
+        bool onlyTransparentWhenPinned = Properties.Settings.Default.OnlyTransparentWhenPinned;
+
+        if (IsFocused)
+            Opacity = (transparentNotes && !opaqueWhenFocused) ? _transparentOpacity : _opaqueOpacity;
+        else if (IsPinned)
+            Opacity = transparentNotes ? _transparentOpacity : _opaqueOpacity;
+        else
+            Opacity = (transparentNotes && !onlyTransparentWhenPinned) ? _transparentOpacity : _opaqueOpacity;
+    }
+
     [ObservableProperty]
     private ThemeColors _currentThemeColor;
     partial void OnCurrentThemeColorChanged(ThemeColors value)
@@ -254,6 +276,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     [ObservableProperty]
     private bool _isPinned = false;
+    [ObservableProperty]
+    private bool _isFocused;
     [ObservableProperty]
     private bool _isSaved = false;
 

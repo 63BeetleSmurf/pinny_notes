@@ -98,24 +98,18 @@ public partial class NoteWindow : Window
         )
             WindowState = WindowState.Normal;
     }
-
-    private void NoteWindow_ActivatedChanged(object sender, EventArgs e)
+    private void Window_Activated(object sender, EventArgs e)
     {
-        if (IsActive)
-        {
-            Topmost = true;
-            if (Opacity != 1 && Properties.Settings.Default.OpaqueWhenFocused)
-                Opacity = 1;
-        }
-        else if (_viewModel.IsPinned)
-        {
-            Opacity = Properties.Settings.Default.TransparentNotes ? 0.8 : 1.0;
-        }
-        else
-        {
-            Topmost = false;
-            Opacity = (Properties.Settings.Default.TransparentNotes && !Properties.Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
-        }
+        Topmost = true;
+        _viewModel.IsFocused = true;
+        _viewModel.UpdateOpacity();
+    }
+
+    private void Window_Deactivated(object sender, EventArgs e)
+    {
+        Topmost = _viewModel.IsPinned;
+        _viewModel.IsFocused = false;
+        _viewModel.UpdateOpacity();
     }
 
     #endregion

@@ -21,8 +21,8 @@
         FocusManager.FocusedElement="{Binding ElementName=NoteTextBox}"
         BorderThickness="1"
         StateChanged="NoteWindow_StateChanged"
-        Activated="NoteWindow_ActivatedChanged"
-        Deactivated="NoteWindow_ActivatedChanged"
+        Activated="Window_Activated"
+        Deactivated="Window_Deactivated"
         Opacity="{Binding Opacity}"
         >
     <Window.Resources>
