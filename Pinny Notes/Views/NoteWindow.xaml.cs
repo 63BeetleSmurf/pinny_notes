@@ -125,7 +125,7 @@ public partial class NoteWindow : Window
         string copiedText = NoteTextBox.SelectedText;
         if (Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
-        Clipboard.SetText(copiedText);
+        Clipboard.SetDataObject(copiedText);
     }
 
     public void CutCommandExecute()
@@ -136,7 +136,7 @@ public partial class NoteWindow : Window
         string copiedText = NoteTextBox.SelectedText;
         if (Settings.Default.TrimCopiedText)
             copiedText = copiedText.Trim();
-        Clipboard.SetText(copiedText);
+        Clipboard.SetDataObject(copiedText);
         NoteTextBox.SelectedText = "";
     }
 
