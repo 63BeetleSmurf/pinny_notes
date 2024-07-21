@@ -8,6 +8,8 @@ namespace Pinny_Notes.Tools;
 
 public partial class RemoveTool : BaseTool, ITool
 {
+    private string? _selectedText = null;
+
     public enum ToolActions
     {
         RemoveSpaces,
@@ -15,7 +17,8 @@ public partial class RemoveTool : BaseTool, ITool
         RemoveNewLines,
         RemoveForwardSlashes,
         RemoveBackSlashes,
-        RemoveAllSlashes
+        RemoveAllSlashes,
+        RemoveSelected
     }
 
     public RemoveTool(TextBox noteTextBox) : base(noteTextBox)
@@ -28,11 +31,23 @@ public partial class RemoveTool : BaseTool, ITool
         _menuActions.Add(new("Forward Slashes (/)", MenuActionCommand, ToolActions.RemoveForwardSlashes));
         _menuActions.Add(new("Back Slashes (\\)", MenuActionCommand, ToolActions.RemoveBackSlashes));
         _menuActions.Add(new("All Slashes", MenuActionCommand, ToolActions.RemoveAllSlashes));
+        _menuActions.Add(new("-"));
+        _menuActions.Add(new("Selected", MenuActionCommand, ToolActions.RemoveSelected));
     }
 
     [RelayCommand]
     private void MenuAction(ToolActions action)
     {
+        if (action != ToolActions.RemoveSelected)
+        {
+            _selectedText = null;
+        }
+        else
+        {
+            _selectedText = _noteTextBox.SelectedText;
+            _noteTextBox.SelectionLength = 0;
+        }
+
         ApplyFunctionToNoteText(ModifyTextCallback, action);
     }
 
@@ -52,6 +67,10 @@ public partial class RemoveTool : BaseTool, ITool
                 return RemoveCharacters(text, ['\\']);
             case ToolActions.RemoveAllSlashes:
                 return RemoveCharacters(text, ['\\', '/']);
+            case ToolActions.RemoveSelected:
+                if (!string.IsNullOrEmpty(_selectedText))
+                    return RemoveString(text, _selectedText);
+                break;
         }
 
         return text;
@@ -68,5 +87,10 @@ public partial class RemoveTool : BaseTool, ITool
         }
 
         return stringBuilder.ToString();
+    }
+
+    private string RemoveString(string text, string toRemove)
+    {
+        return text.Replace(toRemove, "");
     }
 }
