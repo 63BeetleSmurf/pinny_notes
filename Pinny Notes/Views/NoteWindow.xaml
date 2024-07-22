@@ -24,6 +24,7 @@
         Activated="Window_Activated"
         Deactivated="Window_Deactivated"
         Opacity="{Binding Opacity}"
+        Icon="/Images/icon.ico"
         >
     <Window.Resources>
         <Style x:Key="FadeOutButton" TargetType="{x:Type Button}">
