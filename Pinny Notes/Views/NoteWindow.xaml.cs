@@ -71,9 +71,12 @@ public partial class NoteWindow : Window
 
     private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        // Check if the user has switched the mouse buttons
+        MouseButtonState primaryMouseButton = SystemParameters.SwapButtons ? e.RightButton : e.LeftButton;
+
         // Check mouse button is pressed as a missed click of a button
         // can cause issues with DragMove().
-        if (e.LeftButton == MouseButtonState.Pressed)
+        if (primaryMouseButton == MouseButtonState.Pressed)
         {
             DragMove();
 
