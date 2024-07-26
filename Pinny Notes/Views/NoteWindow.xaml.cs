@@ -26,6 +26,8 @@ public partial class NoteWindow : Window
     private RelayCommand _clearCommand = null!;
     private RelayCommand _saveCommand = null!;
 
+    private RelayCommand _resetSizeCommand = null!;
+
     private IEnumerable<ITool> _tools = [];
 
     #region NoteWindow
@@ -67,6 +69,8 @@ public partial class NoteWindow : Window
         ClearMenuItem.Command = _clearCommand;
         _saveCommand = new(SaveCommandExecute);
         SaveMenuItem.Command = _saveCommand;
+        _resetSizeCommand = new(ResetSizeCommandExecute);
+        ResetSizeMenuItem.Command = _resetSizeCommand;
     }
 
     private void NoteWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -169,6 +173,12 @@ public partial class NoteWindow : Window
     public void SaveCommandExecute()
     {
         SaveNote();
+    }
+
+    public void ResetSizeCommandExecute()
+    {
+        Width = NoteViewModel.DefaultWidth;
+        Height = NoteViewModel.DefaultHeight;
     }
 
     #endregion

@@ -102,6 +102,8 @@
                     <MenuItem Name="ClearMenuItem" Header="Clear"/>
                     <MenuItem Name="SaveMenuItem" Header="Save"/>
                     <Separator />
+                    <MenuItem Name="ResetSizeMenuItem" Header="Reset Size" />
+                    <Separator />
                     <MenuItem Header="Yellow" Command="{Binding ChangeThemeColorCommand}" CommandParameter="{x:Static enums:ThemeColors.Yellow}">
                         <MenuItem.Icon>
                             <Rectangle Width="16" Height="16" Fill="#fef7b1" />

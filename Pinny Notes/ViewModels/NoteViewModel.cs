@@ -14,6 +14,9 @@ namespace Pinny_Notes.ViewModels;
 
 public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyChangedMessage<object>>
 {
+    public const double DefaultWidth = 300.0;
+    public const double DefaultHeight = 300.0;
+
     private const double _opaqueOpacity = 1.0;
     private const double _transparentOpacity = 0.8;
 
@@ -269,9 +272,9 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private double _y;
 
     [ObservableProperty]
-    private double _width = 300;
+    private double _width = DefaultWidth;
     [ObservableProperty]
-    private double _height = 300;
+    private double _height = DefaultHeight;
 
     [ObservableProperty]
     private double _opacity = (Settings.Default.TransparentNotes && !Settings.Default.OnlyTransparentWhenPinned) ? 0.8 : 1.0;
