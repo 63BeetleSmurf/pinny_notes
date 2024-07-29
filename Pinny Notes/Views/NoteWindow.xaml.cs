@@ -369,14 +369,36 @@ public partial class NoteWindow : Window
             // Select the full lines so we can now easily get the required selected text
             NoteTextBox.Select(selectionStart, selectionEnd - selectionStart);
 
-            // Loop though each line adding or removing a tab where required
+            // Loop though each line adding or removing a tab, or block of 4 spaces, where required
             string[] lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
             for (int i = 0; i < lines.Length; i++)
             {
                 if (Keyboard.Modifiers == ModifierKeys.Shift)
                 {
-                    if (lines[i].Length > 0 && lines[i][0] == '\t')
-                        lines[i] = lines[i].Remove(0, 1);
+                    if (lines[i].Length > 0)
+                    {
+                        if (lines[i][0] == '\t')
+                            lines[i] = lines[i].Remove(0, 1);
+                        else if (lines[i][0] == ' ')
+                        {
+                            int concurrentSpaces = 0;
+                            foreach (char character in lines[i])
+                            {
+                                if (character != ' ')
+                                    break;
+                                concurrentSpaces++;
+                            }
+
+                            switch (concurrentSpaces) {
+                                case >= 4:
+                                    lines[i] = lines[i].Remove(0, 4);
+                                    break;
+                                case 1:
+                                    lines[i] = lines[i].Remove(0, concurrentSpaces);
+                                    break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
