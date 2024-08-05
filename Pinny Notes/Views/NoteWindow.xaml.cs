@@ -31,6 +31,7 @@ public partial class NoteWindow : Window
     private IEnumerable<ITool> _tools = [];
 
     #region NoteWindow
+
     public NoteWindow() : this(null) { }
     public NoteWindow(NoteViewModel? parentViewModel = null)
     {
@@ -157,6 +158,17 @@ public partial class NoteWindow : Window
         string clipboardString = Clipboard.GetText();
         if (Settings.Default.TrimPastedText)
             clipboardString = clipboardString.Trim();
+
+        // Replace tabs/spaces if specified
+        if (Settings.Default.ConvertIndentation)
+        {
+            string spaces = "".PadLeft(Settings.Default.TabWidth, ' ');
+
+            if (Settings.Default.TabSpaces)
+                clipboardString = clipboardString.Replace("\t", spaces);
+            else
+                clipboardString = clipboardString.Replace(spaces, "\t");
+        }
 
         bool hasSelectedText = (NoteTextBox.SelectionLength > 0);
         int caretIndex = (hasSelectedText) ? NoteTextBox.SelectionStart : NoteTextBox.CaretIndex;
@@ -347,7 +359,30 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Tab && NoteTextBox.SelectionLength > 0)
+        if (e.Key == Key.Tab && NoteTextBox.SelectionLength == 0 && Settings.Default.TabSpaces)
+        {
+            int spaceCount = Settings.Default.TabWidth;
+
+            int lineStart = NoteTextBox.GetCharacterIndexFromLineIndex(
+                NoteTextBox.GetLineIndexFromCharacterIndex(
+                    NoteTextBox.CaretIndex
+                )
+            );
+            if (lineStart != NoteTextBox.CaretIndex)
+            {
+                int lineCaretIndex = NoteTextBox.CaretIndex - lineStart;
+                int tabWidth = lineCaretIndex % spaceCount;
+                if (tabWidth > 0)
+                    spaceCount = spaceCount - tabWidth;
+            }
+            string spaces = "".PadLeft(spaceCount, ' ');
+
+            int caretIndex = NoteTextBox.CaretIndex;
+            NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, spaces);
+            NoteTextBox.CaretIndex = caretIndex + spaceCount;
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Tab && NoteTextBox.SelectionLength > 0)
         {
             int selectionStart = NoteTextBox.SelectionStart;
             int selectionEnd = NoteTextBox.SelectionStart + NoteTextBox.SelectionLength;
@@ -369,7 +404,8 @@ public partial class NoteWindow : Window
             // Select the full lines so we can now easily get the required selected text
             NoteTextBox.Select(selectionStart, selectionEnd - selectionStart);
 
-            // Loop though each line adding or removing a tab, or block of 4 spaces, where required
+            // Loop though each line adding or removing the indentation where required
+            string indentation = (Settings.Default.TabSpaces) ? "".PadLeft(Settings.Default.TabWidth, ' ') : "\t";
             string[] lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
             for (int i = 0; i < lines.Length; i++)
             {
@@ -402,7 +438,7 @@ public partial class NoteWindow : Window
                 }
                 else
                 {
-                    lines[i] = $"\t{lines[i]}";
+                    lines[i] = $"{indentation}{lines[i]}";
                 }
             }
 

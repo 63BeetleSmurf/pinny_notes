@@ -33,6 +33,12 @@
             <CheckBox Content="New Line At End" IsChecked="{Binding NewLineAtEnd}" />
             <CheckBox Margin="20,0,0,0" Content="Keep New Line At End Visible" IsEnabled="{Binding NewLineAtEnd}" IsChecked="{Binding KeepNewLineAtEndVisible}" />
             <CheckBox Content="Auto Indent" IsChecked="{Binding AutoIndent}" />
+            <CheckBox Content="Use spaces instead of tabs" IsChecked="{Binding TabSpaces}" />
+            <StackPanel Margin="20,0,0,0" Orientation="Horizontal">
+                <Label Content="Tab width"/>
+                <TextBox Width="50" Text="{Binding TabWidth}" />
+            </StackPanel>
+            <CheckBox Content="Convert indentation in pasted text" IsChecked="{Binding ConvertIndentation}" />
             <StackPanel Orientation="Horizontal">
                 <Label Content="Allow notes to be minimized"/>
                 <ComboBox

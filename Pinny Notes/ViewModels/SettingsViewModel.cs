@@ -46,6 +46,9 @@ public partial class SettingsViewModel : ObservableRecipient
         _newLineAtEnd = Settings.Default.NewLineAtEnd;
         _keepNewLineAtEndVisible = Settings.Default.KeepNewLineAtEndVisible;
         _autoIndent = Settings.Default.AutoIndent;
+        _tabSpaces = Settings.Default.TabSpaces;
+        _tabWidth = Settings.Default.TabWidth;
+        _convertIndentation = Settings.Default.ConvertIndentation;
         _minimizeMode = (MinimizeModes)Settings.Default.MinimizeMode;
         _transparentNotes = Settings.Default.TransparentNotes;
         _opaqueWhenFocused = Settings.Default.OpaqueWhenFocused;
@@ -114,6 +117,21 @@ public partial class SettingsViewModel : ObservableRecipient
     private bool _autoIndent;
     partial void OnAutoIndentChanged(bool oldValue, bool newValue) =>
         UpdateSetting(nameof(AutoIndent), oldValue, newValue);
+
+    [ObservableProperty]
+    private bool _tabSpaces;
+    partial void OnTabSpacesChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(TabSpaces), oldValue, newValue);
+
+    [ObservableProperty]
+    private int _tabWidth;
+    partial void OnTabWidthChanged(int oldValue, int newValue) =>
+        UpdateSetting(nameof(TabWidth), oldValue, newValue);
+
+    [ObservableProperty]
+    private bool _convertIndentation;
+    partial void OnConvertIndentationChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(ConvertIndentation), oldValue, newValue);
 
     [ObservableProperty]
     private MinimizeModes _minimizeMode;
