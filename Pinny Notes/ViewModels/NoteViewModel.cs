@@ -20,6 +20,8 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
     private const double _opaqueOpacity = 1.0;
     private const double _transparentOpacity = 0.8;
 
+    private const string _monoFontFamily = "Consolas";
+
     private static readonly Dictionary<ThemeColors, Color[]> _colors = new() {
         {
             ThemeColors.Yellow,
@@ -101,6 +103,9 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
                 break;
             case "ColorMode":
                 UpdateBrushes(CurrentThemeColor);
+                break;
+            case "UseMonoFont":
+                FontFamily = ((bool)message.NewValue) ? _monoFontFamily : "";
                 break;
         }
     }
@@ -291,6 +296,9 @@ public partial class NoteViewModel : ObservableRecipient, IRecipient<PropertyCha
 
     [ObservableProperty]
     private string _content = "";
+
+    [ObservableProperty]
+    private string _fontFamily = (Settings.Default.UseMonoFont) ? _monoFontFamily : "";
 
     [RelayCommand]
     private void ChangeThemeColor(ThemeColors themeColor) => CurrentThemeColor = themeColor;

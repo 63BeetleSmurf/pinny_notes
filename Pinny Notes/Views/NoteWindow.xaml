@@ -245,6 +245,7 @@
                 VerticalScrollBarVisibility="Auto"
                 SpellCheck.IsEnabled="{Binding SpellCheck}"
                 Text="{Binding Content}"
+                FontFamily="{Binding FontFamily}"
                 />
         </Grid>
     </Grid>

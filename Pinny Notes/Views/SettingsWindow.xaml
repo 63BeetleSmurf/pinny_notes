@@ -62,6 +62,7 @@
                     SelectedValue="{Binding ColorMode, Mode=TwoWay}"
                     />
             </StackPanel>
+            <CheckBox Content="Use mono font" IsChecked="{Binding UseMonoFont}" />
             <Button x:Name="CloseButton" Content="Close" Click="CloseButton_Click" />
         </StackPanel>
     </Grid>

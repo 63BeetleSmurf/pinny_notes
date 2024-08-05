@@ -250,5 +250,17 @@ namespace Pinny_Notes.Properties {
                 this["ConvertIndentation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseMonoFont {
+            get {
+                return ((bool)(this["UseMonoFont"]));
+            }
+            set {
+                this["UseMonoFont"] = value;
+            }
+        }
     }
 }

@@ -54,6 +54,7 @@ public partial class SettingsViewModel : ObservableRecipient
         _opaqueWhenFocused = Settings.Default.OpaqueWhenFocused;
         _onlyTransparentWhenPinned = Settings.Default.OnlyTransparentWhenPinned;
         _colorMode = (ColorModes)Settings.Default.ColorMode;
+        _useMonoFont = Settings.Default.UseMonoFont;
     }
 
     public KeyValuePair<StartupPositions, string>[] StartupPositionsList => _startupPositionsList;
@@ -157,4 +158,9 @@ public partial class SettingsViewModel : ObservableRecipient
     private ColorModes _colorMode;
     partial void OnColorModeChanged(ColorModes oldValue, ColorModes newValue) =>
         UpdateSetting(nameof(ColorMode), (int)oldValue, (int)newValue);
+
+    [ObservableProperty]
+    private bool _useMonoFont;
+    partial void OnUseMonoFontChanged(bool oldValue, bool newValue) =>
+        UpdateSetting(nameof(UseMonoFont), oldValue, newValue);
 }
