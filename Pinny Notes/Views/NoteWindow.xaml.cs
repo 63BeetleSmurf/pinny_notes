@@ -359,92 +359,120 @@ public partial class NoteWindow : Window
 
     private void NoteTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Tab && NoteTextBox.SelectionLength == 0 && Settings.Default.TabSpaces)
+        if (e.Key == Key.Tab)
         {
-            int spaceCount = Settings.Default.TabWidth;
-
-            int lineStart = NoteTextBox.GetCharacterIndexFromLineIndex(
-                NoteTextBox.GetLineIndexFromCharacterIndex(
-                    NoteTextBox.CaretIndex
-                )
-            );
-            if (lineStart != NoteTextBox.CaretIndex)
+            if (NoteTextBox.SelectionLength == 0 && Keyboard.Modifiers != ModifierKeys.Shift && Settings.Default.TabSpaces)
             {
-                int lineCaretIndex = NoteTextBox.CaretIndex - lineStart;
-                int tabWidth = lineCaretIndex % spaceCount;
-                if (tabWidth > 0)
-                    spaceCount = spaceCount - tabWidth;
-            }
-            string spaces = "".PadLeft(spaceCount, ' ');
+                int spaceCount = Settings.Default.TabWidth;
 
-            int caretIndex = NoteTextBox.CaretIndex;
-            NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, spaces);
-            NoteTextBox.CaretIndex = caretIndex + spaceCount;
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Tab && NoteTextBox.SelectionLength > 0)
-        {
-            int selectionStart = NoteTextBox.SelectionStart;
-            int selectionEnd = NoteTextBox.SelectionStart + NoteTextBox.SelectionLength;
-
-            // Fix the selection so full lines, not wrapped lines, are selected
-            // Find the starting line by making sure the previous line ends with a new line
-            int startLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionStart);
-            while (startLineIndex > 0 && !NoteTextBox.GetLineText(startLineIndex - 1).Contains(Environment.NewLine))
-                startLineIndex--;
-            selectionStart = NoteTextBox.GetCharacterIndexFromLineIndex(startLineIndex);
-
-            // Find the end line by making sure it ends with a new line
-            int endLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionEnd);
-            int lineCount = GetLineCount();
-            while (endLineIndex < lineCount - 1 && !NoteTextBox.GetLineText(endLineIndex).Contains(Environment.NewLine))
-                endLineIndex++;
-            selectionEnd = NoteTextBox.GetCharacterIndexFromLineIndex(endLineIndex) + NoteTextBox.GetLineLength(endLineIndex) - Environment.NewLine.Length;
-
-            // Select the full lines so we can now easily get the required selected text
-            NoteTextBox.Select(selectionStart, selectionEnd - selectionStart);
-
-            // Loop though each line adding or removing the indentation where required
-            string indentation = (Settings.Default.TabSpaces) ? "".PadLeft(Settings.Default.TabWidth, ' ') : "\t";
-            string[] lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
-            for (int i = 0; i < lines.Length; i++)
-            {
-                if (Keyboard.Modifiers == ModifierKeys.Shift)
+                int lineStart = NoteTextBox.GetCharacterIndexFromLineIndex(
+                    NoteTextBox.GetLineIndexFromCharacterIndex(
+                        NoteTextBox.CaretIndex
+                    )
+                );
+                if (lineStart != NoteTextBox.CaretIndex)
                 {
-                    if (lines[i].Length > 0)
-                    {
-                        if (lines[i][0] == '\t')
-                            lines[i] = lines[i].Remove(0, 1);
-                        else if (lines[i][0] == ' ')
-                        {
-                            int concurrentSpaces = 0;
-                            foreach (char character in lines[i])
-                            {
-                                if (character != ' ')
-                                    break;
-                                concurrentSpaces++;
-                            }
+                    int lineCaretIndex = NoteTextBox.CaretIndex - lineStart;
+                    int tabWidth = lineCaretIndex % spaceCount;
+                    if (tabWidth > 0)
+                        spaceCount = spaceCount - tabWidth;
+                }
+                string spaces = "".PadLeft(spaceCount, ' ');
 
-                            switch (concurrentSpaces) {
-                                case >= 4:
-                                    lines[i] = lines[i].Remove(0, 4);
-                                    break;
-                                case 1:
-                                    lines[i] = lines[i].Remove(0, concurrentSpaces);
-                                    break;
+                int caretIndex = NoteTextBox.CaretIndex;
+                NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, spaces);
+                NoteTextBox.CaretIndex = caretIndex + spaceCount;
+                e.Handled = true;
+            }
+            else if (NoteTextBox.SelectionLength == 0 && Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                int caretIndex = NoteTextBox.CaretIndex;
+                if (NoteTextBox.Text[caretIndex - 1] == '\t')
+                {
+                    NoteTextBox.Text = NoteTextBox.Text.Remove(caretIndex - 1, 1);
+                    NoteTextBox.CaretIndex = caretIndex - 1;
+                }
+                else if (Settings.Default.TabSpaces && NoteTextBox.Text[caretIndex - 1] == ' ')
+                {
+                    int lineStart = NoteTextBox.GetCharacterIndexFromLineIndex(
+                        NoteTextBox.GetLineIndexFromCharacterIndex(
+                            NoteTextBox.CaretIndex
+                        )
+                    );
+
+                    int tabStartIndex = caretIndex - 1;
+                    while (NoteTextBox.Text[tabStartIndex - 1] == ' ' && tabStartIndex % Settings.Default.TabWidth != 0)
+                        tabStartIndex--;
+                    NoteTextBox.Text = NoteTextBox.Text.Remove(tabStartIndex, caretIndex - tabStartIndex);
+                    NoteTextBox.CaretIndex = tabStartIndex;
+                }
+                e.Handled = true;
+            }
+            else if (NoteTextBox.SelectionLength > 0)
+            {
+                int selectionStart = NoteTextBox.SelectionStart;
+                int selectionEnd = NoteTextBox.SelectionStart + NoteTextBox.SelectionLength;
+
+                // Fix the selection so full lines, not wrapped lines, are selected
+                // Find the starting line by making sure the previous line ends with a new line
+                int startLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionStart);
+                while (startLineIndex > 0 && !NoteTextBox.GetLineText(startLineIndex - 1).Contains(Environment.NewLine))
+                    startLineIndex--;
+                selectionStart = NoteTextBox.GetCharacterIndexFromLineIndex(startLineIndex);
+
+                // Find the end line by making sure it ends with a new line
+                int endLineIndex = NoteTextBox.GetLineIndexFromCharacterIndex(selectionEnd);
+                int lineCount = GetLineCount();
+                while (endLineIndex < lineCount - 1 && !NoteTextBox.GetLineText(endLineIndex).Contains(Environment.NewLine))
+                    endLineIndex++;
+                selectionEnd = NoteTextBox.GetCharacterIndexFromLineIndex(endLineIndex) + NoteTextBox.GetLineLength(endLineIndex) - Environment.NewLine.Length;
+
+                // Select the full lines so we can now easily get the required selected text
+                NoteTextBox.Select(selectionStart, selectionEnd - selectionStart);
+
+                // Loop though each line adding or removing the indentation where required
+                string indentation = (Settings.Default.TabSpaces) ? "".PadLeft(Settings.Default.TabWidth, ' ') : "\t";
+                string[] lines = NoteTextBox.SelectedText.Split(Environment.NewLine);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (Keyboard.Modifiers == ModifierKeys.Shift)
+                    {
+                        if (lines[i].Length > 0)
+                        {
+                            if (lines[i][0] == '\t')
+                                lines[i] = lines[i].Remove(0, 1);
+                            else if (lines[i][0] == ' ')
+                            {
+                                int concurrentSpaces = 0;
+                                foreach (char character in lines[i])
+                                {
+                                    if (character != ' ')
+                                        break;
+                                    concurrentSpaces++;
+                                }
+
+                                switch (concurrentSpaces)
+                                {
+                                    case >= 4:
+                                        lines[i] = lines[i].Remove(0, 4);
+                                        break;
+                                    case 1:
+                                        lines[i] = lines[i].Remove(0, concurrentSpaces);
+                                        break;
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        lines[i] = $"{indentation}{lines[i]}";
+                    }
                 }
-                else
-                {
-                    lines[i] = $"{indentation}{lines[i]}";
-                }
+
+                NoteTextBox.SelectedText = string.Join(Environment.NewLine, lines);
+
+                e.Handled = true;
             }
-
-            NoteTextBox.SelectedText = string.Join(Environment.NewLine, lines);
-
-            e.Handled = true;
         }
         else if (e.Key == Key.Return && Settings.Default.AutoIndent)
         {
