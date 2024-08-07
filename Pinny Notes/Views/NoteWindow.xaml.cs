@@ -361,27 +361,34 @@ public partial class NoteWindow : Window
     {
         if (e.Key == Key.Tab)
         {
-            if (NoteTextBox.SelectionLength == 0 && Keyboard.Modifiers != ModifierKeys.Shift && Settings.Default.TabSpaces)
+            if ((NoteTextBox.SelectionLength == 0 || !NoteTextBox.SelectedText.Contains(Environment.NewLine)) && Keyboard.Modifiers != ModifierKeys.Shift && Settings.Default.TabSpaces)
             {
                 int spaceCount = Settings.Default.TabWidth;
+                int caretIndex = (NoteTextBox.SelectionLength == 0) ? NoteTextBox.CaretIndex : NoteTextBox.SelectionStart;
 
                 int lineStart = NoteTextBox.GetCharacterIndexFromLineIndex(
-                    NoteTextBox.GetLineIndexFromCharacterIndex(
-                        NoteTextBox.CaretIndex
-                    )
+                    NoteTextBox.GetLineIndexFromCharacterIndex(caretIndex)
                 );
-                if (lineStart != NoteTextBox.CaretIndex)
+                if (lineStart != caretIndex)
                 {
-                    int lineCaretIndex = NoteTextBox.CaretIndex - lineStart;
+                    int lineCaretIndex = caretIndex - lineStart;
                     int tabWidth = lineCaretIndex % spaceCount;
                     if (tabWidth > 0)
                         spaceCount = spaceCount - tabWidth;
                 }
                 string spaces = "".PadLeft(spaceCount, ' ');
 
-                int caretIndex = NoteTextBox.CaretIndex;
-                NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, spaces);
-                NoteTextBox.CaretIndex = caretIndex + spaceCount;
+                if (NoteTextBox.SelectionLength == 0)
+                {
+                    NoteTextBox.Text = NoteTextBox.Text.Insert(caretIndex, spaces);
+                    NoteTextBox.CaretIndex = caretIndex + spaceCount;
+                }
+                else
+                {
+                    NoteTextBox.SelectedText = spaces;
+                    NoteTextBox.SelectionLength = 0;
+                    NoteTextBox.CaretIndex = caretIndex + spaceCount;
+                }
                 e.Handled = true;
             }
             else if (NoteTextBox.SelectionLength == 0 && Keyboard.Modifiers == ModifierKeys.Shift)
@@ -408,7 +415,7 @@ public partial class NoteWindow : Window
                 }
                 e.Handled = true;
             }
-            else if (NoteTextBox.SelectionLength > 0)
+            else if (NoteTextBox.SelectionLength > 0 && NoteTextBox.SelectedText.Contains(Environment.NewLine))
             {
                 int selectionStart = NoteTextBox.SelectionStart;
                 int selectionEnd = NoteTextBox.SelectionStart + NoteTextBox.SelectionLength;
